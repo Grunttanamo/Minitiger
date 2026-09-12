@@ -1,15 +1,21 @@
 import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models/base-item-kind';
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models/image-type';
+import { ItemFields } from '@jellyfin/sdk/lib/generated-client/models/item-fields';
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by';
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order';
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
+import { useNextUp } from 'apps/legacy/features/libraries/api/useNextUp';
+import { useResumeItems } from 'apps/legacy/features/libraries/api/useResumeItems';
 import { appRouter } from 'components/router/appRouter';
 import { useUserViews } from 'hooks/api/useUserViews';
 import { useApi } from 'hooks/useApi';
 import { useGetItems } from 'hooks/useFetchItems';
+import type { ItemDto } from 'types/base/models/item-dto';
 
+import MinitigerHero from './components/MinitigerHero';
+import MinitigerMediaRow from './components/MinitigerMediaRow';
 import './MinitigerHome.scss';
 
 const getLibraryIcon = (collectionType?: string | null) => {
@@ -54,58 +60,10 @@ const getLibraryTypeName = (collectionType?: string | null) => {
     }
 };
 
-const getMediaTypeName = (type?: string | null) => {
-    switch (String(type ?? '').toLowerCase()) {
-        case 'movie':
-            return 'Film';
-        case 'series':
-            return 'Serie';
-        case 'episode':
-            return 'Episode';
-        case 'audio':
-            return 'Musik';
-        case 'musicalbum':
-            return 'Album';
-        case 'musicvideo':
-            return 'Musikvideo';
-        case 'book':
-            return 'Buch';
-        case 'video':
-            return 'Video';
-        default:
-            return type ?? 'Medium';
-    }
-};
-
-interface PosterProps {
-    imageUrl?: string;
-}
-
-const MinitigerPoster = ({ imageUrl }: PosterProps) => {
-    const [ imageFailed, setImageFailed ] = useState(false);
-
-    if (!imageUrl || imageFailed) {
-        return (
-            <div className='minitigerPosterFallback'>
-                🐯
-            </div>
-        );
-    }
-
-    return (
-        <img
-            src={imageUrl}
-            alt=''
-            loading='lazy'
-            onError={() => setImageFailed(true)}
-        />
-    );
-};
-
 const MinitigerHome = () => {
     const {
         user,
-        __legacyApiClient__: legacyApiClient
+        __legacyApiClient__: apiClient
     } = useApi();
 
     const {
@@ -114,6 +72,44 @@ const MinitigerHome = () => {
         isError: librariesError
     } = useUserViews({
         userId: user?.Id
+    });
+
+    const {
+        data: resumeData,
+        isPending: resumePending,
+        isError: resumeError
+    } = useResumeItems({
+        limit: 18,
+        fields: [
+            ItemFields.PrimaryImageAspectRatio
+        ],
+        imageTypeLimit: 1,
+        enableImageTypes: [
+            ImageType.Primary,
+            ImageType.Backdrop,
+            ImageType.Thumb
+        ],
+        enableTotalRecordCount: false
+    });
+
+    const {
+        data: nextUpData,
+        isPending: nextUpPending,
+        isError: nextUpError
+    } = useNextUp({
+        limit: 18,
+        fields: [
+            ItemFields.PrimaryImageAspectRatio,
+            ItemFields.DateCreated
+        ],
+        imageTypeLimit: 1,
+        enableImageTypes: [
+            ImageType.Primary,
+            ImageType.Backdrop,
+            ImageType.Thumb
+        ],
+        enableTotalRecordCount: false,
+        enableResumable: false
     });
 
     const {
@@ -140,173 +136,122 @@ const MinitigerHome = () => {
     });
 
     const libraries = userViewsData?.Items ?? [];
+    const resumeItems = (resumeData?.Items ?? []) as ItemDto[];
+    const nextUpItems = (nextUpData?.Items ?? []) as ItemDto[];
     const recentItems = recentItemsData?.Items ?? [];
 
     return (
         <main className='minitigerHome'>
-            <section className='minitigerIntro'>
-                <div className='minitigerIntroEyebrow'>
-                    MINITIGER WEB
-                </div>
+            <MinitigerHero />
 
-                <h1>
-                    Willkommen zurück{user?.Name ? `, ${user.Name}` : ''}.
-                </h1>
+            <div className='minitigerHomeContent'>
+                <section className='minitigerSection minitigerLibrarySection'>
+                    <div className='minitigerSectionHeader'>
+                        <div>
+                            <span className='minitigerSectionAccent' />
+                            <h2>Meine Medien</h2>
+                        </div>
 
-                <p>
-                    Native Jellyfin Web 12 Oberfläche
-                </p>
-            </section>
-
-            <section className='minitigerSection'>
-                <div className='minitigerSectionHeader'>
-                    <div>
-                        <span className='minitigerSectionAccent' />
-                        <h2>Meine Medien</h2>
+                        {!librariesPending && !librariesError && (
+                            <span className='minitigerLibraryCount'>
+                                {libraries.length} Bibliotheken
+                            </span>
+                        )}
                     </div>
 
-                    {!librariesPending && !librariesError && (
-                        <span className='minitigerLibraryCount'>
-                            {libraries.length} Bibliotheken
-                        </span>
+                    {librariesPending && (
+                        <div className='minitigerStatusCard'>
+                            Bibliotheken werden geladen …
+                        </div>
                     )}
-                </div>
 
-                {librariesPending && (
-                    <div className='minitigerStatusCard'>
-                        Bibliotheken werden geladen …
-                    </div>
-                )}
-
-                {librariesError && (
-                    <div className='minitigerStatusCard minitigerStatusError'>
-                        Die Bibliotheken konnten nicht geladen werden.
-                    </div>
-                )}
-
-                {!librariesPending && !librariesError && libraries.length === 0 && (
-                    <div className='minitigerStatusCard'>
-                        Keine Bibliotheken gefunden.
-                    </div>
-                )}
-
-                {!librariesPending && !librariesError && libraries.length > 0 && (
-                    <div className='minitigerLibraryGrid'>
-                        {libraries.map((library) => (
-                            <Link
-                                key={library.Id ?? library.Name}
-                                className='minitigerLibraryCard'
-                                to={appRouter
-                                    .getRouteUrl(
-                                        library,
-                                        { context: library.CollectionType }
-                                    )
-                                    .substring(1)}
-                            >
-                                <div className='minitigerLibraryGlow' />
-
-                                <div className='minitigerLibraryIcon'>
-                                    {getLibraryIcon(library.CollectionType)}
-                                </div>
-
-                                <div className='minitigerLibraryInfo'>
-                                    <strong>
-                                        {library.Name ?? 'Bibliothek'}
-                                    </strong>
-
-                                    <span>
-                                        {getLibraryTypeName(
-                                            library.CollectionType
-                                        )}
-                                    </span>
-                                </div>
-
-                                <div className='minitigerLibraryArrow'>
-                                    ›
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
-            </section>
-
-            <section className='minitigerSection minitigerMediaSection'>
-                <div className='minitigerSectionHeader'>
-                    <div>
-                        <span className='minitigerSectionAccent' />
-                        <h2>Neu hinzugefügt</h2>
-                    </div>
-
-                    {!recentPending && !recentError && recentItems.length > 0 && (
-                        <span className='minitigerLibraryCount'>
-                            {recentItems.length} Einträge
-                        </span>
+                    {librariesError && (
+                        <div className='minitigerStatusCard minitigerStatusError'>
+                            Die Bibliotheken konnten nicht geladen werden.
+                        </div>
                     )}
-                </div>
 
-                {recentPending && (
-                    <div className='minitigerStatusCard'>
-                        Medien werden geladen …
-                    </div>
-                )}
+                    {!librariesPending
+                        && !librariesError
+                        && libraries.length > 0
+                        && (
+                            <div className='minitigerLibraryGrid'>
+                                {libraries.map((library) => (
+                                    <Link
+                                        key={library.Id ?? library.Name}
+                                        className='minitigerLibraryCard'
+                                        to={appRouter
+                                            .getRouteUrl(
+                                                library,
+                                                {
+                                                    context:
+                                                        library.CollectionType
+                                                }
+                                            )
+                                            .substring(1)}
+                                    >
+                                        <div className='minitigerLibraryGlow' />
 
-                {recentError && (
-                    <div className='minitigerStatusCard minitigerStatusError'>
-                        Die Medien konnten nicht geladen werden.
-                    </div>
-                )}
+                                        <div className='minitigerLibraryIcon'>
+                                            {getLibraryIcon(
+                                                library.CollectionType
+                                            )}
+                                        </div>
 
-                {!recentPending && !recentError && recentItems.length === 0 && (
-                    <div className='minitigerStatusCard'>
-                        Keine Medien gefunden.
-                    </div>
-                )}
+                                        <div className='minitigerLibraryInfo'>
+                                            <strong>
+                                                {library.Name ?? 'Bibliothek'}
+                                            </strong>
 
-                {!recentPending && !recentError && recentItems.length > 0 && (
-                    <div className='minitigerMediaRow'>
-                        {recentItems.map((item) => {
-                            const imageUrl = item.Id
-                                ? legacyApiClient?.getImageUrl(item.Id, {
-                                    type: 'Primary',
-                                    tag: item.ImageTags?.Primary,
-                                    maxWidth: 420,
-                                    quality: 90
-                                }) || undefined
-                                : undefined;
+                                            <span>
+                                                {getLibraryTypeName(
+                                                    library.CollectionType
+                                                )}
+                                            </span>
+                                        </div>
 
-                            return (
-                                <Link
-                                    key={item.Id ?? item.Name}
-                                    className='minitigerMediaCard'
-                                    to={appRouter.getRouteUrl(item)}
-                                >
-                                    <div className='minitigerPoster'>
-                                        <MinitigerPoster imageUrl={imageUrl} />
-                                        <div className='minitigerPosterShade' />
-                                    </div>
+                                        <div className='minitigerLibraryArrow'>
+                                            ›
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                </section>
 
-                                    <div className='minitigerMediaInfo'>
-                                        <strong title={item.Name ?? undefined}>
-                                            {item.Name ?? 'Unbekannt'}
-                                        </strong>
+                <MinitigerMediaRow
+                    title='Fortsetzen'
+                    items={resumeItems}
+                    apiClient={apiClient}
+                    pending={resumePending}
+                    error={resumeError}
+                    variant='landscape'
+                    showProgress
+                />
 
-                                        <span>
-                                            {getMediaTypeName(item.Type)}
-                                            {item.ProductionYear
-                                                ? ` · ${item.ProductionYear}`
-                                                : ''}
-                                        </span>
-                                    </div>
-                                </Link>
-                            );
-                        })}
-                    </div>
-                )}
-            </section>
+                <MinitigerMediaRow
+                    title='Als Nächstes'
+                    items={nextUpItems}
+                    apiClient={apiClient}
+                    pending={nextUpPending}
+                    error={nextUpError}
+                    variant='landscape'
+                />
 
-            <footer className='minitigerDevFooter'>
-                🐯 Minitiger Native Home · Phase 2.1
-            </footer>
+                <MinitigerMediaRow
+                    title='Neu hinzugefügt'
+                    items={recentItems}
+                    apiClient={apiClient}
+                    pending={recentPending}
+                    error={recentError}
+                    variant='poster'
+                    emptyText='Keine neuen Medien gefunden.'
+                />
+
+                <footer className='minitigerDevFooter'>
+                    🐯 Minitiger Native Home · Phase 3
+                </footer>
+            </div>
         </main>
     );
 };

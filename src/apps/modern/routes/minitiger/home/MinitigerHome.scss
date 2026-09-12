@@ -1,42 +1,312 @@
 .minitigerHome {
     --mt-accent: #e8a52c;
+    --mt-accent-hover: #f2b842;
+    --mt-accent-text: #111111;
     --mt-accent-soft: rgba(232, 165, 44, 0.18);
     --mt-card: rgba(255, 255, 255, 0.055);
     --mt-card-hover: rgba(255, 255, 255, 0.095);
     --mt-border: rgba(255, 255, 255, 0.10);
+    --mt-button: #34373e;
+    --mt-button-hover: #50545e;
 
     min-height: calc(100vh - 4rem);
     box-sizing: border-box;
-    padding: 3.2rem max(2rem, 4vw) 4rem;
+    padding: 0 0 4rem;
 }
 
-.minitigerIntro {
-    margin: 0 0 3rem;
+.minitigerHomeContent {
+    padding: 0 max(2rem, 4vw);
 }
 
-.minitigerIntroEyebrow {
-    color: var(--mt-accent);
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.18em;
-    margin-bottom: 0.65rem;
+/* =========================================================
+   HERO / BANNER
+   ========================================================= */
+
+.minitigerHero {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: min(31vw, 640px);
+    min-height: 390px;
+    margin: 0 0 2.2rem;
+    overflow: hidden;
+    background:
+        radial-gradient(
+            circle at 70% 35%,
+            rgba(232, 165, 44, 0.08),
+            transparent 40%
+        ),
+        #08090b;
+    isolation: isolate;
+    -webkit-mask-image:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 1) 91%,
+            rgba(0, 0, 0, 0.82) 94%,
+            rgba(0, 0, 0, 0.38) 97%,
+            rgba(0, 0, 0, 0) 100%
+        );
+    mask-image:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 1) 0%,
+            rgba(0, 0, 0, 1) 91%,
+            rgba(0, 0, 0, 0.82) 94%,
+            rgba(0, 0, 0, 0.38) 97%,
+            rgba(0, 0, 0, 0) 100%
+        );
 }
 
-.minitigerIntro h1 {
+.minitigerHeroBackdrop,
+.minitigerHeroShade {
+    position: absolute;
+    inset: 0;
+}
+
+.minitigerHeroBackdrop {
+    z-index: 1;
+    background:
+        radial-gradient(
+            circle at 70% 40%,
+            rgba(232, 165, 44, 0.10),
+            transparent 40%
+        ),
+        #111318;
+}
+
+.minitigerHeroBackdrop img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center 25%;
+    animation: minitigerHeroFadeIn 450ms ease both;
+}
+
+@keyframes minitigerHeroFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(1.01);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.minitigerHeroShade {
+    z-index: 2;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(5, 7, 10, 0.97) 0%,
+            rgba(5, 7, 10, 0.86) 21%,
+            rgba(5, 7, 10, 0.48) 48%,
+            rgba(5, 7, 10, 0.13) 73%,
+            rgba(5, 7, 10, 0.30) 100%
+        ),
+        linear-gradient(
+            0deg,
+            rgba(5, 7, 10, 0.82) 0%,
+            transparent 36%
+        );
+}
+
+.minitigerHeroContent {
+    position: absolute;
+    z-index: 4;
+    left: max(2rem, 4vw);
+    bottom: 17%;
+    width: min(38rem, 44vw);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.72rem;
+}
+
+.minitigerHeroLogoHost {
+    min-height: 5rem;
+    display: flex;
+    align-items: flex-end;
+}
+
+.minitigerHeroLogo {
+    display: block;
+    max-width: min(25vw, 430px);
+    max-height: 9.5rem;
+    object-fit: contain;
+    object-position: left bottom;
+    filter: drop-shadow(0 2px 7px rgba(0, 0, 0, 0.55));
+}
+
+.minitigerHeroTitle {
     margin: 0;
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    font-weight: 750;
-    line-height: 1.05;
+    max-width: 100%;
+    font-size: clamp(2rem, 3.1vw, 4.8rem);
+    line-height: 0.98;
+    font-weight: 850;
+    letter-spacing: -0.035em;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
 }
 
-.minitigerIntro p {
-    margin: 0.8rem 0 0;
-    opacity: 0.55;
-    font-size: 1rem;
+.minitigerHeroMeta {
+    font-size: 0.96rem;
+    font-weight: 750;
+    color: var(--mt-accent);
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.9);
 }
+
+.minitigerHeroOverview {
+    margin: 0;
+    max-width: 38rem;
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    font-size: 1rem;
+    line-height: 1.48;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+}
+
+.minitigerHeroActions {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.18rem;
+    flex-wrap: wrap;
+}
+
+.minitigerHeroButton {
+    min-height: 2.65rem;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.42rem;
+    padding: 0.62rem 1.05rem;
+    border: 1px solid var(--mt-button);
+    border-radius: 5px;
+    background: var(--mt-button);
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        transform 150ms ease,
+        background 150ms ease,
+        border-color 150ms ease;
+}
+
+.minitigerHeroButton:hover,
+.minitigerHeroButton:focus-visible {
+    transform: translateY(-1px);
+    background: var(--mt-button-hover);
+    border-color: var(--mt-button-hover);
+    outline: none;
+}
+
+.minitigerHeroButton:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+.minitigerHeroPlay {
+    background: var(--mt-accent);
+    border-color: var(--mt-accent);
+    color: var(--mt-accent-text);
+}
+
+.minitigerHeroPlay:hover,
+.minitigerHeroPlay:focus-visible {
+    background: var(--mt-accent-hover);
+    border-color: var(--mt-accent-hover);
+    color: var(--mt-accent-text);
+}
+
+.minitigerHeroFavoriteOn {
+    background: var(--mt-button-hover);
+    border-color: var(--mt-accent);
+}
+
+.minitigerHeroNavigation {
+    position: absolute;
+    z-index: 5;
+    right: max(2rem, 4vw);
+    bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+}
+
+.minitigerHeroArrow {
+    width: 2.35rem;
+    height: 2.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    background: var(--mt-button);
+    color: #fff;
+    font-size: 1.6rem;
+    cursor: pointer;
+}
+
+.minitigerHeroArrow:hover,
+.minitigerHeroArrow:focus-visible {
+    background: var(--mt-button-hover);
+    outline: none;
+}
+
+.minitigerHeroCounter {
+    min-width: 3.2rem;
+    padding: 0.42rem 0.58rem;
+    border-radius: 5px;
+    background: rgba(15, 17, 20, 0.72);
+    text-align: center;
+    font-weight: 700;
+}
+
+.minitigerHeroLoading,
+.minitigerHeroFallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.minitigerHeroLoadingText {
+    opacity: 0.55;
+    font-weight: 700;
+}
+
+.minitigerHeroFallbackInner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.minitigerHeroFallbackInner span {
+    font-size: 4rem;
+}
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
 
 .minitigerSection {
     width: 100%;
+}
+
+.minitigerLibrarySection {
+    margin-top: 0.3rem;
 }
 
 .minitigerMediaSection {
@@ -76,6 +346,10 @@
     opacity: 0.5;
     font-size: 0.85rem;
 }
+
+/* =========================================================
+   LIBRARY CARDS
+   ========================================================= */
 
 .minitigerLibraryGrid {
     display: grid;
@@ -172,6 +446,10 @@
     transform: translateX(3px);
 }
 
+/* =========================================================
+   MEDIA ROWS
+   ========================================================= */
+
 .minitigerMediaRow {
     display: flex;
     gap: 1rem;
@@ -191,6 +469,10 @@
     transition: transform 160ms ease;
 }
 
+.minitigerMediaCardLandscape {
+    flex-basis: 300px;
+}
+
 .minitigerMediaCard:hover,
 .minitigerMediaCard:focus-visible {
     transform: translateY(-5px);
@@ -204,6 +486,10 @@
     border-radius: 13px;
     background: var(--mt-card);
     border: 1px solid var(--mt-border);
+}
+
+.minitigerPosterLandscape {
+    aspect-ratio: 16 / 9;
 }
 
 .minitigerPoster img {
@@ -228,8 +514,8 @@
     background:
         linear-gradient(
             to bottom,
-            transparent 70%,
-            rgba(0, 0, 0, 0.25) 100%
+            transparent 68%,
+            rgba(0, 0, 0, 0.28) 100%
         );
 }
 
@@ -249,6 +535,21 @@
     font-size: 2.4rem;
 }
 
+.minitigerProgressTrack {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 4px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.minitigerProgressValue {
+    height: 100%;
+    background: var(--mt-accent);
+}
+
 .minitigerMediaInfo {
     min-width: 0;
     padding: 0.75rem 0.15rem 0;
@@ -257,12 +558,16 @@
     gap: 0.28rem;
 }
 
-.minitigerMediaInfo strong {
+.minitigerMediaInfo strong,
+.minitigerMediaInfo span {
     overflow: hidden;
-    font-size: 0.95rem;
-    line-height: 1.25;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.minitigerMediaInfo strong {
+    font-size: 0.95rem;
+    line-height: 1.25;
 }
 
 .minitigerMediaInfo span {
@@ -289,9 +594,55 @@
     font-size: 0.75rem;
 }
 
-@media (max-width: 700px) {
-    .minitigerHome {
-        padding: 2rem 1rem 3rem;
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 70em) {
+    .minitigerHero {
+        height: 56vw;
+        min-height: 360px;
+    }
+
+    .minitigerHeroContent {
+        bottom: 14%;
+        width: min(38rem, 72vw);
+    }
+
+    .minitigerHeroLogo {
+        max-width: 52vw;
+    }
+}
+
+@media (max-width: 46em) {
+    .minitigerHomeContent {
+        padding: 0 1rem;
+    }
+
+    .minitigerHero {
+        height: 72vw;
+        min-height: 390px;
+    }
+
+    .minitigerHeroContent {
+        left: 1rem;
+        width: calc(100% - 2rem);
+        bottom: 15%;
+    }
+
+    .minitigerHeroLogo {
+        max-width: 68vw;
+        max-height: 7rem;
+    }
+
+    .minitigerHeroOverview {
+        -webkit-line-clamp: 3;
+        font-size: 0.92rem;
+    }
+
+    .minitigerHeroNavigation {
+        right: 1rem;
+        bottom: 1.2rem;
     }
 
     .minitigerLibraryGrid {
@@ -304,5 +655,9 @@
 
     .minitigerMediaCard {
         flex-basis: 145px;
+    }
+
+    .minitigerMediaCardLandscape {
+        flex-basis: 245px;
     }
 }
