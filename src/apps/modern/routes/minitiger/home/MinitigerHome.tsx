@@ -3,10 +3,12 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models/image-type'
 import { ItemFields } from '@jellyfin/sdk/lib/generated-client/models/item-fields';
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by';
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useNextUp } from 'apps/legacy/features/libraries/api/useNextUp';
+import { clearBackdrop } from 'components/backdrop/backdrop';
+import Page from 'components/Page';
 import { useResumeItems } from 'apps/legacy/features/libraries/api/useResumeItems';
 import { useUserViews } from 'hooks/api/useUserViews';
 import { useApi } from 'hooks/useApi';
@@ -164,6 +166,10 @@ const MinitigerHome = () => {
         sortOrder: [ SortOrder.Descending ]
     });
 
+    useEffect(() => {
+        clearBackdrop();
+    }, []);
+
     const libraries = userViewsData?.Items ?? [];
     const resumeItems = (resumeData?.Items ?? []) as ItemDto[];
     const nextUpItems = (nextUpData?.Items ?? []) as ItemDto[];
@@ -171,7 +177,11 @@ const MinitigerHome = () => {
     const recentItems = recentItemsData?.Items ?? [];
 
     return (
-        <main className='minitigerHome'>
+        <Page
+            id='indexPage'
+            className='mainAnimatedPage homePage minitigerHome'
+            isBackButtonEnabled={false}
+        >
             <MinitigerHero />
 
             <div className='minitigerHomeContent'>
@@ -286,10 +296,10 @@ const MinitigerHome = () => {
                 />
 
                 <footer className='minitigerDevFooter'>
-                    🐯 Minitiger Native Home · Phase 4
+                    🐯 Minitiger Native Home · Phase 5
                 </footer>
             </div>
-        </main>
+        </Page>
     );
 };
 

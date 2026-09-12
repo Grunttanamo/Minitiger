@@ -21,6 +21,9 @@ import {
     getBackdropImageUrl,
     getLogoImageUrl,
     getMediaTypeName,
+    getRatingLabel,
+    getRuntimeLabel,
+    getStreamLanguages,
     shortOverview
 } from '../mediaUtils';
 import { getItemRoute } from '../routingUtils';
@@ -219,6 +222,46 @@ const MinitigerHero = () => {
         queryClient
     ]);
 
+    const handleTrailer = useCallback(async () => {
+        if (!apiClient || !heroItem?.Id) {
+            return;
+        }
+
+        try {
+            if ((heroItem.LocalTrailerCount ?? 0) > 0) {
+                const trailers = await apiClient.getLocalTrailers(
+                    apiClient.getCurrentUserId(),
+                    heroItem.Id
+                );
+
+                if (trailers.length > 0) {
+                    await playbackManager.play({
+                        items: trailers
+                    });
+
+                    return;
+                }
+            }
+
+            const remoteUrl = heroItem.RemoteTrailers
+                ?.map(trailer => trailer.Url)
+                .find((url): url is string => Boolean(url));
+
+            if (remoteUrl) {
+                window.open(
+                    remoteUrl,
+                    '_blank',
+                    'noopener,noreferrer'
+                );
+            }
+        } catch (error) {
+            console.error(
+                '[Minitiger Hero] Trailer konnte nicht gestartet werden',
+                error
+            );
+        }
+    }, [ apiClient, heroItem ]);
+
     const isPending = playlistPending && fallbackPending;
 
     if (isPending) {
@@ -251,8 +294,23 @@ const MinitigerHero = () => {
     const metadata = [
         heroItem.ProductionYear,
         getMediaTypeName(heroItem.Type),
-        heroItem.OfficialRating
+        getRuntimeLabel(heroItem.RunTimeTicks)
     ].filter(Boolean);
+
+    const ratingLabel = getRatingLabel(heroItem.OfficialRating);
+    const audioLanguages = getStreamLanguages(heroItem, 'Audio');
+    const subtitleLanguages = getStreamLanguages(
+        heroItem,
+        'Subtitle'
+    );
+
+    const hasTrailer = (
+        (heroItem.LocalTrailerCount ?? 0) > 0
+        || Boolean(
+            heroItem.RemoteTrailers
+                ?.some(trailer => Boolean(trailer.Url))
+        )
+    );
 
     return (
         <section
@@ -290,9 +348,40 @@ const MinitigerHero = () => {
                     )}
                 </div>
 
-                {metadata.length > 0 && (
-                    <div className='minitigerHeroMeta'>
-                        {metadata.join(' · ')}
+                <div className='minitigerHeroMetaRow'>
+                    {metadata.length > 0 && (
+                        <div className='minitigerHeroMeta'>
+                            {metadata.join(' · ')}
+                        </div>
+                    )}
+
+                    {ratingLabel && (
+                        <span className='minitigerHeroRating'>
+                            {ratingLabel}
+                        </span>
+                    )}
+
+                    {heroItem.CommunityRating != null && (
+                        <span className='minitigerHeroCommunityRating'>
+                            ★ {heroItem.CommunityRating.toFixed(1)}
+                        </span>
+                    )}
+                </div>
+
+                {(audioLanguages.length > 0
+                    || subtitleLanguages.length > 0) && (
+                    <div className='minitigerHeroLanguages'>
+                        {audioLanguages.length > 0 && (
+                            <span>
+                                🔊 {audioLanguages.join(' / ')}
+                            </span>
+                        )}
+
+                        {subtitleLanguages.length > 0 && (
+                            <span>
+                                💬 {subtitleLanguages.join(' / ')}
+                            </span>
+                        )}
                     </div>
                 )}
 
@@ -331,6 +420,17 @@ const MinitigerHero = () => {
                         </span>
                         <span>Watchliste</span>
                     </button>
+
+                    {hasTrailer && (
+                        <button
+                            type='button'
+                            className='minitigerHeroButton minitigerHeroTrailer'
+                            onClick={handleTrailer}
+                        >
+                            <span aria-hidden='true'>🎞</span>
+                            <span>Trailer</span>
+                        </button>
+                    )}
 
                     <Link
                         className='minitigerHeroButton minitigerHeroInfo'

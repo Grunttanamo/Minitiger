@@ -713,3 +713,78 @@
         display: none;
     }
 }
+
+/* =========================================================
+   PHASE 5 - PAGE LIFECYCLE + RICH BANNER META
+   ========================================================= */
+
+.page.minitigerHome {
+    position: relative;
+    inset: auto;
+    overflow: visible;
+    width: 100%;
+}
+
+.minitigerHeroMetaRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+}
+
+.minitigerHeroRating,
+.minitigerHeroCommunityRating {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.65rem;
+    box-sizing: border-box;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    line-height: 1;
+    text-shadow: none;
+}
+
+.minitigerHeroRating {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(10, 12, 15, 0.56);
+    color: #fff;
+}
+
+.minitigerHeroCommunityRating {
+    border: 1px solid rgba(232, 165, 44, 0.38);
+    background: rgba(10, 12, 15, 0.56);
+    color: var(--mt-accent);
+}
+
+.minitigerHeroLanguages {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.minitigerHeroLanguages > span {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.34rem 0.52rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 5px;
+    background: rgba(10, 12, 15, 0.54);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.78rem;
+    font-weight: 650;
+    backdrop-filter: blur(6px);
+}
+
+.minitigerHeroTrailer {
+    background: rgba(52, 55, 62, 0.92);
+}
+
+@media (max-width: 46em) {
+    .minitigerHeroLanguages {
+        display: none;
+    }
+}
+

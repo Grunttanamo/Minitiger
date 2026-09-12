@@ -206,3 +206,94 @@ export const shortOverview = (overview?: string | null, limit = 330) => {
 
     return `${value.slice(0, limit).trimEnd()}…`;
 };
+
+const LANGUAGE_NAMES: Record<string, string> = {
+    de: 'Deutsch',
+    deu: 'Deutsch',
+    ger: 'Deutsch',
+    en: 'Englisch',
+    eng: 'Englisch',
+    ja: 'Japanisch',
+    jpn: 'Japanisch',
+    ko: 'Koreanisch',
+    kor: 'Koreanisch',
+    zh: 'Chinesisch',
+    zho: 'Chinesisch',
+    chi: 'Chinesisch',
+    fr: 'Französisch',
+    fra: 'Französisch',
+    fre: 'Französisch',
+    es: 'Spanisch',
+    spa: 'Spanisch',
+    it: 'Italienisch',
+    ita: 'Italienisch'
+};
+
+const normalizeLanguage = (value?: string | null) => {
+    const code = String(value ?? '').trim().toLowerCase();
+
+    if (!code || code === 'und' || code === 'unknown') {
+        return null;
+    }
+
+    return LANGUAGE_NAMES[code] ?? code.toUpperCase();
+};
+
+export const getStreamLanguages = (
+    item: ItemDto,
+    type: 'Audio' | 'Subtitle'
+) => {
+    const values = (item.MediaStreams ?? [])
+        .filter(stream =>
+            String(stream.Type ?? '').toLowerCase()
+            === type.toLowerCase()
+        )
+        .map(stream =>
+            normalizeLanguage(
+                stream.Language
+                ?? stream.LocalizedLanguage
+                ?? stream.Title
+            )
+        )
+        .filter((value): value is string => Boolean(value));
+
+    return Array.from(new Set(values));
+};
+
+export const getRatingLabel = (rating?: string | null) => {
+    const value = String(rating ?? '').trim();
+
+    if (!value) {
+        return null;
+    }
+
+    const fskMatch = value.match(
+        /(?:FSK[\s-]*)?(0|6|12|16|18)$/i
+    );
+
+    if (fskMatch) {
+        return `FSK ${fskMatch[1]}`;
+    }
+
+    return value;
+};
+
+export const getRuntimeLabel = (ticks?: number | null) => {
+    if (!ticks || ticks <= 0) {
+        return null;
+    }
+
+    const totalMinutes = Math.round(ticks / 600_000_000);
+
+    if (totalMinutes < 60) {
+        return `${totalMinutes} Min.`;
+    }
+
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    return minutes
+        ? `${hours} Std. ${minutes} Min.`
+        : `${hours} Std.`;
+};
+
