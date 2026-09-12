@@ -8,7 +8,6 @@ import { Link } from 'react-router-dom';
 
 import { useNextUp } from 'apps/legacy/features/libraries/api/useNextUp';
 import { useResumeItems } from 'apps/legacy/features/libraries/api/useResumeItems';
-import { appRouter } from 'components/router/appRouter';
 import { useUserViews } from 'hooks/api/useUserViews';
 import { useApi } from 'hooks/useApi';
 import { useGetItems } from 'hooks/useFetchItems';
@@ -16,6 +15,7 @@ import type { ItemDto } from 'types/base/models/item-dto';
 
 import MinitigerHero from './components/MinitigerHero';
 import MinitigerMediaRow from './components/MinitigerMediaRow';
+import { getItemRoute } from './routingUtils';
 import './MinitigerHome.scss';
 
 const getLibraryIcon = (collectionType?: string | null) => {
@@ -113,6 +113,35 @@ const MinitigerHome = () => {
     });
 
     const {
+        data: watchlistData,
+        isPending: watchlistPending,
+        isError: watchlistError
+    } = useGetItems({
+        recursive: true,
+        limit: 18,
+        isFavorite: true,
+        imageTypeLimit: 1,
+        enableImageTypes: [
+            ImageType.Primary,
+            ImageType.Backdrop,
+            ImageType.Thumb
+        ],
+        enableTotalRecordCount: false,
+        includeItemTypes: [
+            BaseItemKind.Movie,
+            BaseItemKind.Series,
+            BaseItemKind.Episode,
+            BaseItemKind.MusicVideo,
+            BaseItemKind.Video,
+            BaseItemKind.Audio,
+            BaseItemKind.MusicAlbum,
+            BaseItemKind.Book
+        ],
+        sortBy: [ ItemSortBy.SortName ],
+        sortOrder: [ SortOrder.Ascending ]
+    });
+
+    const {
         data: recentItemsData,
         isPending: recentPending,
         isError: recentError
@@ -138,6 +167,7 @@ const MinitigerHome = () => {
     const libraries = userViewsData?.Items ?? [];
     const resumeItems = (resumeData?.Items ?? []) as ItemDto[];
     const nextUpItems = (nextUpData?.Items ?? []) as ItemDto[];
+    const watchlistItems = watchlistData?.Items ?? [];
     const recentItems = recentItemsData?.Items ?? [];
 
     return (
@@ -180,15 +210,13 @@ const MinitigerHome = () => {
                                     <Link
                                         key={library.Id ?? library.Name}
                                         className='minitigerLibraryCard'
-                                        to={appRouter
-                                            .getRouteUrl(
-                                                library,
-                                                {
-                                                    context:
-                                                        library.CollectionType
-                                                }
-                                            )
-                                            .substring(1)}
+                                        to={getItemRoute(
+                                            library as ItemDto,
+                                            {
+                                                context:
+                                                    library.CollectionType
+                                            }
+                                        )}
                                     >
                                         <div className='minitigerLibraryGlow' />
 
@@ -239,6 +267,15 @@ const MinitigerHome = () => {
                 />
 
                 <MinitigerMediaRow
+                    title='Watchliste'
+                    items={watchlistItems}
+                    apiClient={apiClient}
+                    pending={watchlistPending}
+                    error={watchlistError}
+                    variant='poster'
+                />
+
+                <MinitigerMediaRow
                     title='Neu hinzugefügt'
                     items={recentItems}
                     apiClient={apiClient}
@@ -249,7 +286,7 @@ const MinitigerHome = () => {
                 />
 
                 <footer className='minitigerDevFooter'>
-                    🐯 Minitiger Native Home · Phase 3
+                    🐯 Minitiger Native Home · Phase 4
                 </footer>
             </div>
         </main>

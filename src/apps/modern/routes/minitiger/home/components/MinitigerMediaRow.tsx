@@ -1,8 +1,7 @@
 import type { ApiClient } from 'jellyfin-apiclient';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 
-import { appRouter } from 'components/router/appRouter';
 import type { ItemDto } from 'types/base/models/item-dto';
 
 import {
@@ -12,6 +11,7 @@ import {
     getPlaybackProgress,
     getPrimaryImageUrl
 } from '../mediaUtils';
+import { getItemRoute } from '../routingUtils';
 import MinitigerPoster from './MinitigerPoster';
 
 interface MinitigerMediaRowProps {
@@ -35,6 +35,21 @@ const MinitigerMediaRow = ({
     showProgress = false,
     emptyText
 }: MinitigerMediaRowProps) => {
+    const rowRef = useRef<HTMLDivElement>(null);
+
+    const scrollRow = (direction: -1 | 1) => {
+        const row = rowRef.current;
+
+        if (!row) {
+            return;
+        }
+
+        row.scrollBy({
+            left: direction * Math.max(320, row.clientWidth * 0.78),
+            behavior: 'smooth'
+        });
+    };
+
     if (!pending && !error && items.length === 0 && !emptyText) {
         return null;
     }
@@ -47,11 +62,33 @@ const MinitigerMediaRow = ({
                     <h2>{title}</h2>
                 </div>
 
-                {!pending && !error && items.length > 0 && (
-                    <span className='minitigerLibraryCount'>
-                        {items.length} Einträge
-                    </span>
-                )}
+                <div className='minitigerSectionTools'>
+                    {!pending && !error && items.length > 0 && (
+                        <span className='minitigerLibraryCount'>
+                            {items.length} Einträge
+                        </span>
+                    )}
+
+                    {!pending && !error && items.length > 0 && (
+                        <div className='minitigerRowArrows'>
+                            <button
+                                type='button'
+                                onClick={() => scrollRow(-1)}
+                                aria-label={`${title} nach links scrollen`}
+                            >
+                                ‹
+                            </button>
+
+                            <button
+                                type='button'
+                                onClick={() => scrollRow(1)}
+                                aria-label={`${title} nach rechts scrollen`}
+                            >
+                                ›
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {pending && (
@@ -74,6 +111,7 @@ const MinitigerMediaRow = ({
 
             {!pending && !error && items.length > 0 && (
                 <div
+                    ref={rowRef}
                     className={[
                         'minitigerMediaRow',
                         variant === 'landscape'
@@ -99,7 +137,7 @@ const MinitigerMediaRow = ({
                                         ? 'minitigerMediaCardLandscape'
                                         : ''
                                 ].filter(Boolean).join(' ')}
-                                to={appRouter.getRouteUrl(item)}
+                                to={getItemRoute(item)}
                             >
                                 <div
                                     className={[

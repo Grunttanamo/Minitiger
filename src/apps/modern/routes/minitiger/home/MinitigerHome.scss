@@ -661,3 +661,55 @@
         flex-basis: 245px;
     }
 }
+
+
+/* =========================================================
+   PHASE 4 - ROW CONTROLS
+   ========================================================= */
+
+.minitigerSectionTools {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.minitigerRowArrows {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.minitigerRowArrows button {
+    width: 2.15rem;
+    height: 2.15rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--mt-border);
+    border-radius: 6px;
+    background: var(--mt-button);
+    color: #fff;
+    font: inherit;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        transform 140ms ease,
+        background 140ms ease,
+        border-color 140ms ease;
+}
+
+.minitigerRowArrows button:hover,
+.minitigerRowArrows button:focus-visible {
+    transform: translateY(-1px);
+    background: var(--mt-button-hover);
+    border-color: rgba(255, 255, 255, 0.2);
+    outline: none;
+}
+
+@media (max-width: 46em) {
+    .minitigerRowArrows {
+        display: none;
+    }
+}

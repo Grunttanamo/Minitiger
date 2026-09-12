@@ -1,6 +1,7 @@
 import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models/base-item-kind';
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models/image-type';
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by';
+import { useQueryClient } from '@tanstack/react-query';
 import React, {
     useCallback,
     useEffect,
@@ -10,33 +11,52 @@ import React, {
 import { Link } from 'react-router-dom';
 
 import { playbackManager } from 'components/playback/playbackmanager';
-import { appRouter } from 'components/router/appRouter';
 import { useApi } from 'hooks/useApi';
 import { useGetItems, useToggleFavoriteMutation } from 'hooks/useFetchItems';
 import { useItem } from 'hooks/useItem';
 import type { ItemDto } from 'types/base/models/item-dto';
 
+import { useMinitigerBannerItems } from '../hooks/useMinitigerBannerItems';
 import {
     getBackdropImageUrl,
     getLogoImageUrl,
     getMediaTypeName,
     shortOverview
 } from '../mediaUtils';
+import { getItemRoute } from '../routingUtils';
 
 const AUTO_ROTATE_MS = 12000;
+
+const shuffledCopy = (items: ItemDto[]) => {
+    const result = [ ...items ];
+
+    for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [ result[i], result[j] ] = [ result[j], result[i] ];
+    }
+
+    return result;
+};
 
 const MinitigerHero = () => {
     const {
         __legacyApiClient__: apiClient
     } = useApi();
 
+    const queryClient = useQueryClient();
+
     const {
-        data: candidateResult,
-        isPending,
-        isError
+        data: playlistData,
+        isPending: playlistPending
+    } = useMinitigerBannerItems();
+
+    const {
+        data: fallbackResult,
+        isPending: fallbackPending,
+        isError: fallbackError
     } = useGetItems({
         recursive: true,
-        limit: 10,
+        limit: 12,
         imageTypeLimit: 3,
         enableImageTypes: [
             ImageType.Backdrop,
@@ -52,19 +72,29 @@ const MinitigerHero = () => {
         sortBy: [ ItemSortBy.Random ]
     });
 
-    const candidates = useMemo(
-        () => (candidateResult?.Items ?? [])
-            .filter(item =>
-                Boolean(
-                    item.Id
-                    && (
-                        item.BackdropImageTags?.length
-                        || item.ImageTags?.Primary
-                    )
+    const playlistItems = playlistData?.items ?? [];
+    const fallbackItems = fallbackResult?.Items ?? [];
+    const usingPlaylist = playlistItems.length > 0;
+
+    const candidates = useMemo(() => {
+        const source = usingPlaylist
+            ? playlistItems
+            : fallbackItems;
+
+        const usable = source.filter(item =>
+            Boolean(
+                item.Id
+                && (
+                    item.BackdropImageTags?.length
+                    || item.ImageTags?.Primary
                 )
-            ),
-        [ candidateResult?.Items ]
-    );
+            )
+        );
+
+        return usingPlaylist
+            ? shuffledCopy(usable)
+            : usable;
+    }, [ fallbackItems, playlistItems, usingPlaylist ]);
 
     const [ activeIndex, setActiveIndex ] = useState(0);
     const [ paused, setPaused ] = useState(false);
@@ -73,11 +103,14 @@ const MinitigerHero = () => {
     const [ favorite, setFavorite ] = useState(false);
 
     const activeCandidate = candidates[activeIndex];
+
     const {
         data: detailedItem
     } = useItem(activeCandidate?.Id ?? undefined);
 
-    const heroItem = (detailedItem ?? activeCandidate) as ItemDto | undefined;
+    const heroItem =
+        (detailedItem ?? activeCandidate) as ItemDto | undefined;
+
     const favoriteMutation = useToggleFavoriteMutation();
 
     useEffect(() => {
@@ -91,6 +124,22 @@ const MinitigerHero = () => {
         setLogoFailed(false);
         setFavorite(Boolean(heroItem?.UserData?.IsFavorite));
     }, [ heroItem?.Id, heroItem?.UserData?.IsFavorite ]);
+
+    useEffect(() => {
+        if (usingPlaylist && playlistData?.playlistName) {
+            console.info(
+                `[Minitiger Hero] Bannerquelle: ${playlistData.playlistName}`
+            );
+        } else if (!playlistPending) {
+            console.info(
+                '[Minitiger Hero] Bannerquelle: Zufällige Fallback-Auswahl'
+            );
+        }
+    }, [
+        playlistData?.playlistName,
+        playlistPending,
+        usingPlaylist
+    ]);
 
     const showPrevious = useCallback(() => {
         if (!candidates.length) {
@@ -134,7 +183,10 @@ const MinitigerHero = () => {
             items: [ heroItem ],
             startPositionTicks: playbackPosition
         }).catch(error => {
-            console.error('[Minitiger Hero] Wiedergabe fehlgeschlagen', error);
+            console.error(
+                '[Minitiger Hero] Wiedergabe fehlgeschlagen',
+                error
+            );
         });
     }, [ heroItem ]);
 
@@ -150,13 +202,24 @@ const MinitigerHero = () => {
             });
 
             setFavorite(Boolean(newValue));
+
+            await queryClient.invalidateQueries({
+                queryKey: [ 'Items' ]
+            });
         } catch (error) {
             console.error(
                 '[Minitiger Hero] Watchlisten-Status konnte nicht geändert werden',
                 error
             );
         }
-    }, [ favorite, favoriteMutation, heroItem?.Id ]);
+    }, [
+        favorite,
+        favoriteMutation,
+        heroItem?.Id,
+        queryClient
+    ]);
+
+    const isPending = playlistPending && fallbackPending;
 
     if (isPending) {
         return (
@@ -168,7 +231,7 @@ const MinitigerHero = () => {
         );
     }
 
-    if (isError || !heroItem) {
+    if ((fallbackError && !usingPlaylist) || !heroItem) {
         return (
             <section className='minitigerHero minitigerHeroFallback'>
                 <div className='minitigerHeroFallbackInner'>
@@ -245,11 +308,11 @@ const MinitigerHero = () => {
                         className='minitigerHeroButton minitigerHeroPlay'
                         onClick={handlePlay}
                     >
-                        <span aria-hidden='true'>
-                            {playbackPosition > 0 ? '▶' : '▶'}
-                        </span>
+                        <span aria-hidden='true'>▶</span>
                         <span>
-                            {playbackPosition > 0 ? 'Fortsetzen' : 'Abspielen'}
+                            {playbackPosition > 0
+                                ? 'Fortsetzen'
+                                : 'Abspielen'}
                         </span>
                     </button>
 
@@ -271,7 +334,7 @@ const MinitigerHero = () => {
 
                     <Link
                         className='minitigerHeroButton minitigerHeroInfo'
-                        to={appRouter.getRouteUrl(heroItem)}
+                        to={getItemRoute(heroItem)}
                     >
                         <span aria-hidden='true'>ⓘ</span>
                         <span>Weitere Infos</span>
