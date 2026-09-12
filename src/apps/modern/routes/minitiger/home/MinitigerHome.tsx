@@ -1,7 +1,8 @@
+import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models/base-item-kind';
 import { ImageType } from '@jellyfin/sdk/lib/generated-client/models/image-type';
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by';
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { appRouter } from 'components/router/appRouter';
@@ -59,16 +60,12 @@ const getMediaTypeName = (type?: string | null) => {
             return 'Film';
         case 'series':
             return 'Serie';
-        case 'season':
-            return 'Staffel';
         case 'episode':
             return 'Episode';
         case 'audio':
             return 'Musik';
         case 'musicalbum':
             return 'Album';
-        case 'musicartist':
-            return 'Künstler';
         case 'musicvideo':
             return 'Musikvideo';
         case 'book':
@@ -78,6 +75,31 @@ const getMediaTypeName = (type?: string | null) => {
         default:
             return type ?? 'Medium';
     }
+};
+
+interface PosterProps {
+    imageUrl?: string;
+}
+
+const MinitigerPoster = ({ imageUrl }: PosterProps) => {
+    const [ imageFailed, setImageFailed ] = useState(false);
+
+    if (!imageUrl || imageFailed) {
+        return (
+            <div className='minitigerPosterFallback'>
+                🐯
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={imageUrl}
+            alt=''
+            loading='lazy'
+            onError={() => setImageFailed(true)}
+        />
+    );
 };
 
 const MinitigerHome = () => {
@@ -103,6 +125,16 @@ const MinitigerHome = () => {
         limit: 18,
         imageTypeLimit: 1,
         enableImageTypes: [ ImageType.Primary ],
+        includeItemTypes: [
+            BaseItemKind.Movie,
+            BaseItemKind.Series,
+            BaseItemKind.Episode,
+            BaseItemKind.MusicVideo,
+            BaseItemKind.Video,
+            BaseItemKind.Audio,
+            BaseItemKind.MusicAlbum,
+            BaseItemKind.Book
+        ],
         sortBy: [ ItemSortBy.DateCreated ],
         sortOrder: [ SortOrder.Descending ]
     });
@@ -249,18 +281,7 @@ const MinitigerHome = () => {
                                     to={appRouter.getRouteUrl(item)}
                                 >
                                     <div className='minitigerPoster'>
-                                        {imageUrl ? (
-                                            <img
-                                                src={imageUrl}
-                                                alt=''
-                                                loading='lazy'
-                                            />
-                                        ) : (
-                                            <div className='minitigerPosterFallback'>
-                                                🐯
-                                            </div>
-                                        )}
-
+                                        <MinitigerPoster imageUrl={imageUrl} />
                                         <div className='minitigerPosterShade' />
                                     </div>
 
@@ -284,7 +305,7 @@ const MinitigerHome = () => {
             </section>
 
             <footer className='minitigerDevFooter'>
-                🐯 Minitiger Native Home · Phase 2
+                🐯 Minitiger Native Home · Phase 2.1
             </footer>
         </main>
     );
