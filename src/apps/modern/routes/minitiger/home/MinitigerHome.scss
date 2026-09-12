@@ -1,0 +1,202 @@
+.minitigerHome {
+    --mt-accent: #e8a52c;
+    --mt-accent-soft: rgba(232, 165, 44, 0.18);
+    --mt-card: rgba(255, 255, 255, 0.055);
+    --mt-card-hover: rgba(255, 255, 255, 0.095);
+    --mt-border: rgba(255, 255, 255, 0.10);
+
+    min-height: calc(100vh - 4rem);
+    box-sizing: border-box;
+    padding: 3.2rem max(2rem, 4vw) 4rem;
+}
+
+.minitigerIntro {
+    margin: 0 0 3rem;
+}
+
+.minitigerIntroEyebrow {
+    color: var(--mt-accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    margin-bottom: 0.65rem;
+}
+
+.minitigerIntro h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 750;
+    line-height: 1.05;
+}
+
+.minitigerIntro p {
+    margin: 0.8rem 0 0;
+    opacity: 0.55;
+    font-size: 1rem;
+}
+
+.minitigerSection {
+    width: 100%;
+}
+
+.minitigerSectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.minitigerSectionHeader > div {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.minitigerSectionAccent {
+    display: block;
+    width: 4px;
+    height: 1.7rem;
+    border-radius: 999px;
+    background: var(--mt-accent);
+    box-shadow: 0 0 18px var(--mt-accent);
+}
+
+.minitigerSectionHeader h2 {
+    margin: 0;
+    font-size: 1.55rem;
+    font-weight: 700;
+}
+
+.minitigerLibraryCount {
+    opacity: 0.5;
+    font-size: 0.85rem;
+}
+
+.minitigerLibraryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1rem;
+}
+
+.minitigerLibraryCard {
+    position: relative;
+    overflow: hidden;
+    min-height: 115px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.35rem;
+    color: inherit;
+    text-decoration: none;
+    background: var(--mt-card);
+    border: 1px solid var(--mt-border);
+    border-radius: 14px;
+    backdrop-filter: blur(14px);
+    transition:
+        transform 160ms ease,
+        background 160ms ease,
+        border-color 160ms ease;
+}
+
+.minitigerLibraryCard:hover,
+.minitigerLibraryCard:focus-visible {
+    transform: translateY(-4px);
+    background: var(--mt-card-hover);
+    border-color: rgba(232, 165, 44, 0.55);
+    outline: none;
+}
+
+.minitigerLibraryGlow {
+    position: absolute;
+    width: 115px;
+    height: 115px;
+    left: -55px;
+    top: -55px;
+    border-radius: 50%;
+    background: var(--mt-accent-soft);
+    filter: blur(16px);
+    pointer-events: none;
+}
+
+.minitigerLibraryIcon {
+    position: relative;
+    flex: 0 0 auto;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.22);
+    font-size: 1.65rem;
+}
+
+.minitigerLibraryInfo {
+    position: relative;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.minitigerLibraryInfo strong {
+    overflow: hidden;
+    font-size: 1.05rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.minitigerLibraryInfo span {
+    opacity: 0.48;
+    font-size: 0.78rem;
+}
+
+.minitigerLibraryArrow {
+    position: relative;
+    margin-left: auto;
+    opacity: 0.3;
+    font-size: 2rem;
+    transition:
+        opacity 160ms ease,
+        transform 160ms ease;
+}
+
+.minitigerLibraryCard:hover .minitigerLibraryArrow {
+    opacity: 0.85;
+    transform: translateX(3px);
+}
+
+.minitigerStatusCard {
+    padding: 1.4rem;
+    border: 1px solid var(--mt-border);
+    border-radius: 12px;
+    background: var(--mt-card);
+    opacity: 0.7;
+}
+
+.minitigerStatusError {
+    border-color: rgba(255, 90, 90, 0.35);
+}
+
+.minitigerDevFooter {
+    margin-top: 3.5rem;
+    text-align: center;
+    opacity: 0.25;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 700px) {
+    .minitigerHome {
+        padding: 2rem 1rem 3rem;
+    }
+
+    .minitigerLibraryGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .minitigerLibraryCount {
+        display: none;
+    }
+}
