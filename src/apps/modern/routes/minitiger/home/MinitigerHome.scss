@@ -39,6 +39,10 @@
     width: 100%;
 }
 
+.minitigerMediaSection {
+    margin-top: 3rem;
+}
+
 .minitigerSectionHeader {
     display: flex;
     align-items: center;
@@ -168,6 +172,104 @@
     transform: translateX(3px);
 }
 
+.minitigerMediaRow {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.15rem 0 1rem;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+}
+
+.minitigerMediaCard {
+    flex: 0 0 180px;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+    scroll-snap-align: start;
+    transition: transform 160ms ease;
+}
+
+.minitigerMediaCard:hover,
+.minitigerMediaCard:focus-visible {
+    transform: translateY(-5px);
+    outline: none;
+}
+
+.minitigerPoster {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 2 / 3;
+    border-radius: 13px;
+    background: var(--mt-card);
+    border: 1px solid var(--mt-border);
+}
+
+.minitigerPoster img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition:
+        transform 220ms ease,
+        filter 220ms ease;
+}
+
+.minitigerMediaCard:hover .minitigerPoster img {
+    transform: scale(1.035);
+    filter: brightness(1.07);
+}
+
+.minitigerPosterShade {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            to bottom,
+            transparent 70%,
+            rgba(0, 0, 0, 0.25) 100%
+        );
+}
+
+.minitigerPosterFallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            var(--mt-accent-soft),
+            transparent 55%
+        ),
+        rgba(255, 255, 255, 0.035);
+    font-size: 2.4rem;
+}
+
+.minitigerMediaInfo {
+    min-width: 0;
+    padding: 0.75rem 0.15rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+}
+
+.minitigerMediaInfo strong {
+    overflow: hidden;
+    font-size: 0.95rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.minitigerMediaInfo span {
+    opacity: 0.5;
+    font-size: 0.76rem;
+}
+
 .minitigerStatusCard {
     padding: 1.4rem;
     border: 1px solid var(--mt-border);
@@ -198,5 +300,9 @@
 
     .minitigerLibraryCount {
         display: none;
+    }
+
+    .minitigerMediaCard {
+        flex-basis: 145px;
     }
 }
