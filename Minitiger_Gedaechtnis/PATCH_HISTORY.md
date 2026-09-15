@@ -3,26 +3,27 @@
 - 18.3.0: Side-Titles, Virtual Hover Media, Indicator-Design, YouTube-Toggle.
 - 18.3.0.1: TypeScript Build Hotfix.
 - 18.3.1: Serverweiter Virtual-Library-Sync via Companion Plugin.
-- 18.3.1.1: Versuchter Upload/UI-Hotfix; beim Nutzer zunächst nicht im Source angekommen.
+- 18.3.1.1: Versuchter Upload/UI-Hotfix.
 - 18.3.1.2: Force-Apply + Verify-Patch.
 - 18.3.2: Virtual Media / UI / Settings Ausbau.
 - 18.3.2.1: Hover-Video + Side-Row-Center Hotfix.
 - 18.3.2.2: Side Glow + Arrow-Control-Lane Hotfix.
 - 18.3.3: Virtual Library Card/Nav Polish, smarte Home-Pfeile, Landscape-Audioflaggen.
-- 18.3.3.1: Compile Hotfix für TS2367 in ItemsView.tsx; keine Feature-Änderung.
-- 18.3.4: Detail-Audioflags, Hero-Flags/Burger, Manga-Verlag/Burger, erste Root-Unterdrückung, Virtual-Row-Gap-Versuch.
-- 18.3.5: Detail-Flag-CSS-Hotfix, Verlag-Feinausrichtung, erweiterte Manga-Root-Erkennung, Virtual-Gap-Hotfix.
-- 18.3.6: Einheitlicher Home-Reihenabstand + autoritative Manga-Library-Root-Erkennung via Virtual Folders. Vom Nutzer bestätigt.
+- 18.3.3.1: Compile Hotfix TS2367.
+- 18.3.4: Detail-Audioflags, Hero-Flags/Burger, Manga-Verlag/Burger, Root-Unterdrückung, Gap-Versuch.
+- 18.3.5: Detail-Flag-CSS, Verlag, Manga-Root, Virtual-Gap.
+- 18.3.6: Einheitlicher Home-Reihenabstand + autoritative Manga-Library-Root-Erkennung; bestätigt.
+- 18.3.7: Manga Parent Cleanup + Full-Server Docker/GitHub.
+- 18.3.7.1: .NET-10-Docker-Buildstage auf gültigen `mcr.microsoft.com/dotnet/sdk:10.0`-Tag; Docker-Build später grün bestätigt.
 
-## Phase 18.3.7 – Manga Parent Cleanup + Docker/GitHub
-- Entfernt den klickbaren Parent-/Bibliotheksnamen oberhalb von `MANGA BAND` auf Minitiger-Manga/Buch-Detailpages.
-- Ergänzt ein Dockerfile auf Basis des offiziellen Jellyfin-12.0-Images.
-- Baut Minitiger Web mit Node 24 und Minitiger Virtual Sync mit .NET 10.
-- Startup-Wrapper installiert die Companion-Plugin-DLL in `/config/plugins`, auch bei persistentem Docker-Config-Volume.
-- GitHub Action publiziert amd64/arm64 Images nach GHCR.
-- Compose-Beispiel und Schritt-für-Schritt-GitHub-Anleitung hinzugefügt.
+## Jellyfin 12.1 Migration
+- Separater Branch `minitiger-v12.1` angelegt.
+- Offizieller Jellyfin-Web-Tag `v12.1` konfliktfrei gemerged.
+- Nutzer aktualisierte Jellyfin Server auf 12.1 und bestätigte, dass Minitiger weiterhin funktioniert.
 
-## Phase 18.3.7.1 – .NET 10 Docker Image Hotfix
-- Erster GitHub-Actions-Build von 18.3.7 scheiterte an `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found`.
-- Wechselt die Plugin-Buildstage auf den offiziellen Tag `mcr.microsoft.com/dotnet/sdk:10.0`.
-- Keine Web-/UI-Funktionsänderung.
+## Phase 18.4.0 – Sidecar Preview
+- Neuer eigenständiger Minitiger-Web-Dockercontainer ohne Jellyfin-Server.
+- nginx liefert `/web/` lokal aus und reverse-proxied API/WebSocket/Streams an vorhandenes Jellyfin.
+- Kein Zugriff auf Jellyfin-Appdata/Datenbank nötig.
+- Compose + Unraid-Anleitung.
+- Eigener GitHub-Workflow und GHCR-Image `minitiger-web`, amd64 + arm64.

@@ -1,37 +1,34 @@
-# Aktueller Projektstand – Phase 18.3.7.1
+# Aktueller Projektstand – Phase 18.4.0
 
 ## Bestätigt funktionierend
-- Detailpage-Einstellungen greifen.
-- Folgen-Detailpage: Version/Audio/Untertitel-Auswahl funktioniert.
-- Lokale Trailer funktionieren im Jellyfin Desktop Client.
-- Banner: kuratierte Auswahl, Serienmarker, einstellbares Inhaltslimit und Desktop-Cache.
-- Virtuelle Bibliotheken: große Inhaltsmengen per Chunking, eigene Größen, Glow/Hover, zentrale Inhalte/Medien via Minitiger Virtual Sync Companion Plugin.
-- Virtuelle Bibliothek Hover-MP4 + Bild/Logo Speicherung/Wiedergabe funktioniert seit 18.3.2.1.
-- Seitliche Reihentitel, Side-Glow und Arrow-Lane funktionieren grundsätzlich.
-- Eigene Manga-Hauptposter-/Band-Größenregler sowie eigene Pfeil-/Genre-Farben vorhanden.
-- Manga/Buch: `Verlag` wird aus Jellyfin `Studios` angezeigt.
-- Phase 18.3.6 vom Nutzer bestätigt: globaler `Reihenabstand` greift korrekt auf normale und virtuelle Home-Reihen.
-- Phase 18.3.6 vom Nutzer bestätigt: Einzelbände direkt in der Books/Comics-Bibliothekswurzel zeigen keine fremden `Weitere Bände` mehr.
+- Minitiger Web 18.3.7.1 wurde auf Jellyfin Web 12.1 gemerged.
+- Offizieller Upstream-Merge `v12.1` lief ohne Konflikte.
+- Node 24.21.0 / npm 11.19.0 vorhanden; `npm ci` lief durch.
+- Nutzer hat Jellyfin Server selbst auf 12.1 aktualisiert.
+- Minitiger wurde gegen Jellyfin 12.1 getestet; Nutzerfeedback: „Scheint alles noch zu gehen“.
+- Production-Build/Git-Schritte aus dem vorherigen Schritt wurden laut Nutzer ebenfalls erfolgreich abgeschlossen.
+- GitHub Actions / GHCR Full-Server-Docker-Build aus 18.3.7.1 wurde grün; Multi-Arch Docker-Build funktioniert grundsätzlich.
+- Phase 18.3.6: Home-Reihenabstand und Manga-Library-Root-Fix bestätigt.
 
-## Phase 18.3.7 – noch zu testen
-- Klickbare Parent-/Bibliothekszeile (z.B. `Comics`) wurde aus Minitiger-Manga/Buch-Detailpages entfernt.
-- Docker/GitHub-Verteilung wurde ergänzt.
-- GitHub-Repository wurde erfolgreich via SSH auf Branch `minitiger-v12` gepusht und GitHub Actions aktiviert.
+## Phase 18.4.0 – neuer Teststand
+- Neuer **Minitiger Web Sidecar** statt Austausch des bestehenden Jellyfin-Containers.
+- Sidecar baut nur Minitiger Web und liefert es über nginx unter `/web/` aus.
+- Alle anderen Requests werden an `JELLYFIN_URL` reverse-proxied.
+- Standardziel: `http://host.docker.internal:8096`.
+- Standard-Port außen: 8097 -> Container 80.
+- Keine `/config`, `/cache` oder Medien-Volumes.
+- Bestehende Jellyfin-Datenbank/Accounts/Appdata bleiben außerhalb des Sidecars.
+- Neuer GHCR-Name: `ghcr.io/grunttanamo/minitiger-web`.
+- Neuer Workflow: `Build Minitiger Sidecar`, Branch `minitiger-v12.1`, amd64 + arm64.
 
-## Docker-Testfeedback
-- Erster Workflow-Lauf `Build Minitiger Docker` startete erfolgreich, scheiterte aber beim Auflösen der Plugin-Buildstage.
-- Konkreter Fehler: `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found`.
-- Ursache: .NET 10 veröffentlicht keine Debian/Bookworm-Containerimages mehr; der verwendete Tag existiert nicht.
-
-## Phase 18.3.7.1 – neuer Hotfix-Teststand
-- `Dockerfile.minitiger` verwendet für die Plugin-Buildstage jetzt `mcr.microsoft.com/dotnet/sdk:10.0`.
-- Der Tag ist der offizielle .NET-10-Standardtag und basiert auf Ubuntu 24.04/Noble.
-- Sonst keine Funktionsänderungen.
+## Bewusst getrennt
+- Das Minitiger Virtual Sync Companion Plugin wird im Sidecar nicht automatisch installiert.
+- Ziel: bestehende Jellyfin-Installation nicht verändern.
+- Optionales Plugin-Repository / einfache Plugin-Installation ist ein späterer Schritt.
 
 ## Nicht verändert
-- Trailer-Pipeline / Desktop-Codec-Fallback.
-- Audioflaggen-Sprachlogik / Flag-Assets.
-- Banner-Datenpipeline.
-- Row-Gap-Fix aus 18.3.6.
-- Manga-Library-Root-Erkennung aus 18.3.6.
-- Manga-Parent-Cleanup aus 18.3.7.
+- Minitiger UI-Code.
+- Trailer-Pipeline.
+- Audioflaggen.
+- Manga-Logik.
+- Virtuelle Bibliothekslogik im Webclient.

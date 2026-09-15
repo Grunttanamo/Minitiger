@@ -1,26 +1,33 @@
 # Übergabe für neuen Chat
 
-Projekt: Jellyfin 12 Custom Web UI `Minitiger Web`, Branch `minitiger-v12`, Source `~/minitiger-web`, Production nativ über `/opt/minitiger-web/dist` auf Port 8096.
+Projekt: Jellyfin Custom Web UI `Minitiger Web`.
 
-Aktueller Patch: Phase 18.3.7.1. Voraussetzung: 18.3.7.
+Aktueller Stand:
+- Jellyfin Server: 12.1.
+- Jellyfin Web: offizieller `v12.1`-Stand wurde konfliktfrei in Minitiger gemerged.
+- Aktiver Branch: `minitiger-v12.1`.
+- Nutzer hat Minitiger unter 12.1 getestet; bisher funktioniert alles.
+- Full-Server GitHub Docker Build aus 18.3.7.1 wurde grün bestätigt.
 
-Wichtiger Docker/GitHub-Stand:
-- GitHub-Repo: `Grunttanamo/Minitiger`, Branch `minitiger-v12`.
-- SSH-Push vom Raspberry Pi funktioniert.
-- Das Repo war ursprünglich shallow; nach `git fetch --unshallow origin` funktionierte der erste vollständige Push (~200 MiB).
-- GitHub Actions wurde aktiviert.
-- Workflow `Build Minitiger Docker` startet.
-- Erster Lauf scheiterte konkret an `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found`.
-- Ursache: .NET 10 hat keine Debian/Bookworm-Images.
-- Phase 18.3.7.1 setzt die Plugin-Buildstage auf `mcr.microsoft.com/dotnet/sdk:10.0`.
+Aktueller Patch: Phase 18.4.0 – Jellyfin 12.1 Sidecar Preview.
 
-Noch nicht bestätigt:
-- 18.3.7 Manga-Parent-Cleanup.
-- Vollständig grüner Docker/GHCR-Build.
-- Docker-Lauf beim Kollegen.
+Ziel des Sidecars:
+- Vorhandenes Jellyfin bleibt unverändert.
+- Kein Mount von `/config`, Datenbank, Cache oder Medien.
+- Minitiger läuft zusätzlich auf Port 8097.
+- nginx serviert Minitiger unter `/web/` und proxied API/WebSocket/Streams auf `JELLYFIN_URL`.
+- Standard: `http://host.docker.internal:8096`.
+- GHCR: `ghcr.io/grunttanamo/minitiger-web`.
+
+Nächster Test:
+1. Patch anwenden und pushen.
+2. Workflow `Build Minitiger Sidecar` muss grün werden.
+3. Sidecar starten und gegen vorhandenen 12.1-Server testen.
+4. Danach Unraid-Test / Paket Public machen.
+5. Später Virtual Sync als optionales Jellyfin Plugin Repository.
 
 Regeln:
-- Zu jedem Patch PowerShell-SCP-Befehl mitsenden.
-- Patch-ZIP nur geänderte Dateien + INSTALL/CHANGELOG/files/VERIFY + `Minitiger_Gedaechtnis/`.
-- Separate Gedächtnis-ZIP ausgeben.
-- Nichts als bestätigt markieren, bevor der Nutzer es getestet hat.
+- Zu jedem Patch PowerShell-SCP-Befehl.
+- Patch nur geänderte/neue Dateien + Install/Changelog/files/VERIFY + Memory.
+- Separate Memory-ZIP.
+- Fix erst nach Nutzer-Test bestätigen.

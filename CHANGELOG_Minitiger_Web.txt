@@ -1,12 +1,27 @@
-Minitiger Web – Phase 18.3.7.1
-2026-09-15
+Minitiger Web – Phase 18.4.0
+Jellyfin 12.1 Sidecar Preview
 
-Docker / GitHub Actions Hotfix
-- Behebt den ersten GHCR-Docker-Buildfehler aus Phase 18.3.7.
-- .NET 10 liefert keine Debian/Bookworm-Containerimages mehr; `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim` existiert daher nicht.
-- Die Plugin-Buildstage verwendet jetzt den offiziellen Multi-Arch-Tag `mcr.microsoft.com/dotnet/sdk:10.0` (Ubuntu 24.04/Noble).
-- Keine Änderung am Minitiger-Webcode, Manga-Code, Audioflaggen, Trailer oder Virtual-Library-Logik.
+NEU
+- Eigenständiges Dockerfile `Dockerfile.minitiger-sidecar`.
+- Minitiger Web wird mit Node 24 gebaut und anschließend in einem kleinen
+  nginx-Container ausgeliefert.
+- Sidecar enthält keinen Jellyfin-Server und keine Jellyfin-Datenbank.
+- Bestehender Jellyfin-Server wird über `JELLYFIN_URL` reverse-proxied.
+- Standard: Jellyfin auf Host-Port 8096, Minitiger auf Host-Port 8097.
+- `/web/` wird lokal aus Minitiger bedient; API, WebSocket, Bilder und Streams
+  werden an den bestehenden Server weitergereicht.
+- Docker HEALTHCHECK über `/minitiger-health`.
+- Compose-Beispiel ohne Config-/Cache-/Media-Volumes.
+- Unraid-Schrittfolge ergänzt.
+- Neuer GitHub-Action-Workflow `Build Minitiger Sidecar` für amd64 + arm64.
+- GHCR-Ziel: `ghcr.io/grunttanamo/minitiger-web` mit `latest`, `12.1` und SHA-Tag.
 
-Noch nicht als erfolgreich bestätigt
-- Der GitHub-Actions-Docker-Build muss nach dem Push dieses Hotfixes erneut laufen.
-- Eventuelle nachfolgende Buildfehler werden erst anhand der neuen vollständigen Fehlermeldung untersucht.
+SICHERHEIT / DESIGN
+- Stoppen oder Löschen des Sidecars verändert den bestehenden Jellyfin-Server
+  nicht.
+- Das Minitiger Virtual Sync Companion Plugin wird bewusst nicht automatisch
+  in fremde Jellyfin-Config-Verzeichnisse kopiert.
+
+NICHT VERÄNDERT
+- Minitiger UI / Trailer / Audioflags / Manga / virtuelle Bibliothekslogik.
+- Bestehendes Full-Server-Docker-Image aus Phase 18.3.7.x.

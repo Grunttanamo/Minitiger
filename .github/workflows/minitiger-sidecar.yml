@@ -1,0 +1,63 @@
+name: Build Minitiger Sidecar
+
+on:
+  push:
+    branches:
+      - minitiger-v12.1
+    paths:
+      - 'src/**'
+      - 'themes/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'webpack*.js'
+      - 'Dockerfile.minitiger-sidecar'
+      - 'Dockerfile.minitiger-sidecar.dockerignore'
+      - 'docker/minitiger-sidecar.conf.template'
+      - '.github/workflows/minitiger-sidecar.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  sidecar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set image name
+        id: image
+        shell: bash
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/minitiger-web" >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish amd64 + arm64 sidecar
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.minitiger-sidecar
+          push: true
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            JELLYFIN_VERSION=12.1
+          tags: |
+            ${{ steps.image.outputs.name }}:latest
+            ${{ steps.image.outputs.name }}:12.1
+            ${{ steps.image.outputs.name }}:sha-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

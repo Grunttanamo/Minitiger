@@ -1,3 +1,9 @@
-Phase 18.3.7.1 Patch: minitiger_native_phase18_3_7_1_dotnet10_docker_hotfix.zip
-Separate memory: Minitiger_Gedaechtnis_2026-09-15_v36.zip
-Primary code change: Dockerfile.minitiger
+Phase 18.4.0 Patch: minitiger_native_phase18_4_0_jellyfin12_1_sidecar_preview.zip
+Separate memory: Minitiger_Gedaechtnis_2026-09-15_v37.zip
+Primary additions:
+- Dockerfile.minitiger-sidecar
+- Dockerfile.minitiger-sidecar.dockerignore
+- docker/minitiger-sidecar.conf.template
+- docker-compose.sidecar.example.yml
+- .github/workflows/minitiger-sidecar.yml
+- SIDECAR_SETUP.md

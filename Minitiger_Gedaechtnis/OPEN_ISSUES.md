@@ -1,15 +1,21 @@
-# Offene Punkte nach Phase 18.3.7.1
+# Offene Punkte nach Phase 18.4.0
 
-## Web / Manga noch testen
-1. Manga-/Buch-Detailpage: Parent-/Bibliotheksname wie `Comics` ist nach 18.3.7 vollständig weg.
-2. Echte Manga-Reihe: `Weitere Bände` bleibt erhalten.
-3. Einzelband in Books/Comics-Root: `Weitere Bände` bleibt unterdrückt.
-4. Regression: globaler Home-`Reihenabstand` bleibt für normale + virtuelle Reihen identisch.
+## Sidecar – als Nächstes testen
+1. Phase 18.4.0 auf Branch `minitiger-v12.1` pushen.
+2. GitHub Action `Build Minitiger Sidecar` muss grün durchlaufen.
+3. Prüfen, ob GHCR `ghcr.io/grunttanamo/minitiger-web:latest` und `:12.1` erzeugt.
+4. Sidecar parallel zum normalen Jellyfin starten: normal :8096, Minitiger :8097.
+5. Prüfen: Login, Home, virtuelle Bibliotheken, Detailpages, Manga, Trailer, Audioflags, Playback.
+6. Prüfen: WebSocket/Session-Updates und längeres Video-Streaming über nginx-Proxy.
+7. Sidecar stoppen/löschen und bestätigen, dass normales Jellyfin unverändert weiterläuft.
+8. Unraid-Test beim Kollegen.
+9. GHCR-Paket ggf. auf Public stellen, damit Laien kein `docker login` benötigen.
 
-## Docker / GitHub jetzt testen
-1. Phase 18.3.7.1 einspielen und nach `minitiger-v12` pushen.
-2. Automatischen Workflow `Build Minitiger Docker` beobachten.
-3. Prüfen, ob die .NET-Plugin-Buildstage nun über `mcr.microsoft.com/dotnet/sdk:10.0` hinauskommt.
-4. Falls ein neuer Fehler erscheint: vollständige neue rote Fehlermeldung analysieren, nicht mehrere blinde Fixes stapeln.
-5. Erst nach komplett grünem Workflow GHCR-Image auf dem Docker-System des Kollegen testen.
-6. Danach Companion Plugin unter `/config/plugins/Minitiger Virtual Sync/` und Status-Endpunkt prüfen.
+## Noch nicht universell bestätigt
+- Jellyfin mit nicht-standardmäßiger Base URL wie `/jellyfin`.
+- Jellyfin hinter exotischen Auth-/Reverse-Proxy-Konfigurationen.
+- HTTPS direkt im Sidecar (empfohlen ist später bestehender Reverse Proxy davor).
+
+## Später
+- Optionales Minitiger Virtual Sync Plugin als normale Jellyfin-Plugin-Repository-Installation.
+- Minitiger GitHub README / öffentliche Installationsseite aufräumen.

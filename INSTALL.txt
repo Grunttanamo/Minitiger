@@ -1,27 +1,53 @@
-MINITIGER PHASE 18.3.7.1 – DOCKER BUILD HOTFIX
+MINITIGER WEB – PHASE 18.4.0
+Jellyfin 12.1 Sidecar Preview
 
-Voraussetzung: Phase 18.3.7 ist im Repo.
+VORAUSSETZUNG
+- Branch: minitiger-v12.1
+- Jellyfin Web wurde bereits auf v12.1 gemerged.
+- package.json meldet Version 12.1.0.
+- Phase 18.3.7.1 / bisheriger Minitiger-Stand ist vorhanden.
 
-Dieser Hotfix ändert nur die Docker-.NET-Buildstage plus Patch-/Gedächtnisdateien.
+DIESER PATCH ÄNDERT KEINE MINITIGER-UI-DATEIEN.
+Er ergänzt ausschließlich den neuen, getrennten Sidecar-Docker-Weg.
 
-1) Patch auf dem Raspberry Pi einspielen:
+INSTALLATION AUF DEM RASPBERRY PI
 
-  cd ~/minitiger-web
-  unzip -o ~/minitiger_native_phase18_3_7_1_dotnet10_docker_hotfix.zip -d ~/minitiger-web
-  chmod +x VERIFY_PATCH.sh
-  ./VERIFY_PATCH.sh
+1) In das Repository wechseln:
+   cd ~/minitiger-web
 
-2) Hotfix nach GitHub pushen, damit der Docker-Workflow neu startet:
+2) Patch entpacken:
+   unzip -o ~/minitiger_native_phase18_4_0_jellyfin12_1_sidecar_preview.zip -d ~/minitiger-web
 
-  git add Dockerfile.minitiger CHANGELOG_Minitiger_Web.txt INSTALL.txt files.txt VERIFY_PATCH.sh Minitiger_Gedaechtnis
-  git commit -m "Fix .NET 10 Docker SDK image"
-  git push
+3) Prüfen:
+   chmod +x VERIFY_PATCH.sh
+   ./VERIFY_PATCH.sh
 
-3) Danach auf GitHub:
-   Repository -> Actions -> Build Minitiger Docker
+4) Git prüfen und committen:
+   git status
+   git add Dockerfile.minitiger-sidecar Dockerfile.minitiger-sidecar.dockerignore \
+     docker/minitiger-sidecar.conf.template docker-compose.sidecar.example.yml \
+     .github/workflows/minitiger-sidecar.yml SIDECAR_SETUP.md \
+     INSTALL.txt CHANGELOG_Minitiger_Web.txt files.txt VERIFY_PATCH.sh \
+     Minitiger_Gedaechtnis
+   git commit -m "Add Minitiger Jellyfin 12.1 sidecar"
 
-Der Workflow sollte automatisch durch den Push starten.
+5) Pushen:
+   git push
 
-Wichtig:
-- Der bisherige Fehler `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found` ist mit diesem Patch adressiert.
-- Wenn der nächste Lauf an einer anderen Stelle rot wird, die neue rote Fehlermeldung vollständig schicken; nicht blind weitere Änderungen machen.
+Der Push auf minitiger-v12.1 startet automatisch den Workflow:
+   Build Minitiger Sidecar
+
+ERWARTETES GHCR-IMAGE NACH GRÜNEM BUILD
+- ghcr.io/grunttanamo/minitiger-web:latest
+- ghcr.io/grunttanamo/minitiger-web:12.1
+- ghcr.io/grunttanamo/minitiger-web:sha-<commit>
+
+ERSTER LOKALER DOCKER-TEST (optional)
+Siehe SIDECAR_SETUP.md bzw. docker-compose.sidecar.example.yml.
+
+WICHTIG
+- Der Sidecar braucht KEIN /config, KEIN /cache und KEINE Medien-Volumes.
+- Bestehendes Jellyfin bleibt unangetastet.
+- Normal: Jellyfin :8096, Minitiger Sidecar :8097.
+- Virtual Sync Companion Plugin ist in diesem Sidecar bewusst NICHT automatisch
+  installiert; das folgt separat, damit der Sidecar keine Serverdaten verändert.

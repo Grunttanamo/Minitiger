@@ -1,20 +1,25 @@
 # Projektregeln
 
-- Sprache: Nutzer bevorzugt Deutsch, locker/casual, gern ♥ / xD.
+- Sprache: Deutsch, locker/casual, gern ♥ / xD.
 - Für Updates möglichst fertige ZIP-Patches liefern.
-- Bei jedem neuen Minitiger-Web-Patch zusätzlich immer den passenden PowerShell-SCP-Befehl vom Windows-Downloads-Ordner zum Raspberry Pi mitsenden.
-- Für Minitiger Web Patch-ZIPs mit geänderten Dateien + Changelog + Install + files.txt liefern.
-- Ab jetzt zusätzlich IMMER `Minitiger_Gedaechtnis/` im Patch und separate Gedächtnis-ZIP mitliefern.
-- Nicht behaupten, ein Fix sei erfolgreich, bevor Nutzer ihn bestätigt.
-- Audioflaggen möglichst nicht anfassen.
-- Lokale Trailer im Desktop Client sind seit 18.2.6-Familie funktionierend; nicht ohne Grund umbauen.
-- Jellyfin Desktop greift auf Production unter Port 8096 zu, nicht auf Dev-Server 8080.
-- Voller nativer Build findet auf dem Raspberry Pi statt; lokale Syntaxchecks ersetzen keinen semantischen Webpack-Build.
-- Bei Buildfehlern komplette rote Fehlermeldung analysieren, keine blinden Folgepatches stapeln.
-- Docker-Minitiger für Jellyfin 12 zunächst auf `jellyfin/jellyfin:12.0` pinnen, nicht ungeprüft `latest` verwenden.
-- Docker/GHCR-Variante soll Minitiger Virtual Sync mit enthalten, nicht nur den Webclient.
+- Bei jedem neuen Minitiger-Web-Patch immer passenden PowerShell-SCP-Befehl vom Windows-Downloads-Ordner zum Raspberry Pi mitsenden.
+- Patch-ZIP: nur geänderte/neue Dateien + Changelog + Install + files.txt + VERIFY + `Minitiger_Gedaechtnis/`.
+- Zusätzlich separate Gedächtnis-ZIP liefern.
+- Nicht behaupten, ein Fix sei erfolgreich, bevor Nutzer ihn getestet hat.
+- Audioflaggen nicht ohne Grund anfassen.
+- Lokale Trailer / Desktop-Codec-Fallback nicht ohne Grund umbauen.
+- Jellyfin Desktop greift auf Production 8096 zu, nicht Dev 8080.
+- Voller nativer Build findet auf Raspberry Pi statt.
+- Bei Buildfehlern komplette rote Fehlermeldung analysieren, keine blinden Folgefixes.
 
-## Gedächtnis-Paket
-- Jeder neue Patch enthält ein `Minitiger_Gedaechtnis/`-Verzeichnis.
-- Zusätzlich wird eine separate Gedächtnis-ZIP bereitgestellt.
-- Status nur als „bestätigt“ markieren, wenn Nutzer es tatsächlich getestet hat.
+## Jellyfin / Branch
+- Aktuelle kompatible Basis: Jellyfin Server + Jellyfin Web 12.1.
+- Aktiver Entwicklungsbranch: `minitiger-v12.1`.
+- 12.0-Rettungspunkt bleibt per Tag/Branch erhalten.
+
+## Docker-Verteilung
+- Bevorzugte öffentliche Architektur ab Phase 18.4.0: **Sidecar**.
+- Sidecar darf standardmäßig keine Jellyfin-Datenbank, `/config`, `/cache` oder Medienordner mounten.
+- Bestehender Jellyfin-Container soll unangetastet bleiben.
+- Full-Server-Docker aus 18.3.7.x bleibt Proof-of-Concept/Legacy, nicht die bevorzugte Laien-Installation.
+- Companion Plugin nicht ungefragt in fremde Serverconfig kopieren; später optionales Plugin-Repository.

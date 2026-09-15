@@ -1,0 +1,13 @@
+services:
+  minitiger-web:
+    image: ghcr.io/grunttanamo/minitiger-web:latest
+    container_name: minitiger-web
+    restart: unless-stopped
+    ports:
+      - "8097:80"
+    environment:
+      # Default Jellyfin host port. Change this only if your normal Jellyfin
+      # server is not reachable on the Docker host at port 8096.
+      JELLYFIN_URL: "http://host.docker.internal:8096"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
