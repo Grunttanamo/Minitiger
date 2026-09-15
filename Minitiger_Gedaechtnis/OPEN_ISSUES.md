@@ -1,11 +1,12 @@
-# Offene Punkte nach Phase 18.4.2
+# Offene Punkte nach Phase 18.4.3
 
 ## Direkt als Nächstes
-1. 18.4.2 patchen, committen und pushen.
-2. GitHub Action `Build Minitiger Sidecar` muss erneut grün werden.
-3. GHCR Package-Seite neu laden und prüfen, ob Description / Source / License sichtbar sind.
-4. Optional GitHub Default Branch von `minitiger-v12` auf `minitiger-v12.1` umstellen, damit die neue Minitiger-README die Repository-Startseite bestimmt.
-5. Unraid-Test beim Kollegen.
+1. Phase 18.4.3 patchen, verifizieren, committen und pushen.
+2. Prüfen, dass README-/Doku-Push keinen langen `Build Minitiger Sidecar` startet.
+3. GitHub Default Branch von `minitiger-v12` auf `minitiger-v12.1` umstellen.
+4. Repository- und GHCR-Package-Seite neu laden und prüfen, ob Banner + Minitiger-README sichtbar sind.
+5. Bei Bedarf `Update Minitiger Package Metadata` manuell starten und Package-Kurzbeschreibung setzen.
+6. Unraid-Test beim Kollegen.
 
 ## Bekannter, aktuell akzeptierter Komfortpunkt
 - Browser kurz `http://IP:8098` funktioniert nicht sauber.
@@ -19,4 +20,3 @@
 
 ## Später
 - Optionales Minitiger Virtual Sync Plugin als normale Jellyfin-Plugin-Repository-Installation.
-- README später optional mit echten Minitiger-Screenshots/Banner erweitern.

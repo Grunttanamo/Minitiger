@@ -25,3 +25,28 @@ NICHT VERÄNDERT
 - Minitiger UI, Trailer, Audioflags, Manga und Virtual-Library-Logik.
 - Jellyfin Server, Datenbank, Accounts, Appdata, Medien und Plugins.
 - Sidecar-Netzwerk-/Proxy-Verhalten.
+
+
+Minitiger Web – Phase 18.4.3
+GitHub Hero Banner + Fast GHCR Metadata
+
+NEU
+- Minitiger Hero-Banner für die Repository-/Package-README.
+- Animiertes GIF aus den zwei bereitgestellten Minitiger-Motiven.
+- Statischer PNG-Fallback liegt daneben.
+- README optisch neu aufgebaut: Hero, Badges, Sidecar-Erklärung, Quick Start,
+  Unraid, Tags, Kompatibilität, Credits und GPL-Hinweis.
+- Neuer manueller GitHub-Workflow `Update Minitiger Package Metadata`.
+- GHCR Description kann damit ohne npm/Webpack/Docker-Multi-Arch-Neubuild
+  aktualisiert werden.
+- README-/Dokumentationsänderungen lösen den langen Sidecar-Build nicht mehr aus.
+
+WICHTIG
+- Damit GitHub auf Repository/Package die neue README statt der alten Upstream-
+  README nimmt, soll `minitiger-v12.1` als Default Branch gesetzt werden.
+- Default-Branch-Wechsel und README-Push bauen das Docker-Image nicht neu.
+
+NICHT VERÄNDERT
+- Minitiger UI / Playback / Trailer / Audioflags / Manga / Virtual Libraries.
+- Jellyfin Server, Datenbank, Accounts, Appdata oder Medien.
+- Funktionsfähiges Sidecar-Image selbst.

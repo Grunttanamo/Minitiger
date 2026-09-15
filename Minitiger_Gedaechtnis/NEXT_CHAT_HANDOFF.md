@@ -4,21 +4,20 @@ Projekt: Jellyfin Custom Web UI `Minitiger Web`.
 
 Aktueller Stand:
 - Jellyfin Server: 12.1.0.
-- Aktiver Branch: `minitiger-v12.1`.
-- Minitiger funktioniert nach 12.1-Migration.
-- Sidecar-Image `ghcr.io/grunttanamo/minitiger-web` baut für amd64 + arm64, ist Public und funktional getestet.
-- Lokaler Sidecar: Port 8098; normales Jellyfin: 8096; 8097 = OpenMediaVault.
-- Desktop Client über Sidecar funktioniert.
-- Login/Home/Bibliotheken/Detailseiten/Playback funktionieren.
-- Browser bestätigt über `/web/index.html`.
-- Kurzer Browser-Root-Link verliert beim 302 den externen Port; Nutzer akzeptiert vorerst die längere Browser-URL.
+- Aktiver Entwicklungsbranch: `minitiger-v12.1`.
+- Repository Default Branch ist bislang `minitiger-v12`.
+- Sidecar `ghcr.io/grunttanamo/minitiger-web` Public, amd64+arm64, funktional getestet.
+- Sidecar lokal 8098; Jellyfin 8096; 8097 OpenMediaVault.
+- Desktop Client, Login, Home, Bibliotheken, Detailseiten und Playback funktionieren.
+- Browser funktioniert über `/web/index.html`.
 
-Aktueller Patch: Phase 18.4.2 GitHub / GHCR Package Page Polish.
-- eigene `README.md`
-- bessere OCI Labels
-- Multi-Arch Index Annotations für GHCR description/license/source
-- GitHub package page danach real prüfen
-- danach optional Default Branch auf `minitiger-v12.1` setzen
+Aktueller Patch: Phase 18.4.3 GitHub Hero + Fast GHCR Metadata.
+- neue README mit Minitiger Hero-Banner
+- echtes animiertes GIF + PNG-Fallback
+- README-/Doku-Push soll keinen Full Docker Build mehr triggern
+- neuer manueller Workflow `Update Minitiger Package Metadata` ohne Image-Neubuild
+- nach Push Default Branch auf `minitiger-v12.1` setzen
+- danach Package-/Repo-Seite real prüfen
 
 Regeln:
 - Zu jedem Patch PowerShell-SCP-Befehl.

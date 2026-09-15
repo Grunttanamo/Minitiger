@@ -10,32 +10,42 @@ ok "Jellyfin-Web-Basis 12.1.0 erkannt"
 
 required=(
   README.md
-  Dockerfile.minitiger-sidecar
+  docs/assets/minitiger-banner.gif
+  docs/assets/minitiger-banner.png
   .github/workflows/minitiger-sidecar.yml
+  .github/workflows/minitiger-package-metadata.yml
   SIDECAR_SETUP.md
 )
 for f in "${required[@]}"; do
   [[ -f "$f" ]] || fail "$f fehlt"
 done
-ok "GitHub-/Sidecar-Dateien vorhanden"
+ok "README, Banner und Workflows vorhanden"
 
-grep -q '^# 🐯 Minitiger Web' README.md || fail "Neue Minitiger README fehlt"
-grep -q 'ghcr.io/grunttanamo/minitiger-web:latest' README.md || fail "README Quick-Start Image fehlt"
+file docs/assets/minitiger-banner.gif | grep -q 'GIF image data' || fail "Banner-GIF ist kein echtes GIF"
+file docs/assets/minitiger-banner.png | grep -q 'PNG image data' || fail "Banner-PNG ist kein PNG"
+ok "Banner-Dateien plausibel"
+
+grep -q 'minitiger-banner.gif' README.md || fail "GIF-Banner fehlt in README"
+grep -q 'ghcr.io/grunttanamo/minitiger-web:latest' README.md || fail "README Quick Start fehlt"
 grep -q 'GPL-2.0-or-later' README.md || fail "README Lizenzhinweis fehlt"
-ok "Minitiger README plausibel"
+ok "Neue Minitiger README plausibel"
 
-grep -q 'org.opencontainers.image.description=' Dockerfile.minitiger-sidecar || fail "OCI Description Label fehlt"
-grep -q 'org.opencontainers.image.licenses="GPL-2.0-or-later"' Dockerfile.minitiger-sidecar || fail "OCI Lizenz-Label fehlt"
-grep -q 'org.opencontainers.image.source=' Dockerfile.minitiger-sidecar || fail "OCI Source Label fehlt"
-ok "Dockerfile OCI-Metadaten vorhanden"
+if grep -q -- "- 'README.md'" .github/workflows/minitiger-sidecar.yml; then
+  fail "README.md darf den langen Sidecar-Build nicht mehr triggern"
+fi
+if grep -q -- "- 'docs/\*\*'" .github/workflows/minitiger-sidecar.yml; then
+  fail "docs/** darf den langen Sidecar-Build nicht triggern"
+fi
+ok "README/Doku triggern keinen Full Sidecar Build"
 
-grep -q 'docker/metadata-action@v6' .github/workflows/minitiger-sidecar.yml || fail "docker/metadata-action fehlt"
-grep -q 'DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index' .github/workflows/minitiger-sidecar.yml || fail "Multi-Arch Index Annotation Level fehlt"
-grep -q 'annotations:.*' .github/workflows/minitiger-sidecar.yml || fail "Annotations fehlen"
-grep -q 'org.opencontainers.image.description=' .github/workflows/minitiger-sidecar.yml || fail "Workflow Description Metadata fehlt"
-grep -q 'org.opencontainers.image.licenses=GPL-2.0-or-later' .github/workflows/minitiger-sidecar.yml || fail "Workflow License Metadata fehlt"
-grep -q -- "- 'README.md'" .github/workflows/minitiger-sidecar.yml || fail "README triggert Sidecar-Build nicht"
-ok "GHCR Multi-Arch-Metadaten Workflow plausibel"
+grep -q '^name: Update Minitiger Package Metadata' .github/workflows/minitiger-package-metadata.yml || fail "Metadata-Workflow-Name fehlt"
+grep -q 'workflow_dispatch:' .github/workflows/minitiger-package-metadata.yml || fail "Metadata-Workflow ist nicht manuell startbar"
+grep -q 'docker buildx imagetools create' .github/workflows/minitiger-package-metadata.yml || fail "imagetools Metadata-Update fehlt"
+grep -q 'index:org.opencontainers.image.description=' .github/workflows/minitiger-package-metadata.yml || fail "Index Description Annotation fehlt"
+if grep -q 'build-push-action' .github/workflows/minitiger-package-metadata.yml; then
+  fail "Metadata-Workflow darf keinen Docker-Neubuild enthalten"
+fi
+ok "Metadata-only Workflow plausibel"
 
 branch=$(git branch --show-current 2>/dev/null || true)
 if [[ "$branch" == "minitiger-v12.1" ]]; then
@@ -45,5 +55,5 @@ else
 fi
 
 echo
-echo "Phase 18.4.2 ist statisch verifiziert."
-echo "Die sichtbare GHCR-Beschreibung muss nach dem neuen Multi-Arch-Build noch real geprüft werden."
+echo "Phase 18.4.3 ist statisch verifiziert."
+echo "Nach dem Push Default Branch auf minitiger-v12.1 setzen und Package-Seite neu laden."

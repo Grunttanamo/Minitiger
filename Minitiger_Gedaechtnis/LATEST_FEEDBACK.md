@@ -5,6 +5,8 @@
 3. Jellyfin Desktop Client funktioniert direkt mit `IP:8098`.
 4. Login, Home, Bibliotheken, Detailseiten und Playback funktionieren.
 5. Browser funktioniert mit `http://IP:8098/web/index.html`.
-6. Kurzer Browser-Link `http://IP:8098` funktioniert trotz 18.4.1 noch nicht; curl zeigt 302 zu `http://127.0.0.1/web/index.html`, wodurch der externe Port fehlt.
-7. Nutzer bewertet diesen Browser-Komfortpunkt aktuell als unwichtig, solange Desktop Client funktioniert und Browser-Pfad dokumentiert ist.
-8. Nächster Wunsch: die öffentliche GitHub-/GHCR-Seite `minitiger-web` hübscher und verständlicher machen.
+6. Kurzer Browser-Link ist für den Nutzer aktuell kein Blocker.
+7. Nutzer möchte nun vor allem die GitHub-/GHCR-Seite hübsch machen.
+8. Phase 18.4.2 hat die sichtbare originale Jellyfin-Beschreibung/README auf der Package-Seite noch nicht ersetzt.
+9. Nutzer möchte ausdrücklich vermeiden, für reine Beschreibung/README-Änderungen jedes Mal den langen Docker-Build laufen zu lassen.
+10. Nutzer stellte zwei Minitiger-Banner-Motive bereit und möchte bevorzugt ein GIF als Banner, alternativ das Bild.

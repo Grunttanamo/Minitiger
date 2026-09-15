@@ -1,12 +1,14 @@
-Phase 18.4.2 Patch: minitiger_native_phase18_4_2_github_package_polish.zip
-Separate memory: Minitiger_Gedaechtnis_2026-09-15_v39.zip
-Changed runtime/build files:
+Aktuelle Artefakte – Phase 18.4.3
+
+Patch:
+- minitiger_native_phase18_4_3_github_hero_metadata_quickupdate.zip
+
+Memory:
+- Minitiger_Gedaechtnis_2026-09-15_v40.zip
+
+Neue/maßgebliche Dateien:
 - README.md
-- Dockerfile.minitiger-sidecar
+- docs/assets/minitiger-banner.gif
+- docs/assets/minitiger-banner.png
 - .github/workflows/minitiger-sidecar.yml
-Documentation/verification:
-- SIDECAR_SETUP.md
-- INSTALL.txt
-- CHANGELOG_Minitiger_Web.txt
-- files.txt
-- VERIFY_PATCH.sh
+- .github/workflows/minitiger-package-metadata.yml

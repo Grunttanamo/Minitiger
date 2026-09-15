@@ -41,3 +41,13 @@
 - docker/metadata-action@v6 ergänzt.
 - Multi-Arch-Index-Annotations für GHCR Package-Beschreibung ergänzt.
 - Package-Seite bleibt GitHub-layoutgebunden; freie Gestaltung erfolgt über Repository-README.
+
+
+## Phase 18.4.3 – GitHub Hero Banner + Fast GHCR Metadata
+- Hero-Banner in der Minitiger-README.
+- Echtes animiertes 2-Frame-GIF aus den zwei bereitgestellten Motiven + PNG-Fallback.
+- README optisch neu strukturiert mit Badges, Sidecar-Übersicht, Quick Start, Unraid, Tags und Credits.
+- README-/Doku-Dateien aus dem Full-Sidecar-Build-Trigger entfernt.
+- Neuer manueller Workflow `Update Minitiger Package Metadata`.
+- Workflow nutzt `docker buildx imagetools create`, um bestehende amd64/arm64-Manifeste wiederzuverwenden und nur GHCR-Index-Metadaten zu ändern.
+- Default Branch `minitiger-v12.1` ist erforderlich/empfohlen, damit GitHub die neue README standardmäßig zeigt.

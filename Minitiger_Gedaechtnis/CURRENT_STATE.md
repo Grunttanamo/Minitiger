@@ -1,4 +1,4 @@
-# Aktueller Projektstand – Phase 18.4.2
+# Aktueller Projektstand – Phase 18.4.3
 
 ## Jellyfin 12.1
 - Jellyfin Server läuft auf 12.1.0.
@@ -19,14 +19,15 @@
 ## Bekannter Komfortpunkt
 - Der kurze Browser-Aufruf nur über `http://IP:8098` funktioniert weiterhin nicht sauber.
 - `curl /` zeigt einen 302-Redirect auf `http://127.0.0.1/web/index.html`; dabei geht der externe Host-Port verloren.
-- Der Nutzer betrachtet dies aktuell nicht als Blocker, da Desktop Client ohne Zusatzpfad funktioniert und Browser-Nutzer `/web/index.html` verwenden können.
+- Nutzer betrachtet dies aktuell nicht als Blocker.
 
-## Phase 18.4.2 – GitHub / GHCR Polish
-- Neue eigene `README.md` für Minitiger Web.
-- Dockerfile bekommt vollständige OCI-Metadaten inkl. GPL-2.0-or-later.
-- GitHub Action schreibt Package-Beschreibung auch als Multi-Arch-Index-Annotation, damit GHCR sie sichtbar darstellen kann.
-- `latest`, `12.1` und `sha-...` bleiben die vorgesehenen Tags.
-- Sichtbare Package-Seite ist erst nach neuem erfolgreichen GHCR-Build bestätigt.
+## GitHub / GHCR Präsentation
+- Phase 18.4.2 änderte OCI-Metadaten und README, aber auf der Package-Seite blieb weiterhin die originale Jellyfin-README sichtbar.
+- Repository-Default-Branch ist noch `minitiger-v12`; `minitiger-v12.1` ist nicht Default.
+- Phase 18.4.3 bringt eine neue Minitiger-README mit Hero-Banner sowie ein echtes animiertes GIF + PNG-Fallback.
+- README-/Doku-Änderungen sollen künftig keinen vollständigen Multi-Arch-Sidecar-Build mehr starten.
+- Neuer Workflow `Update Minitiger Package Metadata` aktualisiert die Multi-Arch-Index-Beschreibung aus einem bestehenden Image ohne npm/Webpack/Docker-Neubuild.
+- Nach 18.4.3 soll `minitiger-v12.1` in GitHub als Default Branch gesetzt werden, damit Repo- und verknüpfte Package-README die Minitiger-Seite zeigen.
 
 ## Weiterhin bewusst getrennt
 - Virtual Sync Companion Plugin wird nicht automatisch in Jellyfin installiert.

@@ -1,5 +1,7 @@
-# Minitiger Gedächtnis v39
+# Minitiger Gedächtnis v40
 
-Startpunkt: `CURRENT_STATE.md`, dann `LATEST_FEEDBACK.md`, `OPEN_ISSUES.md` und `NEXT_CHAT_HANDOFF.md`.
+Stand: 2026-09-15 · Phase 18.4.3
 
-Aktuell: Jellyfin 12.1 + Minitiger Sidecar sind funktional bestätigt. Phase 18.4.2 poliert nun die öffentliche GitHub-/GHCR-Präsentation mit eigener Minitiger-README und korrekten Multi-Arch-Package-Metadaten.
+Wichtigster aktueller Punkt: Der Sidecar ist funktional bestätigt. Jetzt wird die öffentliche GitHub-/GHCR-Präsentation auf Minitiger umgestellt, inklusive Hero-Banner und schneller Package-Metadata-Aktualisierung ohne vollständigen Docker-Neubuild.
+
+Zuerst `CURRENT_STATE.md`, dann `NEXT_CHAT_HANDOFF.md` und `OPEN_ISSUES.md` lesen.

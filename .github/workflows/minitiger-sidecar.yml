@@ -13,8 +13,6 @@ on:
       - 'Dockerfile.minitiger-sidecar'
       - 'Dockerfile.minitiger-sidecar.dockerignore'
       - 'docker/minitiger-sidecar.conf.template'
-      - '.github/workflows/minitiger-sidecar.yml'
-      - 'README.md'
   workflow_dispatch:
 
 permissions:

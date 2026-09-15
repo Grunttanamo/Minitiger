@@ -23,3 +23,8 @@
 - Bestehender Jellyfin-Container soll unangetastet bleiben.
 - Full-Server-Docker aus 18.3.7.x bleibt Proof-of-Concept/Legacy, nicht die bevorzugte Laien-Installation.
 - Companion Plugin nicht ungefragt in fremde Serverconfig kopieren; später optionales Plugin-Repository.
+
+## GitHub / GHCR Präsentation
+- README-/Banner-/Dokumentationsänderungen dürfen keinen vollständigen Multi-Arch-Docker-Build auslösen.
+- Für reine GHCR-Beschreibungsänderungen den Metadata-only Workflow verwenden.
+- Aktuelle Projekt-README liegt auf `minitiger-v12.1`; dieser Branch soll Default sein.

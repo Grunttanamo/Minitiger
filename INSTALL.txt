@@ -1,28 +1,31 @@
-MINITIGER WEB – PHASE 18.4.2
-GitHub / GHCR Package Page Polish
+MINITIGER WEB – PHASE 18.4.3
+GitHub Hero Banner + Fast GHCR Metadata
 
 VORAUSSETZUNG
 - Branch: minitiger-v12.1
-- Phase 18.4.1 ist bereits eingespielt.
+- Phase 18.4.2 ist bereits eingespielt.
 - Jellyfin Server / Webbasis: 12.1.
 - GHCR-Package `minitiger-web` ist Public.
 
 ZIEL
-- Die öffentliche GitHub-/GHCR-Präsentation soll nicht mehr wie ein nacktes
-  Jellyfin-/Docker-Paket wirken.
-- GHCR bekommt eine sichtbare, verständliche Beschreibung und Lizenz.
-- Das Repository bekommt eine eigene Minitiger-README mit Sidecar-Erklärung,
-  Quick Start, Unraid-Hinweisen, Tags und Kompatibilität.
+- Minitiger bekommt eine eigene hübsche README mit Banner statt der sichtbaren
+  Upstream-Jellyfin-Präsentation.
+- README-/Banner-Änderungen sollen KEINEN langen Docker-Multi-Arch-Build mehr
+  auslösen.
+- Die kurze GHCR-Package-Beschreibung kann künftig über einen manuellen,
+  schnellen Metadata-Workflow geändert werden, ohne Minitiger neu zu bauen.
 
-ÄNDERUNGEN
-- README.md komplett auf Minitiger Web umgestellt.
-- Dockerfile.minitiger-sidecar bekommt aussagekräftige OCI-Metadaten:
-  title, description, source, url, licenses, vendor.
-- GitHub Action nutzt docker/metadata-action und schreibt dieselben Metadaten
-  zusätzlich als Multi-Arch-Index-Annotations. Das ist wichtig, damit GHCR die
-  Beschreibung bei amd64+arm64 tatsächlich auf der Package-Seite anzeigen kann.
-- Tags bleiben: latest, 12.1 und sha-...
-- README-Änderungen lösen künftig ebenfalls einen Sidecar-Build aus.
+NEU
+- docs/assets/minitiger-banner.gif
+  -> echtes animiertes 2-Frame-GIF aus den bereitgestellten Minitiger-Motiven.
+- docs/assets/minitiger-banner.png
+  -> statischer Fallback.
+- README.md
+  -> Hero-Banner, Badges, Sidecar-Erklärung, Quick Start, Unraid, Tags,
+     Kompatibilität, Credits/Lizenz.
+- .github/workflows/minitiger-package-metadata.yml
+  -> manueller Metadata-only Workflow für GHCR.
+- Build Minitiger Sidecar wird bei README-/Doku-Änderungen nicht mehr gestartet.
 
 INSTALLATION AUF DEM RASPBERRY PI
 
@@ -30,38 +33,39 @@ INSTALLATION AUF DEM RASPBERRY PI
    cd ~/minitiger-web
 
 2) Patch entpacken:
-   unzip -o ~/minitiger_native_phase18_4_2_github_package_polish.zip -d ~/minitiger-web
+   unzip -o ~/minitiger_native_phase18_4_3_github_hero_metadata_quickupdate.zip -d ~/minitiger-web
 
 3) Prüfen:
    chmod +x VERIFY_PATCH.sh
    ./VERIFY_PATCH.sh
 
 4) Committen und pushen:
-   git add README.md Dockerfile.minitiger-sidecar \
-     .github/workflows/minitiger-sidecar.yml SIDECAR_SETUP.md \
-     INSTALL.txt CHANGELOG_Minitiger_Web.txt files.txt VERIFY_PATCH.sh \
-     Minitiger_Gedaechtnis
-   git commit -m "Polish Minitiger GitHub package page"
+   git add README.md docs/assets \
+     .github/workflows/minitiger-sidecar.yml \
+     .github/workflows/minitiger-package-metadata.yml \
+     SIDECAR_SETUP.md INSTALL.txt CHANGELOG_Minitiger_Web.txt \
+     files.txt VERIFY_PATCH.sh Minitiger_Gedaechtnis
+
+   git commit -m "Add Minitiger banner and fast package metadata workflow"
    git push
 
-5) Auf GitHub warten, bis `Build Minitiger Sidecar` grün ist.
+WICHTIG NACH DEM PUSH
+Der sichtbare Package-README-Block hängt am verknüpften Repository. Damit die
+Minitiger-README statt der alten Jellyfin-README erscheint, den Default Branch
+auf `minitiger-v12.1` stellen:
 
-6) Danach Package-Seite neu laden:
-   https://github.com/Grunttanamo/Minitiger/pkgs/container/minitiger-web
+GitHub -> Minitiger -> Settings -> Default branch -> Wechsel-Symbol
+-> minitiger-v12.1 -> Update -> bestätigen.
 
-ERWARTUNG
-- Unter `minitiger-web` erscheint eine Minitiger-Beschreibung.
-- Source Repository ist sauber verknüpft.
-- Lizenz wird als GPL-2.0-or-later angezeigt.
-- Tags latest / 12.1 / sha-... bleiben vorhanden.
+DAS LÖST KEINEN DOCKER-BUILD AUS.
 
-OPTIONAL ABER EMPFOHLEN
-Damit die normale Repository-Startseite ebenfalls sofort Minitiger zeigt:
-GitHub -> Repository -> Settings -> Branches -> Default branch
-und `minitiger-v12.1` als Default setzen.
+PACKAGE-BESCHREIBUNG OHNE DOCKER-BUILD ÄNDERN
+GitHub -> Minitiger -> Actions -> Update Minitiger Package Metadata
+-> Run workflow -> Description bearbeiten -> Run workflow.
 
-HINWEIS
-Die GHCR Package-Seite selbst hat ein festes GitHub-Layout. Man kann dort keine
-beliebigen Banner, CSS oder freie Markdown-Seiten einbauen. Die sichtbaren
-Anpassungspunkte sind vor allem Description, License, Source und Tags. Für die
-richtig hübsche Projektseite ist die README.md zuständig.
+Dieser Workflow kompiliert Minitiger NICHT neu. Er verwendet das vorhandene
+Multi-Arch-Image und aktualisiert nur die GHCR-Index-Metadaten für `latest`
+und `12.1`.
+
+PACKAGE-SEITE
+https://github.com/Grunttanamo/Minitiger/pkgs/container/minitiger-web
