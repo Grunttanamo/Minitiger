@@ -17,7 +17,7 @@ ARG JELLYFIN_VERSION=12.0
 ENV JELLYFIN_VERSION=$JELLYFIN_VERSION
 RUN npm run build:production
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim AS plugin-builder
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS plugin-builder
 WORKDIR /src
 COPY tools/MinitigerVirtualSync/ ./tools/MinitigerVirtualSync/
 RUN dotnet restore tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj \

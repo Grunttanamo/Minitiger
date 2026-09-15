@@ -1,14 +1,11 @@
 # Letztes Nutzerfeedback – 2026-09-15
 
-Phase 18.3.6 wurde vom Nutzer erfolgreich getestet:
+GitHub-/Docker-Setup:
+1. SSH-Zugang vom Raspberry Pi zu GitHub wurde eingerichtet.
+2. Der zunächst fehlschlagende Push war durch ein shallow Jellyfin-Web-Repository verursacht; nach `git fetch --unshallow origin` wurde `minitiger-v12` erfolgreich nach `github.com:Grunttanamo/Minitiger.git` gepusht.
+3. GitHub Actions war anfangs deaktiviert und wurde anschließend aktiviert.
+4. Der Workflow `Build Minitiger Docker` startete nach einem Trigger-Commit.
+5. Der erste Docker-Build scheiterte nach ca. 44 Sekunden an:
+   `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found`.
 
-1. Der Reihenabstand funktioniert nun wie gewünscht; virtuelle Bibliotheken reagieren auf denselben globalen Wert wie die übrigen Home-Reihen.
-2. Einzelne Manga-/Buch-Bände direkt in der Comics/Books-Wurzel zeigen keine fremden `Weitere Bände` mehr.
-
-Neu aufgefallen:
-- Manga/Bücher-Detailpages zeigen oben noch den klickbaren Parent-/Bibliotheksnamen (Beispiel `Comics`). Dieser soll samt Link vollständig verschwinden.
-
-Neuer Testwunsch:
-- Minitiger Web soll einem Kollegen als Docker-Variante gegeben werden können.
-- Der Kollege erwartet eine GitHub-/Registry-basierte Nutzung.
-- Phase 18.3.7 ergänzt dafür Dockerfile, GHCR-Workflow, Compose-Beispiel und Anleitung.
+Phase 18.3.7.1 adressiert ausschließlich diesen konkreten Docker-Buildfehler durch Wechsel auf `mcr.microsoft.com/dotnet/sdk:10.0`.

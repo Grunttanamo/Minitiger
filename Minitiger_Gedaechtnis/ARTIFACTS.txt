@@ -1,5 +1,3 @@
-Aktueller Patch:
-- minitiger_native_phase18_3_7_manga_parent_docker_github.zip
-
-Aktuelles Gedächtnis:
-- Minitiger_Gedaechtnis_2026-09-15_v35.zip
+Phase 18.3.7.1 Patch: minitiger_native_phase18_3_7_1_dotnet10_docker_hotfix.zip
+Separate memory: Minitiger_Gedaechtnis_2026-09-15_v36.zip
+Primary code change: Dockerfile.minitiger

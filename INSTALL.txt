@@ -1,23 +1,27 @@
-MINITIGER PHASE 18.3.7
+MINITIGER PHASE 18.3.7.1 – DOCKER BUILD HOTFIX
 
-Voraussetzung: Phase 18.3.6.
+Voraussetzung: Phase 18.3.7 ist im Repo.
 
-Änderungen:
-- Manga/Bücher-Detailpages zeigen den klickbaren Parent-/Bibliotheksnamen (z.B. "Comics") nicht mehr.
-- Docker/GitHub-Starter hinzugefügt: Dockerfile.minitiger, Compose-Beispiel, GHCR-GitHub-Action und Plugin-Entrypoint.
+Dieser Hotfix ändert nur die Docker-.NET-Buildstage plus Patch-/Gedächtnisdateien.
 
-DEV TEST AUF :8080
+1) Patch auf dem Raspberry Pi einspielen:
 
   cd ~/minitiger-web
-  unzip -o ~/minitiger_native_phase18_3_7_manga_parent_docker_github.zip -d ~/minitiger-web
+  unzip -o ~/minitiger_native_phase18_3_7_1_dotnet10_docker_hotfix.zip -d ~/minitiger-web
   chmod +x VERIFY_PATCH.sh
   ./VERIFY_PATCH.sh
 
-Der Dev-Server kompiliert danach automatisch neu.
+2) Hotfix nach GitHub pushen, damit der Docker-Workflow neu startet:
 
-Docker/GitHub-Anleitung:
-  DOCKER_GITHUB_SETUP.md
+  git add Dockerfile.minitiger CHANGELOG_Minitiger_Web.txt INSTALL.txt files.txt VERIFY_PATCH.sh Minitiger_Gedaechtnis
+  git commit -m "Fix .NET 10 Docker SDK image"
+  git push
 
-Erst nach erfolgreichem normalen Web-Test Production deployen:
-  chmod +x DEPLOY_PRODUCTION.sh
-  ./DEPLOY_PRODUCTION.sh
+3) Danach auf GitHub:
+   Repository -> Actions -> Build Minitiger Docker
+
+Der Workflow sollte automatisch durch den Push starten.
+
+Wichtig:
+- Der bisherige Fehler `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found` ist mit diesem Patch adressiert.
+- Wenn der nächste Lauf an einer anderen Stelle rot wird, die neue rote Fehlermeldung vollständig schicken; nicht blind weitere Änderungen machen.

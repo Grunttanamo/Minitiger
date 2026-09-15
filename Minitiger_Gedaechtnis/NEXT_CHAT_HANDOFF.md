@@ -1,22 +1,26 @@
 # Übergabe für neuen Chat
 
-Projekt: Jellyfin 12 Custom Web UI `Minitiger Web`, Branch `minitiger-v12`, Source `~/minitiger-web`, Production nativ über `/opt/minitiger-web/dist` auf Port 8096. Dev-Server bevorzugt auf Port 8080 testen; Production erst nach Nutzerbestätigung.
+Projekt: Jellyfin 12 Custom Web UI `Minitiger Web`, Branch `minitiger-v12`, Source `~/minitiger-web`, Production nativ über `/opt/minitiger-web/dist` auf Port 8096.
 
-Aktueller Patch: Phase 18.3.7. Voraussetzung: 18.3.6.
+Aktueller Patch: Phase 18.3.7.1. Voraussetzung: 18.3.7.
 
-Vom Nutzer bestätigt nach 18.3.6:
-- Home-Reihenabstand funktioniert nun auch für virtuelle Bibliotheken korrekt.
-- Einzelbände in der Comics/Books-Wurzel zeigen keine fremden `Weitere Bände` mehr.
+Wichtiger Docker/GitHub-Stand:
+- GitHub-Repo: `Grunttanamo/Minitiger`, Branch `minitiger-v12`.
+- SSH-Push vom Raspberry Pi funktioniert.
+- Das Repo war ursprünglich shallow; nach `git fetch --unshallow origin` funktionierte der erste vollständige Push (~200 MiB).
+- GitHub Actions wurde aktiviert.
+- Workflow `Build Minitiger Docker` startet.
+- Erster Lauf scheiterte konkret an `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found`.
+- Ursache: .NET 10 hat keine Debian/Bookworm-Images.
+- Phase 18.3.7.1 setzt die Plugin-Buildstage auf `mcr.microsoft.com/dotnet/sdk:10.0`.
 
-Phase 18.3.7:
-- Entfernt die klickbare Parent-/Bibliothekszeile (z.B. `Comics`) aus Minitiger-Manga/Buch-Detailpages.
-- Fügt Docker/GitHub-Verteilung hinzu: `Dockerfile.minitiger`, GHCR GitHub Action, Compose-Beispiel, Startup-Wrapper für Minitiger Virtual Sync und `DOCKER_GITHUB_SETUP.md`.
-- Docker-Basis absichtlich `jellyfin/jellyfin:12.0`, nicht `latest`.
-- Multi-Arch Ziel: linux/amd64 + linux/arm64.
+Noch nicht bestätigt:
+- 18.3.7 Manga-Parent-Cleanup.
+- Vollständig grüner Docker/GHCR-Build.
+- Docker-Lauf beim Kollegen.
 
-Wichtige Regeln:
-- Trailer-Pipeline und funktionierende Audioflaggen-Sprachlogik nicht unnötig umbauen.
-- Jeder Patch nur mit geänderten Dateien + INSTALL/CHANGELOG/files/VERIFY + `Minitiger_Gedaechtnis/`.
-- Separates Gedächtnis-ZIP ausgeben.
-- Zu jedem Patch den PowerShell-SCP-Befehl vom Windows-Downloads-Ordner zum Raspberry Pi mitgeben.
+Regeln:
+- Zu jedem Patch PowerShell-SCP-Befehl mitsenden.
+- Patch-ZIP nur geänderte Dateien + INSTALL/CHANGELOG/files/VERIFY + `Minitiger_Gedaechtnis/`.
+- Separate Gedächtnis-ZIP ausgeben.
 - Nichts als bestätigt markieren, bevor der Nutzer es getestet hat.

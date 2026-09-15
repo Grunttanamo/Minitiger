@@ -37,3 +37,7 @@ Plugin-Ziel nativ:
 - GitHub Action: `.github/workflows/minitiger-docker.yml`
 - Multi-Arch: amd64 + arm64
 - Anleitung: `DOCKER_GITHUB_SETUP.md`
+
+## Docker-Hotfix 18.3.7.1
+- .NET-10-Plugin-Buildstage: `mcr.microsoft.com/dotnet/sdk:10.0`
+- Nicht `10.0-bookworm-slim`: .NET 10 veröffentlicht keine Debian/Bookworm-Containerimages.

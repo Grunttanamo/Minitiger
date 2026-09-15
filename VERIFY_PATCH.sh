@@ -2,38 +2,34 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MANGA="$ROOT_DIR/src/apps/modern/routes/minitiger/details/MinitigerMangaDetails.tsx"
+DOCKERFILE="$ROOT_DIR/Dockerfile.minitiger"
 
-printf '[18.3.7] Prüfe Manga-Parentzeile ... '
-if grep -q "minitigerDetailsParentTitle" "$MANGA"; then
+printf '[18.3.7.1] Prüfe Dockerfile ... '
+test -f "$DOCKERFILE" || { echo 'FEHLER'; echo 'Dockerfile.minitiger fehlt.' >&2; exit 1; }
+echo 'OK'
+
+printf '[18.3.7.1] Prüfe entfernten ungültigen .NET-10-Bookworm-Tag ... '
+if grep -q 'mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim' "$DOCKERFILE"; then
   echo 'FEHLER'
-  echo 'Die Parent-/Bibliothekszeile ist in MinitigerMangaDetails.tsx noch vorhanden.' >&2
+  echo 'Der nicht existente .NET-10-Bookworm-Tag ist noch vorhanden.' >&2
   exit 1
 fi
 echo 'OK'
 
-printf '[18.3.7] Prüfe Docker-Dateien ... '
-for f in \
-  Dockerfile.minitiger \
-  Dockerfile.minitiger.dockerignore \
-  docker-compose.example.yml \
-  docker/minitiger-entrypoint.sh \
-  .github/workflows/minitiger-docker.yml \
-  DOCKER_GITHUB_SETUP.md; do
-  test -f "$ROOT_DIR/$f" || { echo "FEHLER: $f fehlt" >&2; exit 1; }
-done
-echo 'OK'
-
-printf '[18.3.7] Prüfe Plugin-Quellprojekt im bestehenden Repo ... '
-if [[ ! -f "$ROOT_DIR/tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj" ]]; then
+printf '[18.3.7.1] Prüfe offiziellen .NET-10-SDK-Tag ... '
+grep -q 'mcr.microsoft.com/dotnet/sdk:10.0 AS plugin-builder' "$DOCKERFILE" || {
   echo 'FEHLER'
-  echo 'Das Virtual-Sync-Projekt aus Phase 18.3.1 fehlt. Docker-Build wäre unvollständig.' >&2
+  echo 'Die Plugin-Buildstage verwendet nicht den erwarteten offiziellen .NET-10-SDK-Tag.' >&2
   exit 1
-fi
+}
 echo 'OK'
 
-printf '[18.3.7] Prüfe EntryPoint-Shellsyntax ... '
-sh -n "$ROOT_DIR/docker/minitiger-entrypoint.sh"
+printf '[18.3.7.1] Prüfe bestehendes Virtual-Sync-Projekt ... '
+test -f "$ROOT_DIR/tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj" || {
+  echo 'FEHLER'
+  echo 'Virtual-Sync-Projekt fehlt im Repo.' >&2
+  exit 1
+}
 echo 'OK'
 
-echo '[18.3.7] Patchmarker vollständig.'
+echo '[18.3.7.1] Docker-Hotfixmarker vollständig.'

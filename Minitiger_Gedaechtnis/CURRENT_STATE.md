@@ -1,4 +1,4 @@
-# Aktueller Projektstand – Phase 18.3.7
+# Aktueller Projektstand – Phase 18.3.7.1
 
 ## Bestätigt funktionierend
 - Detailpage-Einstellungen greifen.
@@ -9,24 +9,24 @@
 - Virtuelle Bibliothek Hover-MP4 + Bild/Logo Speicherung/Wiedergabe funktioniert seit 18.3.2.1.
 - Seitliche Reihentitel, Side-Glow und Arrow-Lane funktionieren grundsätzlich.
 - Eigene Manga-Hauptposter-/Band-Größenregler sowie eigene Pfeil-/Genre-Farben vorhanden.
-- Phase 18.3.3.1 behebt den TS2367-Compilefehler in ItemsView.tsx.
 - Manga/Buch: `Verlag` wird aus Jellyfin `Studios` angezeigt.
-- Phase 18.3.6 vom Nutzer bestätigt: globaler `Reihenabstand` greift nun auch korrekt auf die virtuellen Bibliotheksreihen, ohne dass `Weiterschauen` unkontrolliert auseinanderläuft.
+- Phase 18.3.6 vom Nutzer bestätigt: globaler `Reihenabstand` greift korrekt auf normale und virtuelle Home-Reihen.
 - Phase 18.3.6 vom Nutzer bestätigt: Einzelbände direkt in der Books/Comics-Bibliothekswurzel zeigen keine fremden `Weitere Bände` mehr.
 
-## Neues Feedback nach 18.3.6
-- Auf Manga/Bücher-Detailpages erscheint oberhalb von `MANGA BAND` noch der Parent-/Bibliotheksname, z.B. `Comics`.
-- Dieser Text ist klickbar und führt auf eine andere Jellyfin-Detailpage; gewünscht ist, diese Parent-/Bibliothekszeile auf Minitiger-Manga/Buch-Detailpages vollständig zu entfernen.
-- Zusätzlich soll Minitiger Web testweise als Docker-Variante an einen Kollegen verteilt werden können. Gewünscht ist ein einfacher GitHub/GHCR-Workflow.
+## Phase 18.3.7 – noch zu testen
+- Klickbare Parent-/Bibliothekszeile (z.B. `Comics`) wurde aus Minitiger-Manga/Buch-Detailpages entfernt.
+- Docker/GitHub-Verteilung wurde ergänzt.
+- GitHub-Repository wurde erfolgreich via SSH auf Branch `minitiger-v12` gepusht und GitHub Actions aktiviert.
 
-## Phase 18.3.7 – neuer Teststand
-- Die klickbare Parent-/Bibliothekszeile in `MinitigerMangaDetails.tsx` wurde entfernt. `Comics` bzw. vergleichbare Parent-Namen erscheinen damit nicht mehr im Hero.
-- Docker-Unterstützung ergänzt:
-  - `Dockerfile.minitiger` baut Minitiger Web aus dem aktuellen Repo und setzt es auf das offizielle Jellyfin-12.0-Image.
-  - Minitiger Virtual Sync wird mit .NET 10 gebaut.
-  - Startup-Wrapper kopiert die Plugin-DLL in das persistente `/config/plugins`-Volume.
-  - GitHub Actions kann Multi-Arch-Images (amd64 + arm64) nach GHCR veröffentlichen.
-  - Compose-Beispiel + Einsteiger-Anleitung liegen bei.
+## Docker-Testfeedback
+- Erster Workflow-Lauf `Build Minitiger Docker` startete erfolgreich, scheiterte aber beim Auflösen der Plugin-Buildstage.
+- Konkreter Fehler: `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found`.
+- Ursache: .NET 10 veröffentlicht keine Debian/Bookworm-Containerimages mehr; der verwendete Tag existiert nicht.
+
+## Phase 18.3.7.1 – neuer Hotfix-Teststand
+- `Dockerfile.minitiger` verwendet für die Plugin-Buildstage jetzt `mcr.microsoft.com/dotnet/sdk:10.0`.
+- Der Tag ist der offizielle .NET-10-Standardtag und basiert auf Ubuntu 24.04/Noble.
+- Sonst keine Funktionsänderungen.
 
 ## Nicht verändert
 - Trailer-Pipeline / Desktop-Codec-Fallback.
@@ -34,3 +34,4 @@
 - Banner-Datenpipeline.
 - Row-Gap-Fix aus 18.3.6.
 - Manga-Library-Root-Erkennung aus 18.3.6.
+- Manga-Parent-Cleanup aus 18.3.7.

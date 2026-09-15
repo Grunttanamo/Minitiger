@@ -1,17 +1,15 @@
-# Offene Punkte nach Phase 18.3.7
+# Offene Punkte nach Phase 18.3.7.1
 
-## Jetzt testen
-1. Manga-/Buch-Detailpage: oberhalb von `MANGA BAND` darf kein klickbarer Parent-/Bibliotheksname wie `Comics` mehr erscheinen.
-2. Echte Manga-Reihe: `Weitere Bände` bleibt weiterhin vorhanden und navigierbar.
-3. Einzelband in Books/Comics-Root: `Weitere Bände` bleibt weiterhin vollständig unterdrückt.
+## Web / Manga noch testen
+1. Manga-/Buch-Detailpage: Parent-/Bibliotheksname wie `Comics` ist nach 18.3.7 vollständig weg.
+2. Echte Manga-Reihe: `Weitere Bände` bleibt erhalten.
+3. Einzelband in Books/Comics-Root: `Weitere Bände` bleibt unterdrückt.
 4. Regression: globaler Home-`Reihenabstand` bleibt für normale + virtuelle Reihen identisch.
 
-## Docker / GitHub
-- Den aktuellen kompletten `minitiger-v12`-Quellstand inklusive Phase 18.3.7 in ein GitHub-Repository pushen.
-- GitHub Action `Build Minitiger Docker` einmal erfolgreich durchlaufen lassen.
-- GHCR-Image auf einem Docker-System des Kollegen testen.
-- Prüfen, ob Minitiger Virtual Sync im Container unter `/config/plugins/Minitiger Virtual Sync/` geladen wird und der Status-Endpunkt erreichbar ist.
-- Hardware-Transcoding wurde im Compose-Beispiel absichtlich noch nicht vorkonfiguriert, weil Geräte/Host des Kollegen unbekannt sind.
-
-## Weiter beobachten
-- Detail-Audioflaggen aus 18.3.5 wurden zuletzt nicht erneut beanstandet, aber nicht separat als endgültig bestätigt protokolliert.
+## Docker / GitHub jetzt testen
+1. Phase 18.3.7.1 einspielen und nach `minitiger-v12` pushen.
+2. Automatischen Workflow `Build Minitiger Docker` beobachten.
+3. Prüfen, ob die .NET-Plugin-Buildstage nun über `mcr.microsoft.com/dotnet/sdk:10.0` hinauskommt.
+4. Falls ein neuer Fehler erscheint: vollständige neue rote Fehlermeldung analysieren, nicht mehrere blinde Fixes stapeln.
+5. Erst nach komplett grünem Workflow GHCR-Image auf dem Docker-System des Kollegen testen.
+6. Danach Companion Plugin unter `/config/plugins/Minitiger Virtual Sync/` und Status-Endpunkt prüfen.

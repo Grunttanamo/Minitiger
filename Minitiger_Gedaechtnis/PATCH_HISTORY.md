@@ -21,3 +21,8 @@
 - Startup-Wrapper installiert die Companion-Plugin-DLL in `/config/plugins`, auch bei persistentem Docker-Config-Volume.
 - GitHub Action publiziert amd64/arm64 Images nach GHCR.
 - Compose-Beispiel und Schritt-für-Schritt-GitHub-Anleitung hinzugefügt.
+
+## Phase 18.3.7.1 – .NET 10 Docker Image Hotfix
+- Erster GitHub-Actions-Build von 18.3.7 scheiterte an `mcr.microsoft.com/dotnet/sdk:10.0-bookworm-slim: not found`.
+- Wechselt die Plugin-Buildstage auf den offiziellen Tag `mcr.microsoft.com/dotnet/sdk:10.0`.
+- Keine Web-/UI-Funktionsänderung.
