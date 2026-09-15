@@ -15,6 +15,7 @@ import AppDrawer, { isDrawerPath } from './components/drawers/AppDrawer';
 import LibraryToolbar from './features/libraries/components/LibraryToolbar';
 import { LibraryProvider } from './features/libraries/hooks/useLibrary';
 import { isLibraryPath } from './features/libraries/utils/path';
+import MinitigerGlobalSettingsHost from './features/minitiger/MinitigerGlobalSettingsHost';
 
 import './AppOverrides.scss';
 
@@ -26,6 +27,7 @@ export const Component = () => {
     const isMediumScreen = useMediaQuery((t: Theme) => t.breakpoints.up('md'));
     const isDrawerAvailable = isDrawerPath(location.pathname) && Boolean(user) && !isMediumScreen;
     const isDrawerOpen = isDrawerActive && isDrawerAvailable;
+    const isCurrentLibraryPath = isLibraryPath(location.pathname);
 
     const onToggleDrawer = useCallback(() => {
         setIsDrawerActive(!isDrawerActive);
@@ -42,14 +44,20 @@ export const Component = () => {
                 }}
             >
                 <StrictMode>
-                    <OffsetAppBar dense>
+                    <OffsetAppBar
+                        dense
+                        forceTransparent={isCurrentLibraryPath}
+                    >
                         <AppToolbar
                             isDrawerAvailable={!isMediumScreen && isDrawerAvailable}
                             isDrawerOpen={isDrawerOpen}
                             onDrawerButtonClick={onToggleDrawer}
                         />
-                        {isLibraryPath(location.pathname) && <LibraryToolbar />}
                     </OffsetAppBar>
+
+                    {isCurrentLibraryPath && (
+                        <LibraryToolbar />
+                    )}
 
                     {
                         isDrawerAvailable && (
@@ -75,6 +83,7 @@ export const Component = () => {
                     </AppBody>
                 </Box>
             </Box>
+            <MinitigerGlobalSettingsHost />
             <ThemeCss />
             <CustomCss />
         </LibraryProvider>

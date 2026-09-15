@@ -1,0 +1,972 @@
+.minitigerHoverPreview {
+    --mt-preview-accent: #ffbf00;
+    --mt-preview-accent-text: #111;
+
+    position: fixed;
+    z-index: 1500;
+    box-sizing: border-box;
+    overflow: hidden;
+    border-radius: 9px;
+    background: #181818;
+    color: #eee;
+    box-shadow:
+        0 18px 48px rgba(0, 0, 0, 0.72),
+        0 0 0 1px rgba(255, 255, 255, 0.075);
+    animation: minitigerPreviewIn 160ms ease-out;
+}
+
+.minitigerHoverPreviewHero {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #222;
+    color: #fff;
+    text-decoration: none;
+}
+
+.minitigerHoverPreview.isManga {
+    width: min(330px, calc(100vw - 24px)) !important;
+}
+
+.minitigerHoverPreview.isManga
+.minitigerHoverPreviewHero {
+    aspect-ratio: 2 / 3;
+    max-height: 420px;
+}
+
+.minitigerHoverPreviewHero img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerHoverPreview.isManga
+.minitigerHoverPreviewHero img {
+    object-fit: contain;
+    background: #111;
+}
+
+.minitigerHoverPreviewFallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    background:
+        linear-gradient(145deg, #2d3138, #15171b);
+    color: #aaa;
+    text-align: center;
+    font-weight: 800;
+}
+
+.minitigerHoverPreviewHeroShade {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            180deg,
+            transparent 48%,
+            rgba(0, 0, 0, 0.92) 100%
+        );
+    pointer-events: none;
+}
+
+.minitigerHoverPreviewHero strong {
+    position: absolute;
+    z-index: 2;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: 0.72rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 1.12rem;
+    font-weight: 850;
+    text-shadow: 0 2px 6px #000;
+}
+
+.minitigerHoverPreviewControls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.55rem;
+    padding: 0.72rem 0.85rem 0.32rem;
+}
+
+.minitigerHoverPreviewControls > div {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.minitigerHoverPreviewControls button {
+    width: 2.55rem;
+    height: 2.55rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 2px solid #666;
+    border-radius: 50%;
+    background: #272727;
+    color: #fff;
+    font: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    transition:
+        transform 140ms ease,
+        background 140ms ease,
+        border-color 140ms ease;
+}
+
+.minitigerHoverPreviewControls button:hover,
+.minitigerHoverPreviewControls button:focus-visible {
+    transform: scale(1.055);
+    border-color: #eee;
+    background: #343434;
+    outline: none;
+}
+
+.minitigerHoverPreviewControls button.isPrimary {
+    border-color: var(--mt-preview-accent);
+    background: var(--mt-preview-accent);
+    color: var(--mt-preview-accent-text);
+}
+
+.minitigerHoverPreviewMeta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding: 0.3rem 0.9rem 0;
+    color: #d7d7d7;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.minitigerHoverPreviewMeta span {
+    padding: 0.1rem 0.3rem;
+    border: 1px solid #555;
+    border-radius: 3px;
+}
+
+.minitigerHoverPreview p {
+    margin: 0;
+    padding: 0.65rem 0.9rem 1rem;
+    color: #cfcfcf;
+    font-size: 0.88rem;
+    line-height: 1.42;
+}
+
+.minitigerLargePreviewBackdrop {
+    --mt-preview-accent: #ffbf00;
+    --mt-preview-accent-text: #111;
+
+    position: fixed;
+    inset: 0;
+    z-index: 1600;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 5vh 1rem;
+    overflow: auto;
+    background: rgba(0, 0, 0, 0.74);
+    animation: minitigerPreviewFadeIn 170ms ease-out;
+}
+
+.minitigerLargePreview {
+    position: relative;
+    width: min(1100px, 82vw);
+    max-width: calc(100vw - 2rem);
+    margin: auto 0;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #181818;
+    color: #eee;
+    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.84);
+}
+
+.minitigerLargePreview.isManga {
+    width: min(760px, 72vw);
+}
+
+.minitigerLargePreviewClose {
+    position: absolute;
+    z-index: 12;
+    right: 1rem;
+    top: 1rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(24, 24, 24, 0.9);
+    color: #fff;
+    font: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.minitigerLargePreviewHero {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 7;
+    min-height: 340px;
+    overflow: hidden;
+    background: #202020;
+}
+
+.minitigerLargePreview.isManga
+.minitigerLargePreviewHero {
+    aspect-ratio: 2 / 3;
+    max-height: 62vh;
+    min-height: 0;
+    background: #111;
+}
+
+.minitigerLargePreviewHero > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerLargePreview.isManga
+.minitigerLargePreviewHero > img {
+    object-fit: contain;
+}
+
+.minitigerLargePreviewFallback {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(145deg, #2d3138, #15171b);
+}
+
+.minitigerLargePreviewShade {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(
+            180deg,
+            transparent 24%,
+            rgba(24, 24, 24, 0.15) 52%,
+            #181818 100%
+        );
+}
+
+.minitigerLargePreviewHeroContent {
+    position: absolute;
+    z-index: 4;
+    left: 2.2rem;
+    right: 2.2rem;
+    bottom: 2rem;
+}
+
+.minitigerLargePreviewType {
+    color: var(--mt-preview-accent);
+    font-size: 0.75rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.minitigerLargePreviewHeroContent h2 {
+    max-width: 80%;
+    margin: 0.3rem 0 1rem;
+    font-size: clamp(2rem, 3vw, 3.2rem);
+    line-height: 1.05;
+}
+
+.minitigerLargePreviewButtons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.minitigerLargePreviewButtons button,
+.minitigerLargePreviewButtons a {
+    min-height: 2.55rem;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.55rem 0.8rem;
+    border: 0;
+    border-radius: 5px;
+    background: #34373e;
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.minitigerLargePreviewButtons .isPrimary {
+    background: var(--mt-preview-accent);
+    color: var(--mt-preview-accent-text);
+}
+
+.minitigerLargePreviewContent {
+    padding: 0.15rem 2.2rem 2rem;
+}
+
+.minitigerLargePreviewMeta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.minitigerLargePreviewMeta span {
+    padding: 0.12rem 0.35rem;
+    border: 1px solid #555;
+    border-radius: 3px;
+    color: #d8d8d8;
+    font-size: 0.88rem;
+    font-weight: 700;
+}
+
+.minitigerLargePreviewContent p {
+    margin: 0;
+    color: #ddd;
+    font-size: 1rem;
+    line-height: 1.55;
+}
+
+.minitigerLargePreviewHint {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: #777;
+    font-size: 0.78rem;
+}
+
+@keyframes minitigerPreviewIn {
+    from {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes minitigerPreviewFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 900px) {
+    .minitigerLargePreview {
+        width: min(96vw, 1100px);
+    }
+
+    .minitigerLargePreviewHeroContent,
+    .minitigerLargePreviewContent {
+        left: 1.35rem;
+        right: 1.35rem;
+    }
+
+    .minitigerLargePreviewContent {
+        padding-left: 1.35rem;
+        padding-right: 1.35rem;
+    }
+}
+
+@media (max-width: 620px) {
+    .minitigerHoverPreview {
+        display: none !important;
+    }
+
+    .minitigerLargePreviewBackdrop {
+        padding: 1rem 0.5rem;
+    }
+
+    .minitigerLargePreview {
+        width: 100%;
+        max-width: calc(100vw - 1rem);
+    }
+
+    .minitigerLargePreviewHero {
+        min-height: 260px;
+    }
+
+    .minitigerLargePreviewHeroContent h2 {
+        max-width: 100%;
+        font-size: 1.65rem;
+    }
+}
+
+/* =========================================================
+   PHASE 9.1 - LOGOS + SERIES SEASON/EPISODE PREVIEW
+   ========================================================= */
+
+.minitigerHoverPreviewLogo {
+    position: absolute;
+    z-index: 3;
+    left: 0.9rem;
+    bottom: 0.72rem;
+    width: auto !important;
+    height: auto !important;
+    max-width: 58%;
+    max-height: 34%;
+    object-fit: contain !important;
+    object-position: left bottom;
+    filter:
+        drop-shadow(0 2px 5px rgba(0, 0, 0, 0.9));
+}
+
+.minitigerLargePreviewLogo {
+    display: block;
+    width: auto;
+    max-width: min(44%, 430px);
+    max-height: 120px;
+    margin: 0.45rem 0 1rem;
+    object-fit: contain;
+    object-position: left bottom;
+    filter:
+        drop-shadow(0 3px 8px rgba(0, 0, 0, 0.88));
+}
+
+.minitigerSeriesPreview {
+    margin-top: 1.55rem;
+    padding-top: 1.15rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.minitigerSeriesPreviewHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.minitigerSeriesPreviewHeader h3 {
+    margin: 0;
+    font-size: 1.12rem;
+    font-weight: 850;
+}
+
+.minitigerSeriesPreviewHeader select {
+    min-width: 150px;
+    min-height: 2.25rem;
+    padding: 0.35rem 2rem 0.35rem 0.65rem;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background: #2d2f34;
+    color: #fff;
+    font: inherit;
+    font-size: 0.9rem;
+}
+
+.minitigerSeriesPreviewLoading {
+    padding: 0.8rem 0;
+    color: #8f8f8f;
+    font-size: 0.9rem;
+}
+
+.minitigerSeriesEpisodeRow {
+    display: flex;
+    gap: 0.72rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.15rem 0 0.65rem;
+    scrollbar-width: thin;
+}
+
+.minitigerSeriesEpisodeCard {
+    flex: 0 0 clamp(235px, 23vw, 300px);
+    min-width: 0;
+}
+
+.minitigerSeriesEpisodeCard > a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerSeriesEpisodeImage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #262626;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.055);
+}
+
+.minitigerSeriesEpisodeImage img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerSeriesEpisodeFallback {
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(145deg, #2d3138, #15171b);
+}
+
+.minitigerSeriesEpisodePlay {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 2.6rem;
+    height: 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--mt-preview-accent);
+    color: var(--mt-preview-accent-text);
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+    cursor: pointer;
+    transition:
+        opacity 140ms ease,
+        transform 140ms ease;
+}
+
+.minitigerSeriesEpisodeCard:hover
+.minitigerSeriesEpisodePlay,
+.minitigerSeriesEpisodeCard:focus-within
+.minitigerSeriesEpisodePlay {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.minitigerSeriesEpisodeCard strong {
+    display: block;
+    margin-top: 0.46rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.9rem;
+}
+
+.minitigerSeriesEpisodeCard span {
+    display: block;
+    margin-top: 0.12rem;
+    color: #999;
+    font-size: 0.78rem;
+}
+
+@media (max-width: 720px) {
+    .minitigerLargePreviewLogo {
+        max-width: 64%;
+        max-height: 90px;
+    }
+
+    .minitigerSeriesPreviewHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .minitigerSeriesPreviewHeader select {
+        width: 100%;
+    }
+}
+
+/* =========================================================
+   PHASE 9.2 - VERTICAL SERIES EPISODE LIST
+   ========================================================= */
+
+.minitigerSeriesEpisodeRow {
+    display: none;
+}
+
+.minitigerSeriesEpisodeList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.58rem;
+    width: 100%;
+}
+
+.minitigerSeriesEpisodeCard {
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    border-radius: 6px;
+    background: #292929;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.045);
+    transition:
+        transform 150ms ease,
+        box-shadow 150ms ease,
+        background 150ms ease;
+}
+
+.minitigerSeriesEpisodeCard:hover,
+.minitigerSeriesEpisodeCard:focus-within {
+    transform: translateY(-2px);
+    background: #303030;
+    box-shadow:
+        0 0 0 1px
+            color-mix(
+                in srgb,
+                var(--mt-preview-accent) 38%,
+                transparent
+            ),
+        0 0 16px
+            color-mix(
+                in srgb,
+                var(--mt-preview-accent) 18%,
+                transparent
+            );
+}
+
+.minitigerSeriesEpisodeCard > a,
+.minitigerSeriesEpisodeLink {
+    display: grid;
+    grid-template-columns:
+        2.6rem
+        minmax(165px, 205px)
+        minmax(0, 1fr);
+    align-items: center;
+    gap: 0.9rem;
+    min-height: 104px;
+    box-sizing: border-box;
+    padding: 0.55rem 0.72rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerSeriesEpisodeNumber {
+    color: #d9d9d9;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.minitigerSeriesEpisodeImage {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 5px;
+}
+
+.minitigerSeriesEpisodeText {
+    min-width: 0;
+}
+
+.minitigerSeriesEpisodeTitleLine {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.minitigerSeriesEpisodeCard
+.minitigerSeriesEpisodeText strong {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.96rem;
+    font-weight: 800;
+}
+
+.minitigerSeriesEpisodeRuntime {
+    flex: 0 0 auto;
+    color: #eee !important;
+    font-size: 0.82rem !important;
+    font-weight: 700;
+}
+
+.minitigerSeriesEpisodeMeta {
+    display: block !important;
+    margin-top: 0.12rem !important;
+    color: #aaa !important;
+    font-size: 0.78rem !important;
+}
+
+.minitigerSeriesEpisodeText p {
+    display: -webkit-box;
+    margin: 0.35rem 0 0;
+    overflow: hidden;
+    color: #bbb;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+@media (max-width: 760px) {
+    .minitigerSeriesEpisodeCard > a,
+    .minitigerSeriesEpisodeLink {
+        grid-template-columns:
+            2rem
+            minmax(120px, 150px)
+            minmax(0, 1fr);
+        gap: 0.55rem;
+    }
+
+    .minitigerSeriesEpisodeText p {
+        display: none;
+    }
+}
+
+@media (max-width: 540px) {
+    .minitigerSeriesEpisodeCard > a,
+    .minitigerSeriesEpisodeLink {
+        grid-template-columns:
+            1.8rem
+            minmax(100px, 125px)
+            minmax(0, 1fr);
+    }
+
+    .minitigerSeriesEpisodeRuntime {
+        display: none !important;
+    }
+}
+
+/* =========================================================
+   PHASE 10 - MANGA VOLUME PREVIEW
+   ========================================================= */
+
+.minitigerMangaPreview {
+    margin-top: 1.55rem;
+    padding-top: 1.15rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.minitigerMangaPreviewHeader {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.minitigerMangaPreviewHeader h3 {
+    margin: 0;
+    font-size: 1.12rem;
+}
+
+.minitigerMangaPreviewHeader span {
+    color: #888;
+    font-size: 0.8rem;
+}
+
+.minitigerMangaVolumeRow {
+    display: flex;
+    gap: 0.72rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.12rem 0 0.7rem;
+    scrollbar-width: thin;
+}
+
+.minitigerMangaVolumeCard {
+    flex: 0 0 clamp(125px, 14vw, 165px);
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerMangaVolumeImage {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #252525;
+    transition:
+        transform 150ms ease,
+        box-shadow 150ms ease;
+}
+
+.minitigerMangaVolumeImage img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerMangaVolumeFallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #2d3138, #15171b);
+    font-size: 2rem;
+}
+
+.minitigerMangaVolumeCard:hover .minitigerMangaVolumeImage,
+.minitigerMangaVolumeCard:focus-visible .minitigerMangaVolumeImage {
+    transform: translateY(-3px);
+    box-shadow:
+        0 0 0 1px var(--mt-preview-accent),
+        0 0 18px color-mix(
+            in srgb,
+            var(--mt-preview-accent) 32%,
+            transparent
+        );
+}
+
+.minitigerMangaVolumeCard strong,
+.minitigerMangaVolumeCard span {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.minitigerMangaVolumeCard strong {
+    margin-top: 0.42rem;
+    font-size: 0.84rem;
+}
+
+.minitigerMangaVolumeCard span {
+    margin-top: 0.08rem;
+    color: #888;
+    font-size: 0.75rem;
+}
+
+/* =========================================================
+   PHASE 16 - LARGE PREVIEW BUTTON HOVER
+   ========================================================= */
+
+.minitigerLargePreviewButtons button,
+.minitigerLargePreviewButtons a {
+    transition:
+        transform 140ms ease,
+        filter 140ms ease,
+        background 140ms ease,
+        box-shadow 140ms ease;
+}
+
+.minitigerLargePreviewButtons button:hover,
+.minitigerLargePreviewButtons button:focus-visible,
+.minitigerLargePreviewButtons a:hover,
+.minitigerLargePreviewButtons a:focus-visible {
+    background:
+        color-mix(
+            in srgb,
+            var(--mt-preview-accent) 24%,
+            #34373e
+        );
+    filter: brightness(1.13);
+    transform: translateY(-2px);
+    box-shadow:
+        0 5px 14px
+        rgba(0, 0, 0, 0.34);
+    outline: none;
+}
+
+.minitigerLargePreviewButtons .isPrimary:hover,
+.minitigerLargePreviewButtons .isPrimary:focus-visible {
+    background:
+        color-mix(
+            in srgb,
+            var(--mt-preview-accent) 82%,
+            white
+        );
+    color:
+        var(--mt-preview-accent-text);
+}
+
+/* =========================================================
+   PHASE 17.2 - LARGE PREVIEW TRAILER
+   ========================================================= */
+
+.minitigerLargePreviewTrailerMedia {
+    z-index: 2;
+}
+
+.minitigerLargePreviewShade {
+    z-index: 3;
+}
+
+.minitigerLargePreviewHeroContent {
+    z-index: 4;
+}
+
+
+/* =========================================================
+   PHASE 18 - LARGE PREVIEW TRAILER COVER
+   ========================================================= */
+
+.minitigerLargePreviewHero {
+    overflow: hidden;
+}
+
+.minitigerLargePreviewTrailerMedia.isLocalVideo {
+    transform: scale(1.035);
+}
+
+.minitigerLargePreviewTrailerMedia.isYoutube {
+    transform:
+        translate(-50%, -50%)
+        scale(1.07);
+}
+
+.minitigerLargePreviewHero {
+    container-type: size;
+}
+
+@supports (width: 100cqw) {
+    .minitigerLargePreviewTrailerMedia.isYoutube {
+        width: max(100cqw, 177.778cqh);
+        height: max(100cqh, 56.25cqw);
+        aspect-ratio: auto;
+    }
+}
+
+/* =========================================================
+   PHASE 18.2.3 - MANGA PREVIEW GEOMETRY
+   ========================================================= */
+
+/* The inline aspect-ratio comes from Jellyfin's actual Primary image. Do not
+   cap the hero height independently, otherwise portrait covers get bars. */
+.minitigerHoverPreview.isManga .minitigerHoverPreviewHero {
+    max-height: none !important;
+}
+
+.minitigerHoverPreview.isManga .minitigerHoverPreviewHero img {
+    object-fit: contain;
+    background: transparent;
+}
+
+/* Large Manga preview: three volumes per row and continue downward instead
+   of becoming one long horizontal strip. */
+.minitigerLargePreview.isManga .minitigerMangaVolumeRow {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 0.9rem 0.75rem;
+    overflow: visible !important;
+    padding: 0.12rem 0 0.7rem;
+}
+
+.minitigerLargePreview.isManga .minitigerMangaVolumeCard {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: none;
+}
+
+@media (max-width: 620px) {
+    .minitigerLargePreview.isManga .minitigerMangaVolumeRow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

@@ -68,11 +68,16 @@ const collectionsTabContent: LibraryTabContent = {
     noItemsMessage: 'MessageNoCollectionsAvailable'
 };
 
+/*
+ * Minitiger:
+ * A music library opens on artists/interpreters, matching the old
+ * Minitiger design. Albums remain available as another tab.
+ */
 const musicViews: Record<number, LibraryTabContent> = {
-    0: albumsTabContent,
+    0: artistsTabContent,
     1: suggestionsTabContent,
-    2: albumArtistsTabContent,
-    3: artistsTabContent,
+    2: albumsTabContent,
+    3: albumArtistsTabContent,
     4: playlistsTabContent,
     5: songsTabContent,
     6: genresTabContent,

@@ -1,0 +1,12 @@
+CHANGELOG_Minitiger_Web.txt
+INSTALL.txt
+files.txt
+VERIFY_PATCH.sh
+DOCKER_GITHUB_SETUP.md
+Dockerfile.minitiger
+Dockerfile.minitiger.dockerignore
+docker-compose.example.yml
+docker/minitiger-entrypoint.sh
+.github/workflows/minitiger-docker.yml
+src/apps/modern/routes/minitiger/details/MinitigerMangaDetails.tsx
+Minitiger_Gedaechtnis/

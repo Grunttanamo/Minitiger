@@ -1,0 +1,23 @@
+MINITIGER PHASE 18.3.7
+
+Voraussetzung: Phase 18.3.6.
+
+Änderungen:
+- Manga/Bücher-Detailpages zeigen den klickbaren Parent-/Bibliotheksnamen (z.B. "Comics") nicht mehr.
+- Docker/GitHub-Starter hinzugefügt: Dockerfile.minitiger, Compose-Beispiel, GHCR-GitHub-Action und Plugin-Entrypoint.
+
+DEV TEST AUF :8080
+
+  cd ~/minitiger-web
+  unzip -o ~/minitiger_native_phase18_3_7_manga_parent_docker_github.zip -d ~/minitiger-web
+  chmod +x VERIFY_PATCH.sh
+  ./VERIFY_PATCH.sh
+
+Der Dev-Server kompiliert danach automatisch neu.
+
+Docker/GitHub-Anleitung:
+  DOCKER_GITHUB_SETUP.md
+
+Erst nach erfolgreichem normalen Web-Test Production deployen:
+  chmod +x DEPLOY_PRODUCTION.sh
+  ./DEPLOY_PRODUCTION.sh

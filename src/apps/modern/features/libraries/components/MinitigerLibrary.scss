@@ -1,0 +1,1199 @@
+.minitigerLibraryPage {
+    --mt-accent: #ffbf00;
+    --mt-accent-text: #111;
+    --mt-glow:
+        color-mix(in srgb, var(--mt-accent) 34%, transparent);
+
+    box-sizing: border-box;
+    background: #0d0f12;
+}
+
+/* Phase 7 extra hero is intentionally gone. */
+.minitigerLibraryHero,
+.minitigerLibraryHeroGlow,
+.minitigerLibraryHeroArtwork,
+.minitigerLibraryHeroText {
+    display: none !important;
+}
+
+/* Top title/count – rendered inside Jellyfin's library app bar. */
+.minitigerLibraryTopbar {
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.75rem 3.25% 0.55rem;
+    color: #eee;
+    background: #0d0f12;
+}
+
+.minitigerLibraryTopbar h1 {
+    margin: 0;
+    font-size: 1.85rem;
+    line-height: 1.15;
+    font-weight: 800;
+}
+
+.minitigerLibraryTopbar span {
+    color: #888;
+    font-size: 0.82rem;
+    white-space: nowrap;
+}
+
+/* A-Z / Filter bar */
+.minitigerLibraryAZBar {
+    position: sticky;
+    z-index: 90;
+    top: 5.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    box-sizing: border-box;
+    margin: 0 3.25% 1rem;
+    padding: 0.42rem 0.5rem;
+    border-radius: 7px;
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    transform-origin: center;
+}
+
+.minitigerLibraryLetters {
+    min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.08rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.minitigerLibraryLetters::-webkit-scrollbar {
+    display: none;
+}
+
+.minitigerLibraryLetters button {
+    flex: 0 0 auto;
+    min-width: 1.75rem;
+    height: 1.9rem;
+    padding: 0 0.38rem;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 0.74rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.minitigerLibraryLetters button:hover,
+.minitigerLibraryLetters button.isActive {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.minitigerLibraryBarTools {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.minitigerLibrarySort {
+    height: 1.9rem;
+    max-width: 9.5rem;
+    box-sizing: border-box;
+    padding: 0 1.6rem 0 0.45rem;
+    border: 0;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.08);
+    color: inherit;
+    font: inherit;
+    font-size: 0.74rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.minitigerLibraryFilterButton button {
+    min-width: 0;
+    height: 1.9rem;
+    padding: 0 0.5rem !important;
+    border-radius: 5px !important;
+    color: inherit !important;
+    font-size: 0.74rem !important;
+    font-weight: 850 !important;
+}
+
+.minitigerLibraryFilterButton button::after {
+    content: 'Filter';
+    margin-left: 0.25rem;
+}
+
+.minitigerLibraryFilterButton svg {
+    font-size: 1rem;
+}
+
+/* Bounce / roll-out to the right, like old Minitiger */
+@keyframes minitigerLibraryDockBounce {
+    0% {
+        opacity: 0.35;
+        transform: translateX(34px) scale(0.92);
+    }
+
+    68% {
+        opacity: 1;
+        transform: translateX(-6px) scale(1.015);
+    }
+
+    84% {
+        transform: translateX(3px) scale(0.995);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@media (min-width: 901px) {
+    .minitigerLibraryAZBar.isDockedSide {
+        position: fixed;
+        top: 4.1rem;
+        right: 1rem;
+        left: auto;
+        width: 2.75rem;
+        max-height: calc(100vh - 5.1rem);
+        margin: 0;
+        padding: 0.4rem 0.25rem;
+        z-index: 125;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.18rem;
+        animation:
+            minitigerLibraryDockBounce
+            0.38s
+            cubic-bezier(0.2, 0.85, 0.3, 1.15);
+    }
+
+    .minitigerLibraryAZBar.isDockedSide
+    .minitigerLibraryLetters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.02rem;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .minitigerLibraryAZBar.isDockedSide
+    .minitigerLibraryLetters button {
+        width: 100%;
+        min-width: 0;
+        height: 1.42rem;
+        padding: 0 0.08rem;
+        font-size: 0.66rem;
+    }
+
+    .minitigerLibraryAZBar.isDockedSide
+    .minitigerLibraryBarTools {
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .minitigerLibraryAZBar.isDockedSide
+    .minitigerLibrarySort {
+        display: none;
+    }
+
+    .minitigerLibraryAZBar.isDockedSide
+    .minitigerLibraryFilterButton button {
+        width: 100%;
+        height: 1.75rem;
+        padding: 0 !important;
+    }
+
+    .minitigerLibraryAZBar.isDockedSide
+    .minitigerLibraryFilterButton button::after {
+        display: none;
+    }
+}
+
+/* Grid spacing closer to old custom library */
+.minitigerLibraryPage .itemsContainer.vertical-wrap {
+    align-items: flex-start;
+    padding-left: 2.65% !important;
+    padding-right: 2.65% !important;
+}
+
+/* Force type rules from the old design:
+   film/series/books portrait, music square, musicvideo landscape.
+   Shapes themselves come from ItemsView. */
+.minitigerLibraryPage .card .cardBox {
+    transition:
+        transform 0.17s ease,
+        filter 0.17s ease;
+}
+
+.minitigerLibraryPage .card {
+    position: relative;
+    overflow: visible;
+}
+
+.minitigerLibraryPage .card::before {
+    content: '';
+    position: absolute;
+    inset: 0.45em;
+    z-index: 0;
+    border-radius: 9px;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow:
+        0 0 12px var(--mt-glow),
+        0 0 24px
+            color-mix(in srgb, var(--mt-accent) 18%, transparent);
+    transition:
+        opacity 0.17s ease,
+        transform 0.17s ease;
+}
+
+.minitigerLibraryPage .card:hover::before,
+.minitigerLibraryPage .card:focus-within::before {
+    opacity: 1;
+    transform: scale(1.01);
+}
+
+.minitigerLibraryPage .card:hover > .cardBox,
+.minitigerLibraryPage .card:focus-within > .cardBox {
+    transform: translateY(-5px) scale(1.018);
+    filter: brightness(1.045);
+}
+
+/* Parity rule: card image itself does not separately zoom. */
+.minitigerLibraryPage .cardImageContainer,
+.minitigerLibraryPage .cardContent {
+    transform: none !important;
+}
+
+.minitigerLibraryPage .cardImageContainer,
+.minitigerLibraryPage .cardContent,
+.minitigerLibraryPage .cardPadder {
+    border-radius: 7px;
+}
+
+.minitigerLibraryPage .cardText {
+    padding-top: 0.04rem;
+    padding-bottom: 0.04rem;
+    text-align: left !important;
+}
+
+.minitigerLibraryPage .cardText:first-of-type {
+    font-weight: 700;
+}
+
+.minitigerLibraryPage .cardText-secondary {
+    color: #8f8f8f;
+    opacity: 1;
+}
+
+.minitigerLibraryPage .cardOverlayButton,
+.minitigerLibraryPage .btnCardOptions {
+    border-radius: 50% !important;
+}
+
+.minitigerLibraryPage .cardOverlayButton:hover,
+.minitigerLibraryPage .cardOverlayButton:focus-visible,
+.minitigerLibraryPage .btnCardOptions:hover,
+.minitigerLibraryPage .btnCardOptions:focus-visible {
+    background: var(--mt-accent) !important;
+    color: var(--mt-accent-text) !important;
+}
+
+.minitigerLibraryPage .playedIndicator,
+.minitigerLibraryPage .countIndicator {
+    background: var(--mt-accent) !important;
+    color: var(--mt-accent-text) !important;
+}
+
+/* 7-ish cards per row on large screens, like the reference screenshots. */
+@media (min-width: 1400px) {
+    .minitigerLibraryPage .portraitCard {
+        width: 14.2857%;
+    }
+
+    .minitigerLibraryPage .squareCard {
+        width: 14.2857%;
+    }
+
+    .minitigerLibraryPage .backdropCard {
+        width: 25%;
+    }
+}
+
+@media (max-width: 900px) {
+    .minitigerLibraryTopbar {
+        padding-left: 4%;
+        padding-right: 4%;
+    }
+
+    .minitigerLibraryTopbar h1 {
+        font-size: 1.5rem;
+    }
+
+    .minitigerLibraryAZBar {
+        top: 5.2rem;
+        margin-left: 4%;
+        margin-right: 4%;
+    }
+
+    .minitigerLibrarySort {
+        display: none;
+    }
+}
+
+/* =========================================================
+   PHASE 11 - LIBRARY SETTINGS PARITY PASS 1
+   ========================================================= */
+
+.minitigerLibraryPage {
+    --mt-library-bar: var(--mt-accent);
+    --mt-library-bar-text: var(--mt-accent-text);
+    --mt-glow-color: var(--mt-accent);
+    --mt-glow-opacity: 1;
+    --mt-glow-size: 20px;
+    --mt-library-poster-width: 320px;
+    --mt-library-landscape-width: 520px;
+}
+
+.minitigerLibraryAZBar {
+    background: var(--mt-library-bar);
+    color: var(--mt-library-bar-text);
+}
+
+.minitigerLibraryPage .portraitCard,
+.minitigerLibraryPage .squareCard {
+    width: min(
+        var(--mt-library-poster-width),
+        calc(100vw - 2rem)
+    ) !important;
+}
+
+.minitigerLibraryPage .backdropCard,
+.minitigerLibraryPage .bannerCard {
+    width: min(
+        var(--mt-library-landscape-width),
+        calc(100vw - 2rem)
+    ) !important;
+}
+
+.minitigerLibraryPage[data-hover-enabled='false'] .card:hover > .cardBox,
+.minitigerLibraryPage[data-hover-enabled='false'] .card:focus-within > .cardBox {
+    transform: none !important;
+    filter: none !important;
+}
+
+.minitigerLibraryPage[data-glow-enabled='false'] .card::before {
+    display: none !important;
+}
+
+.minitigerLibraryPage[data-glow-enabled='true'] .card::before {
+    box-shadow:
+        0 0 var(--mt-glow-size) var(--mt-glow-color),
+        0 0 calc(var(--mt-glow-size) * 2) var(--mt-glow-color);
+    filter: opacity(var(--mt-glow-opacity));
+}
+
+.minitigerLibraryPage[data-show-played='false'] .playedIndicator,
+.minitigerLibraryPage[data-show-played='false'] .countIndicator {
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+    .minitigerLibraryPage .portraitCard,
+    .minitigerLibraryPage .squareCard,
+    .minitigerLibraryPage .backdropCard,
+    .minitigerLibraryPage .bannerCard {
+        width: auto !important;
+    }
+}
+
+/* =========================================================
+   PHASE 12 - LIVE COLOR VARIABLES
+   ========================================================= */
+
+.minitigerLibraryPage {
+    --mt-accent:
+        var(--minitiger-accent, #ffbf00);
+    --mt-accent-hover:
+        var(--minitiger-accent-hover, #ffe152);
+    --mt-accent-text:
+        var(--minitiger-accent-text, #111);
+    --mt-library-bar:
+        var(
+            --minitiger-library-bar,
+            var(--mt-accent)
+        );
+    --mt-library-bar-text:
+        var(
+            --minitiger-library-bar-text,
+            var(--mt-accent-text)
+        );
+    --mt-glow-color:
+        var(
+            --minitiger-glow,
+            var(--mt-accent)
+        );
+}
+
+
+/* =========================================================
+   PHASE 18 - LIBRARY CHROME + ALIGNMENT
+   ========================================================= */
+
+/* Keep Jellyfin's server/logo + right actions, but remove the v12
+   library/favorites tab strip while a Minitiger library is active. */
+.minitigerLibraryActive .skinHeader {
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.minitigerLibraryActive .headerTabs.sectionTabs,
+.minitigerLibraryActive .headerTabs {
+    display: none !important;
+}
+
+/* The Minitiger title belongs to the page, not to the sticky app bar. */
+.minitigerLibraryTopbar {
+    position: relative !important;
+    top: auto !important;
+    z-index: 2;
+    background: transparent;
+    padding-top: 1rem;
+}
+
+/* A-Z and cards now use exactly the same left/right gutter. */
+.minitigerLibraryPage .itemsContainer.vertical-wrap {
+    box-sizing: border-box;
+    padding-left: 3.25% !important;
+    padding-right: 3.25% !important;
+}
+
+.minitigerLibraryAZBar {
+    top: 3.55rem;
+}
+
+@media (min-width: 901px) {
+    .minitigerLibraryAZBar.isDockedSide {
+        top: 3.35rem;
+    }
+}
+
+/* Move the glow together with the lifted card. Previously the cardBox
+   moved upward while its pseudo glow stayed behind, making the top glow
+   look weaker/smaller than the bottom. */
+.minitigerLibraryPage .card::before {
+    inset: 0.6em;
+}
+
+.minitigerLibraryPage .card:hover::before,
+.minitigerLibraryPage .card:focus-within::before {
+    transform:
+        translateY(-5px)
+        scale(1.018);
+}
+
+/* Hide Jellyfin's default placeholder/folder glyph on these libraries.
+   Minitiger uses the artwork itself and its own overlays instead. */
+.minitigerLibraryPage[data-collection-type='musicvideos']
+.cardImageIcon,
+.minitigerLibraryPage[data-collection-type='books']
+.cardImageIcon {
+    display: none !important;
+}
+
+/* =========================================================
+   PHASE 18.1 - MOBILE GRID + TRUE LIBRARY CHROME CLEANUP
+   ========================================================= */
+
+/* LibraryToolbar now lives below the fixed app bar instead of inside it.
+   Keep it as a normal page heading that scrolls away with the content. */
+.minitigerLibraryTopbar {
+    flex: 0 0 auto;
+    width: 100%;
+    margin: 0;
+    padding-left: 3.25%;
+    padding-right: 3.25%;
+    background: transparent !important;
+}
+
+/* On phones Jellyfin's automatic card sizing can react to the source
+   artwork aspect ratio. Minitiger instead keeps a deterministic grid. */
+@media (max-width: 600px) {
+    .minitigerLibraryPage .itemsContainer.vertical-wrap {
+        padding-left: 2.5% !important;
+        padding-right: 2.5% !important;
+    }
+
+    .minitigerLibraryPage .portraitCard,
+    .minitigerLibraryPage .squareCard {
+        width: 33.333333% !important;
+        max-width: 33.333333% !important;
+        flex: 0 0 33.333333% !important;
+        box-sizing: border-box;
+    }
+
+    .minitigerLibraryPage .backdropCard,
+    .minitigerLibraryPage .bannerCard {
+        width: 50% !important;
+        max-width: 50% !important;
+        flex: 0 0 50% !important;
+        box-sizing: border-box;
+    }
+
+    .minitigerLibraryAZBar {
+        margin-left: 2.5%;
+        margin-right: 2.5%;
+        top: 3.35rem;
+    }
+
+    .minitigerLibraryTopbar {
+        padding-left: 2.5%;
+        padding-right: 2.5%;
+    }
+
+    .minitigerLibraryPage .cardText {
+        font-size: 0.84rem;
+    }
+
+    .minitigerLibraryPage .cardText-secondary {
+        font-size: 0.72rem;
+    }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+    .minitigerLibraryPage .portraitCard,
+    .minitigerLibraryPage .squareCard {
+        width: 25% !important;
+        max-width: 25% !important;
+        flex: 0 0 25% !important;
+    }
+
+    .minitigerLibraryPage .backdropCard,
+    .minitigerLibraryPage .bannerCard {
+        width: 33.333333% !important;
+        max-width: 33.333333% !important;
+        flex: 0 0 33.333333% !important;
+    }
+}
+
+/* =========================================================
+   PHASE 18.2 - LIBRARY POLISH
+   ========================================================= */
+
+/* Jellyfin Desktop can keep a background on the inner Material toolbar even
+   when the AppBar itself is transparent. Force the whole library chrome clear. */
+.minitigerLibraryActive .MuiAppBar-root,
+.minitigerLibraryActive .MuiToolbar-root,
+.minitigerLibraryActive .skinHeader,
+.minitigerLibraryActive .headerTop {
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* The side alphabet should dock immediately after leaving the top region,
+   rather than being dragged halfway down the library first. */
+@media (min-width: 901px) {
+    .minitigerLibraryAZBar.isDockedSide {
+        top: 50% !important;
+        transform: translateY(-50%);
+    }
+}
+
+/* One glow around the complete cardBox is more stable across poster,
+   landscape, square and text-footer layouts than split pseudo glows. */
+.minitigerLibraryPage .card::before {
+    display: none !important;
+}
+
+.minitigerLibraryPage .card > .cardBox {
+    border-radius: 8px;
+    transition:
+        transform 160ms ease,
+        filter 160ms ease,
+        box-shadow 160ms ease !important;
+}
+
+.minitigerLibraryPage[data-glow-enabled='true'] .card:hover > .cardBox,
+.minitigerLibraryPage[data-glow-enabled='true'] .card:focus-within > .cardBox {
+    box-shadow:
+        0 0 var(--mt-glow-size, 20px)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, var(--mt-accent))
+            calc(var(--mt-glow-opacity, 0.65) * 100%),
+            transparent
+        ) !important;
+}
+
+/* =========================================================
+   PHASE 18.2.1 - REGRESSION REPAIR
+   ========================================================= */
+
+/* Dock much earlier and keep the Y-centering inside every animation frame.
+   This removes the short "jump to the bottom" before the rail settles. */
+@keyframes minitigerLibraryDockBounce {
+    0% {
+        opacity: 0.35;
+        transform:
+            translateY(-50%)
+            translateX(34px)
+            scale(0.92);
+    }
+
+    68% {
+        opacity: 1;
+        transform:
+            translateY(-50%)
+            translateX(-6px)
+            scale(1.015);
+    }
+
+    84% {
+        transform:
+            translateY(-50%)
+            translateX(3px)
+            scale(0.995);
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            translateY(-50%)
+            translateX(0)
+            scale(1);
+    }
+}
+
+@media (min-width: 901px) {
+    .minitigerLibraryAZBar.isDockedSide {
+        top: 50% !important;
+        bottom: auto !important;
+        transform: translateY(-50%);
+    }
+}
+
+/* Lift exactly one thing: the complete native card. Image and text therefore
+   stay together and the glow cannot lag behind the artwork anymore. */
+.minitigerLibraryPage .minitigerNativeLibraryCard {
+    isolation: isolate;
+    overflow: visible !important;
+    transition:
+        transform 160ms ease,
+        filter 160ms ease !important;
+}
+
+.minitigerLibraryPage .minitigerNativeLibraryCard:hover,
+.minitigerLibraryPage .minitigerNativeLibraryCard:focus-within {
+    transform:
+        translateY(-5px)
+        scale(1.018) !important;
+    filter: brightness(1.045);
+    z-index: 40;
+}
+
+/* Older rules moved cardBox a second time. Disable that nested movement. */
+.minitigerLibraryPage .minitigerNativeLibraryCard:hover > .cardBox,
+.minitigerLibraryPage .minitigerNativeLibraryCard:focus-within > .cardBox {
+    transform: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+}
+
+.minitigerLibraryPage .minitigerNativeLibraryCard > .cardBox {
+    position: relative;
+    z-index: 1;
+    border-radius: 8px;
+    box-shadow: none !important;
+}
+
+/* Reliable glow without color-mix calculations. Strength is controlled by
+   the pseudo element opacity so it also works in Jellyfin Desktop Chromium. */
+.minitigerLibraryPage .minitigerNativeLibraryCard::before {
+    content: '';
+    display: block !important;
+    position: absolute;
+    inset: -0.28rem !important;
+    z-index: 0;
+    border-radius: 10px;
+    opacity: 0;
+    pointer-events: none;
+    filter: none !important;
+    box-shadow:
+        0 0 var(--mt-glow-size, 20px)
+            var(--mt-glow-color, var(--mt-accent)),
+        0 0 calc(var(--mt-glow-size, 20px) * 1.75)
+            var(--mt-glow-color, var(--mt-accent));
+    transition: opacity 160ms ease;
+}
+
+.minitigerLibraryPage[data-glow-enabled='true']
+.minitigerNativeLibraryCard:hover::before,
+.minitigerLibraryPage[data-glow-enabled='true']
+.minitigerNativeLibraryCard:focus-within::before {
+    opacity: var(--mt-glow-opacity, 0.65);
+    transform: none !important;
+}
+
+.minitigerLibraryPage[data-glow-enabled='false']
+.minitigerNativeLibraryCard::before {
+    display: none !important;
+}
+
+/* Manga/Books and Musicvideo cards never need Jellyfin's generic folder
+   glyph on top of real artwork. Context classes come from ItemsView. */
+.minitigerNativeLibraryCardBooks .cardImageIcon,
+.minitigerNativeLibraryCardBooks .cardImageContainer > .material-icons,
+.minitigerNativeLibraryCardMusicvideos .cardImageIcon,
+.minitigerNativeLibraryCardMusicvideos .cardImageContainer > .material-icons {
+    display: none !important;
+}
+
+/* =========================================================
+   PHASE 18.2.2 - SETTINGS / LIBRARY REGRESSION REPAIR II
+   ========================================================= */
+
+/* Jellyfin cards normally use paint containment. That clips an outer glow
+   before it can leave the card rectangle, so Minitiger keeps layout/style
+   containment but deliberately allows painting outside the card. */
+.minitigerLibraryPage .minitigerNativeLibraryCard {
+    contain: layout style !important;
+    overflow: visible !important;
+}
+
+/* Give the live size sliders an explicit flex basis too. Jellyfin's wrapping
+   card containers otherwise keep their native flex width even if width alone
+   changes. */
+@media (min-width: 901px) {
+    .minitigerLibraryPage .portraitCard,
+    .minitigerLibraryPage .squareCard {
+        width: min(
+            var(--mt-library-poster-width),
+            calc(100vw - 2rem)
+        ) !important;
+        max-width: min(
+            var(--mt-library-poster-width),
+            calc(100vw - 2rem)
+        ) !important;
+        flex: 0 0 min(
+            var(--mt-library-poster-width),
+            calc(100vw - 2rem)
+        ) !important;
+    }
+
+    .minitigerLibraryPage .backdropCard,
+    .minitigerLibraryPage .bannerCard {
+        width: min(
+            var(--mt-library-landscape-width),
+            calc(100vw - 2rem)
+        ) !important;
+        max-width: min(
+            var(--mt-library-landscape-width),
+            calc(100vw - 2rem)
+        ) !important;
+        flex: 0 0 min(
+            var(--mt-library-landscape-width),
+            calc(100vw - 2rem)
+        ) !important;
+    }
+}
+
+/* The little folder in the upper-right corner is Jellyfin's typeIndicator,
+   not cardImageIcon. Hide only that indicator for book/manga and music-video
+   contexts; Minitiger's own badges remain untouched. */
+.minitigerNativeLibraryCardBooks .videoIndicator,
+.minitigerNativeLibraryCardMusicvideos .videoIndicator {
+    display: none !important;
+}
+
+/* "Oben + Rechts": collapse the horizontal bar into the right edge and
+   unfold it from the top of the rail. Keeping the final position top-anchored
+   avoids the old halfway-down-the-page effect. */
+@keyframes minitigerLibraryDockRoll1822 {
+    0% {
+        opacity: 0.92;
+        transform:
+            translateX(-20px)
+            scaleX(0.22)
+            scaleY(0.92);
+    }
+
+    44% {
+        opacity: 0.48;
+        transform:
+            translateX(18px)
+            scaleX(0.18)
+            scaleY(0.22);
+    }
+
+    78% {
+        opacity: 1;
+        transform:
+            translateX(-3px)
+            scaleX(1)
+            scaleY(0.72);
+    }
+
+    100% {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (min-width: 901px) {
+    .minitigerLibraryAZBar.isDockedSide {
+        top: 4.1rem !important;
+        bottom: auto !important;
+        transform: none !important;
+        transform-origin: top right;
+        animation:
+            minitigerLibraryDockRoll1822
+            0.34s
+            cubic-bezier(0.2, 0.84, 0.28, 1.08) !important;
+    }
+}
+
+/* =========================================================
+   PHASE 18.2.3 - CARD GLOW + A-Z TRANSITION REPAIR III
+   ========================================================= */
+
+/* The glow now belongs to the exact same OUTER element that is lifted.
+   This keeps artwork, title and secondary text inside one rectangle on
+   poster, landscape, square, manga and music-video cards. */
+.minitigerLibraryPage .minitigerNativeLibraryCard::before {
+    display: none !important;
+}
+
+.minitigerLibraryPage .minitigerNativeLibraryCard {
+    contain: none !important;
+    overflow: visible !important;
+    border-radius: 9px;
+    box-shadow: none;
+    transition:
+        transform 160ms ease,
+        filter 160ms ease,
+        box-shadow 160ms ease !important;
+}
+
+.minitigerLibraryPage[data-glow-enabled='true']
+.minitigerNativeLibraryCard:hover,
+.minitigerLibraryPage[data-glow-enabled='true']
+.minitigerNativeLibraryCard:focus-within {
+    box-shadow:
+        0 0 var(--mt-glow-size, 20px)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, var(--mt-accent))
+            calc(var(--mt-glow-opacity, 0.65) * 100%),
+            transparent
+        ),
+        0 0 calc(var(--mt-glow-size, 20px) * 1.55)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, var(--mt-accent))
+            calc(var(--mt-glow-opacity, 0.65) * 58%),
+            transparent
+        ) !important;
+}
+
+.minitigerLibraryPage[data-glow-enabled='false']
+.minitigerNativeLibraryCard:hover,
+.minitigerLibraryPage[data-glow-enabled='false']
+.minitigerNativeLibraryCard:focus-within {
+    box-shadow: none !important;
+}
+
+@keyframes minitigerLibraryTopRoll183 {
+    from {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    to {
+        opacity: 0.08;
+        transform:
+            translateX(-8px)
+            scaleX(0.035);
+    }
+}
+
+@keyframes minitigerLibrarySideUnroll183 {
+    0% {
+        opacity: 0.15;
+        transform:
+            translateY(-50%)
+            scaleY(0.06);
+    }
+
+    72% {
+        opacity: 1;
+        transform:
+            translateY(-50%)
+            scaleY(1.025);
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            translateY(-50%)
+            scaleY(1);
+    }
+}
+
+@media (min-width: 901px) {
+    /* First phase: the top bar rolls into its LEFT edge. */
+    .minitigerLibraryAZBar.isDocking {
+        transform-origin: left center !important;
+        pointer-events: none;
+        animation:
+            minitigerLibraryTopRoll183
+            145ms
+            ease-in
+            forwards !important;
+    }
+
+    /* Second phase: the compact rail unfolds downward on the right, but the
+       complete rail remains vertically centered in the viewport. */
+    .minitigerLibraryAZBar.isDockedSide {
+        position: fixed !important;
+        top: 50% !important;
+        right: 1rem !important;
+        bottom: auto !important;
+        left: auto !important;
+        width: 2.75rem !important;
+        max-height: calc(100vh - 2rem) !important;
+        margin: 0 !important;
+        transform:
+            translateY(-50%)
+            scaleY(1) !important;
+        transform-origin: top center !important;
+        animation:
+            minitigerLibrarySideUnroll183
+            240ms
+            cubic-bezier(0.18, 0.86, 0.28, 1.08) !important;
+    }
+}
+
+
+/* =========================================================
+   PHASE 18.2.4 - EXACT CARD GLOW + SMOOTH A-Z MORPH
+   ========================================================= */
+
+/* Put the glow on Jellyfin's actual visible card box.  The outer `.card`
+   includes layout breathing room and is therefore a few pixels larger than
+   the artwork/footer frame; using it for box-shadow made the cyan rectangle
+   look detached from the card.  The outer element still owns the lift. */
+.minitigerLibraryPage .minitigerNativeLibraryCard,
+.minitigerLibraryPage[data-glow-enabled='true']
+.minitigerNativeLibraryCard:hover,
+.minitigerLibraryPage[data-glow-enabled='true']
+.minitigerNativeLibraryCard:focus-within,
+.minitigerLibraryPage[data-glow-enabled='false']
+.minitigerNativeLibraryCard:hover,
+.minitigerLibraryPage[data-glow-enabled='false']
+.minitigerNativeLibraryCard:focus-within {
+    box-shadow: none !important;
+}
+
+.minitigerLibraryPage .minitigerNativeLibraryCard > .cardBox {
+    overflow: visible !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    transition:
+        box-shadow 170ms ease,
+        filter 160ms ease !important;
+}
+
+.minitigerLibraryPage[data-glow-enabled='true']
+.minitigerNativeLibraryCard:hover > .cardBox,
+.minitigerLibraryPage[data-glow-enabled='true']
+.minitigerNativeLibraryCard:focus-within > .cardBox {
+    box-shadow:
+        0 0 var(--mt-glow-size, 20px)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, var(--mt-accent))
+            calc(var(--mt-glow-opacity, 0.65) * 100%),
+            transparent
+        ),
+        0 0 calc(var(--mt-glow-size, 20px) * 1.38)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, var(--mt-accent))
+            calc(var(--mt-glow-opacity, 0.65) * 42%),
+            transparent
+        ) !important;
+}
+
+.minitigerLibraryPage[data-glow-enabled='false']
+.minitigerNativeLibraryCard:hover > .cardBox,
+.minitigerLibraryPage[data-glow-enabled='false']
+.minitigerNativeLibraryCard:focus-within > .cardBox {
+    box-shadow: none !important;
+}
+
+/* A slower two-stage morph: first the horizontal rail rolls neatly into its
+   left edge, then the compact right rail grows from its own top edge. */
+@keyframes minitigerLibraryTopRoll184 {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scaleX(1) scaleY(1);
+        filter: blur(0);
+    }
+
+    62% {
+        opacity: 0.78;
+        transform: translateX(-0.3rem) scaleX(0.34) scaleY(0.94);
+        filter: blur(0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-0.5rem) scaleX(0.018) scaleY(0.86);
+        filter: blur(0.2px);
+    }
+}
+
+@keyframes minitigerLibrarySideUnroll184 {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) scaleY(0.035) scaleX(0.9);
+    }
+
+    55% {
+        opacity: 0.9;
+        transform: translateY(-50%) scaleY(0.76) scaleX(0.98);
+    }
+
+    82% {
+        opacity: 1;
+        transform: translateY(-50%) scaleY(1.025) scaleX(1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(-50%) scaleY(1) scaleX(1);
+    }
+}
+
+@media (min-width: 901px) {
+    .minitigerLibraryAZBar.isDocking {
+        transform-origin: left center !important;
+        will-change: transform, opacity;
+        animation:
+            minitigerLibraryTopRoll184
+            240ms
+            cubic-bezier(0.42, 0, 0.86, 0.48)
+            forwards !important;
+    }
+
+    .minitigerLibraryAZBar.isDockedSide {
+        top: 50% !important;
+        right: 1rem !important;
+        bottom: auto !important;
+        left: auto !important;
+        transform-origin: top center !important;
+        will-change: transform, opacity;
+        animation:
+            minitigerLibrarySideUnroll184
+            340ms
+            cubic-bezier(0.16, 0.82, 0.26, 1.08)
+            both !important;
+    }
+}
+
+/* =========================================================
+   PHASE 18.2.9 - RIGHT-ROLL A-Z + GLOW ESCAPE
+   ========================================================= */
+
+/* Native library wrappers must not clip a lifted card's aura at the page or
+   row boundary. Card widths/spacing stay unchanged. */
+.minitigerLibraryPage .padded-bottom-page,
+.minitigerLibraryPage .itemsContainer,
+.minitigerLibraryPage .itemsContainer.vertical-wrap {
+    overflow: visible !important;
+    contain: none !important;
+}
+
+/* User correction: the horizontal A-Z bar should roll INTO its RIGHT edge,
+   then the vertical rail unfolds from the upper-right while staying centered. */
+@keyframes minitigerLibraryTopRoll189 {
+    0% {
+        opacity: 1;
+        transform: translateX(0) scaleX(1) scaleY(1);
+    }
+
+    62% {
+        opacity: 0.78;
+        transform: translateX(0.3rem) scaleX(0.34) scaleY(0.94);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(0.5rem) scaleX(0.018) scaleY(0.86);
+    }
+}
+
+@keyframes minitigerLibrarySideUnroll189 {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) scaleY(0.035) scaleX(0.9);
+    }
+
+    55% {
+        opacity: 0.9;
+        transform: translateY(-50%) scaleY(0.76) scaleX(0.98);
+    }
+
+    82% {
+        opacity: 1;
+        transform: translateY(-50%) scaleY(1.025) scaleX(1);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(-50%) scaleY(1) scaleX(1);
+    }
+}
+
+@media (min-width: 901px) {
+    .minitigerLibraryAZBar.isDocking {
+        transform-origin: right center !important;
+        pointer-events: none;
+        will-change: transform, opacity;
+        animation:
+            minitigerLibraryTopRoll189
+            240ms
+            cubic-bezier(0.42, 0, 0.86, 0.48)
+            forwards !important;
+    }
+
+    .minitigerLibraryAZBar.isDockedSide {
+        top: 50% !important;
+        right: 1rem !important;
+        bottom: auto !important;
+        left: auto !important;
+        transform-origin: top right !important;
+        will-change: transform, opacity;
+        animation:
+            minitigerLibrarySideUnroll189
+            340ms
+            cubic-bezier(0.16, 0.82, 0.26, 1.08)
+            both !important;
+    }
+}

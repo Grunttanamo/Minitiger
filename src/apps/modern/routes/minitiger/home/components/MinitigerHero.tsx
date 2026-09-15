@@ -1,22 +1,24 @@
-import { BaseItemKind } from '@jellyfin/sdk/lib/generated-client/models/base-item-kind';
-import { ImageType } from '@jellyfin/sdk/lib/generated-client/models/image-type';
-import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by';
 import { useQueryClient } from '@tanstack/react-query';
 import React, {
     useCallback,
     useEffect,
     useMemo,
+    useRef,
     useState
 } from 'react';
 import { Link } from 'react-router-dom';
 
 import { playbackManager } from 'components/playback/playbackmanager';
 import { useApi } from 'hooks/useApi';
-import { useGetItems, useToggleFavoriteMutation } from 'hooks/useFetchItems';
+import { useToggleFavoriteMutation } from 'hooks/useFetchItems';
 import { useItem } from 'hooks/useItem';
 import type { ItemDto } from 'types/base/models/item-dto';
 
 import { useMinitigerBannerItems } from '../hooks/useMinitigerBannerItems';
+import MinitigerInlineTrailer, {
+    resolveMinitigerLocalTrailers
+} from './MinitigerInlineTrailer';
+import MinitigerTrailerDebugPanel from './MinitigerTrailerDebugPanel';
 import {
     getBackdropImageUrl,
     getLogoImageUrl,
@@ -28,7 +30,6 @@ import {
 } from '../mediaUtils';
 import { getItemRoute } from '../routingUtils';
 
-const AUTO_ROTATE_MS = 12000;
 
 const shuffledCopy = (items: ItemDto[]) => {
     const result = [ ...items ];
@@ -41,7 +42,19 @@ const shuffledCopy = (items: ItemDto[]) => {
     return result;
 };
 
-const MinitigerHero = () => {
+interface MinitigerHeroProps {
+    autoRotateMs?: number;
+    maxItems?: number;
+    debugEnabled?: boolean;
+    youtubeTrailersEnabled?: boolean;
+}
+
+const MinitigerHero = ({
+    autoRotateMs = 12000,
+    maxItems = 10,
+    debugEnabled = true,
+    youtubeTrailersEnabled = true
+}: MinitigerHeroProps) => {
     const {
         __legacyApiClient__: apiClient
     } = useApi();
@@ -49,63 +62,97 @@ const MinitigerHero = () => {
     const queryClient = useQueryClient();
 
     const {
-        data: playlistData,
-        isPending: playlistPending
-    } = useMinitigerBannerItems();
+        data: bannerData,
+        isPending: bannerPending,
+        isError: bannerError
+    } = useMinitigerBannerItems(maxItems);
 
-    const {
-        data: fallbackResult,
-        isPending: fallbackPending,
-        isError: fallbackError
-    } = useGetItems({
-        recursive: true,
-        limit: 12,
-        imageTypeLimit: 3,
-        enableImageTypes: [
-            ImageType.Backdrop,
-            ImageType.Primary,
-            ImageType.Logo
-        ],
-        enableTotalRecordCount: false,
-        includeItemTypes: [
-            BaseItemKind.Movie,
-            BaseItemKind.Series,
-            BaseItemKind.MusicVideo
-        ],
-        sortBy: [ ItemSortBy.Random ]
-    });
+    const bannerItems =
+        bannerData?.items
+        ?? [];
 
-    const playlistItems = playlistData?.items ?? [];
-    const fallbackItems = fallbackResult?.Items ?? [];
-    const usingPlaylist = playlistItems.length > 0;
+    const usingPlaylist =
+        bannerData?.source
+        === 'playlist';
 
-    const candidates = useMemo(() => {
-        const source = usingPlaylist
-            ? playlistItems
-            : fallbackItems;
+    const lastSuccessfulCandidatesRef = useRef<ItemDto[]>([]);
 
-        const usable = source.filter(item =>
-            Boolean(
-                item.Id
-                && (
-                    item.BackdropImageTags?.length
-                    || item.ImageTags?.Primary
-                )
-            )
+    const freshCandidates = useMemo(() => {
+        const usable =
+            bannerItems.filter(item => {
+                const type =
+                    String(
+                        item.Type
+                        ?? ''
+                    ).toLowerCase();
+
+                /*
+                 * Banner stays deliberately on top-level movies/series.
+                 * Episodes, seasons and music videos do not enter the hero.
+                 */
+                const isTopLevel = (
+                    type === 'movie'
+                    || type === 'series'
+                );
+
+                return Boolean(
+                    isTopLevel
+                    && item.Id
+                    && (
+                        item.BackdropImageTags?.length
+                        || item.ImageTags?.Primary
+                    )
+                );
+            });
+
+        /* Keep the complete curated pool.  The hero only loads artwork for
+           the active item, so limiting this to ten merely made larger banner
+           selections feel repetitive and could statistically hide Series. */
+        return shuffledCopy(
+            usable
         );
+    }, [bannerItems]);
 
-        return usingPlaylist
-            ? shuffledCopy(usable)
-            : usable;
-    }, [ fallbackItems, playlistItems, usingPlaylist ]);
+    if (freshCandidates.length) {
+        lastSuccessfulCandidatesRef.current =
+            freshCandidates;
+    }
+
+    /* Keep the last valid hero set while a background refresh briefly has
+       no usable data. This avoids dropping to the "Minitiger Web" fallback
+       between queries/remounts. */
+    const candidates = freshCandidates.length
+        ? freshCandidates
+        : lastSuccessfulCandidatesRef.current;
 
     const [ activeIndex, setActiveIndex ] = useState(0);
-    const [ paused, setPaused ] = useState(false);
+    const [ trailerDebugOpen, setTrailerDebugOpen ] = useState(false);
+    const [ trailerLoading, setTrailerLoading ] = useState(false);
+    const paused = trailerDebugOpen || trailerLoading;
     const [ backdropFailed, setBackdropFailed ] = useState(false);
     const [ logoFailed, setLogoFailed ] = useState(false);
     const [ favorite, setFavorite ] = useState(false);
 
-    const activeCandidate = candidates[activeIndex];
+    /* Start at a different entry whenever a fresh candidate pool arrives.
+       This makes returning to Home visibly rotate even while React Query
+       reuses the same cached playlist pool. */
+    useEffect(() => {
+        if (!candidates.length) {
+            setActiveIndex(0);
+            return;
+        }
+
+        setActiveIndex(
+            Math.floor(Math.random() * candidates.length)
+        );
+    }, [candidates]);
+
+    const safeActiveIndex = candidates.length
+        ? activeIndex % candidates.length
+        : 0;
+
+    const activeCandidate =
+        candidates[safeActiveIndex];
 
     const {
         data: detailedItem
@@ -128,19 +175,29 @@ const MinitigerHero = () => {
         setFavorite(Boolean(heroItem?.UserData?.IsFavorite));
     }, [ heroItem?.Id, heroItem?.UserData?.IsFavorite ]);
 
+    const bannerPlaylistName =
+        bannerData
+        && 'playlistName' in bannerData
+            ? bannerData.playlistName
+            : undefined;
+
     useEffect(() => {
-        if (usingPlaylist && playlistData?.playlistName) {
+        if (
+            usingPlaylist
+            && bannerPlaylistName
+        ) {
             console.info(
-                `[Minitiger Hero] Bannerquelle: ${playlistData.playlistName}`
+                `[Minitiger Hero] Bannerquelle: ${bannerPlaylistName} · ${candidates.length} Einträge`
             );
-        } else if (!playlistPending) {
+        } else if (!bannerPending) {
             console.info(
-                '[Minitiger Hero] Bannerquelle: Zufällige Fallback-Auswahl'
+                `[Minitiger Hero] Bannerquelle: Zufällige Fallback-Auswahl · ${candidates.length} Einträge`
             );
         }
     }, [
-        playlistData?.playlistName,
-        playlistPending,
+        bannerPlaylistName,
+        bannerPending,
+        candidates.length,
         usingPlaylist
     ]);
 
@@ -165,14 +222,23 @@ const MinitigerHero = () => {
     }, [ candidates.length ]);
 
     useEffect(() => {
-        if (paused || candidates.length <= 1) {
+        if (
+            paused
+            || candidates.length <= 1
+            || autoRotateMs <= 0
+        ) {
             return;
         }
 
-        const timer = window.setInterval(showNext, AUTO_ROTATE_MS);
+        const timer = window.setInterval(showNext, autoRotateMs);
 
         return () => window.clearInterval(timer);
-    }, [ candidates.length, paused, showNext ]);
+    }, [
+        autoRotateMs,
+        candidates.length,
+        paused,
+        showNext
+    ]);
 
     const handlePlay = useCallback(() => {
         if (!heroItem) {
@@ -228,24 +294,25 @@ const MinitigerHero = () => {
         }
 
         try {
-            if ((heroItem.LocalTrailerCount ?? 0) > 0) {
-                const trailers = await apiClient.getLocalTrailers(
-                    apiClient.getCurrentUserId(),
-                    heroItem.Id
+            const trailers =
+                await resolveMinitigerLocalTrailers(
+                    apiClient,
+                    heroItem
                 );
 
-                if (trailers.length > 0) {
-                    await playbackManager.play({
-                        items: trailers
-                    });
+            if (trailers.length > 0) {
+                await playbackManager.play({
+                    items: trailers
+                });
 
-                    return;
-                }
+                return;
             }
 
-            const remoteUrl = heroItem.RemoteTrailers
-                ?.map(trailer => trailer.Url)
-                .find((url): url is string => Boolean(url));
+            const remoteUrl = youtubeTrailersEnabled
+                ? heroItem.RemoteTrailers
+                    ?.map(trailer => trailer.Url)
+                    .find((url): url is string => Boolean(url))
+                : undefined;
 
             if (remoteUrl) {
                 window.open(
@@ -260,11 +327,9 @@ const MinitigerHero = () => {
                 error
             );
         }
-    }, [ apiClient, heroItem ]);
+    }, [ apiClient, heroItem, youtubeTrailersEnabled ]);
 
-    const isPending = playlistPending && fallbackPending;
-
-    if (isPending) {
+    if (bannerPending && !candidates.length) {
         return (
             <section className='minitigerHero minitigerHeroLoading'>
                 <div className='minitigerHeroLoadingText'>
@@ -274,7 +339,7 @@ const MinitigerHero = () => {
         );
     }
 
-    if ((fallbackError && !usingPlaylist) || !heroItem) {
+    if ((bannerError && !candidates.length) || !heroItem) {
         return (
             <section className='minitigerHero minitigerHeroFallback'>
                 <div className='minitigerHeroFallbackInner'>
@@ -306,17 +371,18 @@ const MinitigerHero = () => {
 
     const hasTrailer = (
         (heroItem.LocalTrailerCount ?? 0) > 0
-        || Boolean(
-            heroItem.RemoteTrailers
-                ?.some(trailer => Boolean(trailer.Url))
+        || (
+            youtubeTrailersEnabled
+            && Boolean(
+                heroItem.RemoteTrailers
+                    ?.some(trailer => Boolean(trailer.Url))
+            )
         )
     );
 
     return (
         <section
             className='minitigerHero'
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
         >
             <div className='minitigerHeroBackdrop'>
                 {backdropUrl && !backdropFailed && (
@@ -327,6 +393,15 @@ const MinitigerHero = () => {
                         onError={() => setBackdropFailed(true)}
                     />
                 )}
+
+                <MinitigerInlineTrailer
+                    apiClient={apiClient}
+                    item={heroItem}
+                    className='minitigerHeroTrailerMedia'
+                    delayMs={900}
+                    onLoadingChange={setTrailerLoading}
+                    allowYouTube={youtubeTrailersEnabled}
+                />
             </div>
 
             <div className='minitigerHeroShade' />
@@ -355,12 +430,6 @@ const MinitigerHero = () => {
                         </div>
                     )}
 
-                    {ratingLabel && (
-                        <span className='minitigerHeroRating'>
-                            {ratingLabel}
-                        </span>
-                    )}
-
                     {heroItem.CommunityRating != null && (
                         <span className='minitigerHeroCommunityRating'>
                             ★ {heroItem.CommunityRating.toFixed(1)}
@@ -370,16 +439,24 @@ const MinitigerHero = () => {
 
                 {(audioLanguages.length > 0
                     || subtitleLanguages.length > 0) && (
-                    <div className='minitigerHeroLanguages'>
+                    <div className='minitigerHeroLanguageLine'>
                         {audioLanguages.length > 0 && (
                             <span>
-                                🔊 {audioLanguages.join(' / ')}
+                                Audio: {audioLanguages.join(', ')}
                             </span>
                         )}
 
+                        {audioLanguages.length > 0
+                            && subtitleLanguages.length > 0
+                            && (
+                                <span aria-hidden='true'> · </span>
+                            )}
+
                         {subtitleLanguages.length > 0 && (
                             <span>
-                                💬 {subtitleLanguages.join(' / ')}
+                                Untertitel: {
+                                    subtitleLanguages.join(', ')
+                                }
                             </span>
                         )}
                     </div>
@@ -439,8 +516,23 @@ const MinitigerHero = () => {
                         <span aria-hidden='true'>ⓘ</span>
                         <span>Weitere Infos</span>
                     </Link>
+
+
+                    {debugEnabled && (
+                        <MinitigerTrailerDebugPanel
+                            apiClient={apiClient}
+                            item={heroItem}
+                            onOpenChange={setTrailerDebugOpen}
+                        />
+                    )}
                 </div>
             </div>
+
+            {ratingLabel && (
+                <div className='minitigerHeroFskFloating'>
+                    {ratingLabel}
+                </div>
+            )}
 
             {candidates.length > 1 && (
                 <div className='minitigerHeroNavigation'>
@@ -454,7 +546,7 @@ const MinitigerHero = () => {
                     </button>
 
                     <span className='minitigerHeroCounter'>
-                        {activeIndex + 1}/{candidates.length}
+                        {safeActiveIndex + 1}/{candidates.length}
                     </span>
 
                     <button

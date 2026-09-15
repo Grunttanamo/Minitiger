@@ -1,0 +1,14 @@
+services:
+  jellyfin:
+    image: ghcr.io/DEIN_GITHUB_NAME/minitiger-jellyfin:latest
+    container_name: jellyfin-minitiger
+    restart: unless-stopped
+    ports:
+      - "8096:8096/tcp"
+      - "7359:7359/udp"
+    environment:
+      - TZ=Europe/Berlin
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - /PFAD/ZU/DEINEN/MEDIEN:/media:ro

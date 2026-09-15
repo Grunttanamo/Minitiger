@@ -1,5 +1,6 @@
 import React, { type FC } from 'react';
 
+import MinitigerNativeLibraryOverlay from 'apps/modern/features/minitiger/MinitigerNativeLibraryOverlay';
 import layoutManager from 'components/layoutManager';
 import { ItemAction } from 'constants/itemAction';
 import type { ItemDto } from 'types/base/models/item-dto';
@@ -45,12 +46,17 @@ const CardBox: FC<CardBoxProps> = ({
                     item={item}
                     cardOptions={cardOptions}
                     coveredImage={coveredImage}
-
                     overlayText={overlayText}
                     imgUrl={imgUrl}
                     blurhash={blurhash}
                     forceName={forceName}
                 />
+
+                <MinitigerNativeLibraryOverlay
+                    item={item}
+                    cardOptions={cardOptions}
+                />
+
                 {layoutManager.mobile && (
                     <CardOverlayButtons
                         item={item}
@@ -81,4 +87,3 @@ const CardBox: FC<CardBoxProps> = ({
 };
 
 export default CardBox;
-

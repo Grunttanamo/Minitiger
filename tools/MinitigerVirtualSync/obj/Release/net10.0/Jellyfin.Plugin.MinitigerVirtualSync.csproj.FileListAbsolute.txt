@@ -1,0 +1,13 @@
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/bin/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.deps.json
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/bin/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.dll
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/bin/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.pdb
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.csproj.AssemblyReference.cache
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.GeneratedMSBuildEditorConfig.editorconfig
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.AssemblyInfoInputs.cache
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.AssemblyInfo.cs
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.csproj.CoreCompileInputs.cache
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.sourcelink.json
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.dll
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/refint/Jellyfin.Plugin.MinitigerVirtualSync.dll
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/Jellyfin.Plugin.MinitigerVirtualSync.pdb
+/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/obj/Release/net10.0/ref/Jellyfin.Plugin.MinitigerVirtualSync.dll

@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT="$ROOT_DIR/tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj"
+BUILD_DIR="$ROOT_DIR/tools/MinitigerVirtualSync/out"
+PLUGIN_DIR="/var/lib/jellyfin/plugins/Minitiger Virtual Sync"
+
+if [[ ! -f "$PROJECT" ]]; then
+  echo "[Minitiger Sync] Projekt nicht gefunden: $PROJECT" >&2
+  exit 1
+fi
+
+DOTNET_BIN=""
+if command -v dotnet >/dev/null 2>&1 && dotnet --list-sdks 2>/dev/null | grep -q '^10\.'; then
+  DOTNET_BIN="$(command -v dotnet)"
+elif [[ -x "$HOME/.dotnet/dotnet" ]] && "$HOME/.dotnet/dotnet" --list-sdks 2>/dev/null | grep -q '^10\.'; then
+  DOTNET_BIN="$HOME/.dotnet/dotnet"
+else
+  echo "[Minitiger Sync] .NET 10 SDK fehlt – installiere es nur für diesen Benutzer nach ~/.dotnet ..."
+  if ! command -v curl >/dev/null 2>&1; then
+    sudo apt-get update
+    sudo apt-get install -y curl
+  fi
+  curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/minitiger-dotnet-install.sh
+  bash /tmp/minitiger-dotnet-install.sh --channel 10.0 --quality GA --install-dir "$HOME/.dotnet"
+  DOTNET_BIN="$HOME/.dotnet/dotnet"
+fi
+
+export DOTNET_ROOT="$(dirname "$DOTNET_BIN")"
+export PATH="$DOTNET_ROOT:$PATH"
+
+echo "[Minitiger Sync] Verwende: $($DOTNET_BIN --version)"
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
+
+"$DOTNET_BIN" restore "$PROJECT"
+"$DOTNET_BIN" publish "$PROJECT" -c Release -o "$BUILD_DIR" --no-self-contained
+
+if [[ ! -f "$BUILD_DIR/Jellyfin.Plugin.MinitigerVirtualSync.dll" ]]; then
+  echo "[Minitiger Sync] Build-DLL wurde nicht erzeugt." >&2
+  exit 1
+fi
+
+echo "[Minitiger Sync] Installiere Jellyfin-Plugin ..."
+sudo mkdir -p "$PLUGIN_DIR"
+sudo cp -f "$BUILD_DIR/Jellyfin.Plugin.MinitigerVirtualSync.dll" "$PLUGIN_DIR/"
+sudo chown -R jellyfin:jellyfin "$PLUGIN_DIR"
+sudo chmod 755 "$PLUGIN_DIR"
+sudo chmod 644 "$PLUGIN_DIR/Jellyfin.Plugin.MinitigerVirtualSync.dll"
+
+sudo systemctl restart jellyfin
+sleep 4
+sudo systemctl --no-pager --full status jellyfin | head -25
+
+echo
+echo "[Minitiger Sync] Fertig. Endpoint: /Minitiger/VirtualLibraries/Status"
+echo "[Minitiger Sync] Beim ersten Admin-Aufruf überträgt Minitiger den bisherigen lokalen Stand automatisch, falls der Server noch leer ist."

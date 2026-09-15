@@ -1,0 +1,2240 @@
+.minitigerVideoDetailsPage {
+    --mt-details-surface: rgba(7, 8, 11, 0.74);
+
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: #08090b;
+}
+
+.minitigerDetailsBackdrop,
+.minitigerDetailsShade {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+
+.minitigerDetailsBackdrop {
+    z-index: 0;
+    background-position: center 18%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    filter: brightness(0.62);
+    transform: scale(1.01);
+}
+
+.minitigerDetailsShade {
+    z-index: 1;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(5, 7, 10, 0.92) 0%,
+            rgba(5, 7, 10, 0.66) 48%,
+            rgba(5, 7, 10, 0.58) 100%
+        ),
+        linear-gradient(
+            0deg,
+            rgba(5, 7, 10, 0.96) 0%,
+            rgba(5, 7, 10, 0.55) 66%,
+            rgba(5, 7, 10, 0.35) 100%
+        );
+}
+
+.minitigerDetailsSurface {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    padding:
+        3.2rem max(3rem, 6vw)
+        4.5rem;
+    box-sizing: border-box;
+    background:
+        linear-gradient(
+            180deg,
+            rgba(0, 0, 0, 0.06),
+            var(--mt-details-surface)
+        );
+}
+
+.minitigerDetailsHero {
+    display: grid;
+    grid-template-columns:
+        minmax(
+            250px,
+            var(
+                --mt-details-poster-width,
+                390px
+            )
+        )
+        minmax(0, 1fr);
+    align-items: start;
+    gap: clamp(2rem, 3vw, 3.8rem);
+    max-width: 1640px;
+    margin: 0 auto 2.3rem;
+}
+
+.minitigerDetailsPoster {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 7px;
+    background: #17191d;
+    box-shadow:
+        0 18px 52px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.minitigerDetailsPoster img,
+.minitigerDetailsPosterFallback {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.minitigerDetailsPoster img {
+    object-fit: cover;
+}
+
+.minitigerDetailsPosterFallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.minitigerDetailsInfo {
+    padding-top: 0.6rem;
+}
+
+.minitigerDetailsType {
+    margin-bottom: 0.4rem;
+    color: #36d399;
+    font-size: 0.78rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+}
+
+.minitigerDetailsInfo h1 {
+    margin: 0;
+    max-width: 1200px;
+    color: #fff;
+    font-size:
+        clamp(2.5rem, 4.5vw, 5rem);
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+}
+
+.minitigerDetailsLogo {
+    display: block;
+    width: auto;
+    max-width: min(640px, 70%);
+    max-height: 150px;
+    object-fit: contain;
+    object-position: left bottom;
+    filter:
+        drop-shadow(
+            0 4px 12px
+            rgba(0, 0, 0, 0.55)
+        );
+}
+
+.minitigerDetailsMeta,
+.minitigerDetailsLanguages {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.85rem;
+}
+
+.minitigerDetailsMeta span,
+.minitigerDetailsLanguages span {
+    padding: 0.2rem 0.45rem;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 4px;
+    background: rgba(18, 20, 24, 0.72);
+    color: #ddd;
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.minitigerDetailsOverview {
+    max-width: 1050px;
+    margin: 1rem 0 0;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 7px;
+    background: rgba(15, 17, 20, 0.52);
+    color: #e2e2e2;
+    font-size: 0.96rem;
+    line-height: 1.5;
+}
+
+.minitigerDetailsVersion {
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: 0.85rem;
+}
+
+.minitigerDetailsVersion > span {
+    color: #aaa;
+    font-size: 0.8rem;
+}
+
+.minitigerDetailsVersion select,
+.minitigerDetailsSectionHead select {
+    min-height: 2.45rem;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background: #23262c;
+    color: #fff;
+}
+
+.minitigerDetailsExtraMeta {
+    max-width: 850px;
+    margin-top: 0.9rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    background: rgba(15, 17, 20, 0.44);
+}
+
+.minitigerDetailsExtraMeta > div {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 0.8rem;
+    padding: 0.28rem 0;
+}
+
+.minitigerDetailsExtraMeta strong {
+    color: #aaa;
+    font-size: 0.8rem;
+}
+
+.minitigerDetailsExtraMeta span {
+    color: #ddd;
+    font-size: 0.84rem;
+}
+
+.minitigerDetailsGenreChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.32rem;
+}
+
+.minitigerDetailsGenreChips em {
+    padding: 0.18rem 0.38rem;
+    border-radius: 999px;
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    font-style: normal;
+    font-weight: 800;
+}
+
+.minitigerDetailsActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.95rem;
+}
+
+.minitigerDetailsActions button {
+    min-width: 2.75rem;
+    min-height: 2.65rem;
+    padding: 0.55rem 0.85rem;
+    border: 0;
+    border-radius: 6px;
+    background: var(--mt-button);
+    color: #fff;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    transition:
+        transform 130ms ease,
+        background 130ms ease;
+}
+
+.minitigerDetailsActions button:hover,
+.minitigerDetailsActions button:focus-visible,
+.minitigerDetailsActions button.isActive {
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    outline: none;
+    transform: translateY(-1px);
+}
+
+.minitigerDetailsActions button.isPrimary {
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+}
+
+.minitigerDetailsSection {
+    max-width: 1640px;
+    margin: 0 auto 2.6rem;
+}
+
+.minitigerDetailsSectionHead {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.minitigerDetailsSectionHead h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.35rem;
+}
+
+.minitigerDetailsSectionHead span {
+    color: #888;
+    font-size: 0.78rem;
+}
+
+.minitigerDetailsEpisodeRow,
+.minitigerDetailsSeasonRow,
+.minitigerDetailsCastRow {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.15rem 0 0.55rem;
+    scrollbar-width: thin;
+}
+
+.minitigerDetailsEpisodeCard {
+    flex:
+        0 0
+        min(
+            var(
+                --mt-details-content-width,
+                380px
+            ),
+            78vw
+        );
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerDetailsEpisodeCard > div {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 5px;
+    background: #1d1f23;
+}
+
+.minitigerDetailsEpisodeCard img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerDetailsEpisodeCard strong,
+.minitigerDetailsEpisodeCard small,
+.minitigerDetailsEpisodeCard p {
+    display: block;
+}
+
+.minitigerDetailsEpisodeCard strong {
+    margin-top: 0.42rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #f2f2f2;
+    font-size: 0.9rem;
+}
+
+.minitigerDetailsEpisodeCard small {
+    margin-top: 0.12rem;
+    color: #aaa;
+}
+
+.minitigerDetailsEpisodeCard p {
+    display: -webkit-box;
+    margin: 0.28rem 0 0;
+    overflow: hidden;
+    color: #aaa;
+    font-size: 0.78rem;
+    line-height: 1.32;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.minitigerDetailsEpisodeCard:hover > div,
+.minitigerDetailsSeasonCard:hover > div,
+.minitigerDetailsCastCard:hover > div {
+    box-shadow:
+        0 0 var(--mt-glow-size)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color) 45%,
+            transparent
+        );
+}
+
+.minitigerDetailsSeasonCard {
+    flex:
+        0 0
+        min(
+            var(
+                --mt-details-season-width,
+                190px
+            ),
+            46vw
+        );
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerDetailsSeasonCard > div {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 5px;
+    background: #1d1f23;
+}
+
+.minitigerDetailsSeasonCard img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerDetailsSeasonCard strong {
+    display: block;
+    margin-top: 0.38rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #eee;
+    text-align: center;
+    font-size: 0.84rem;
+}
+
+.minitigerDetailsCastCard {
+    flex:
+        0 0
+        min(
+            var(
+                --mt-details-cast-width,
+                148px
+            ),
+            35vw
+        );
+    text-align: center;
+}
+
+.minitigerDetailsCastCard > div {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #1d1f23;
+}
+
+.minitigerDetailsCastCard img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.minitigerDetailsCastCard > div > span {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.minitigerDetailsCastCard strong {
+    display: block;
+    margin-top: 0.35rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 0.78rem;
+}
+
+.minitigerDetailsCastCard small {
+    display: block;
+    margin-top: 0.1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #aaa;
+    font-size: 0.68rem;
+}
+
+.minitigerDetailsLoading {
+    padding: 5rem max(2rem, 6vw);
+    color: #aaa;
+}
+
+.minitigerDetailsInlineStatus {
+    padding: 1rem 0;
+    color: #999;
+}
+
+.minitigerDetailsAdminHint {
+    max-width: 1640px;
+    margin: 1rem auto 0;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.72rem;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .minitigerDetailsSurface {
+        padding:
+            2rem 1.25rem
+            3.5rem;
+    }
+
+    .minitigerDetailsHero {
+        grid-template-columns: 1fr;
+    }
+
+    .minitigerDetailsPoster {
+        width: min(330px, 78vw);
+        margin: 0 auto;
+    }
+
+    .minitigerDetailsLogo {
+        max-width: min(580px, 86%);
+    }
+}
+
+
+/* =========================================================
+   PHASE 16 - NATIVE EPISODE / SEASON DETAILS
+   ========================================================= */
+
+.minitigerDetailsParentTitle {
+    margin-bottom: 0.32rem;
+    color: #eee;
+    font-size: 0.96rem;
+    font-weight: 800;
+}
+
+.minitigerDetailsHero.isEpisode {
+    grid-template-columns:
+        minmax(
+            360px,
+            min(
+                34vw,
+                620px
+            )
+        )
+        minmax(0, 1fr);
+    align-items: center;
+}
+
+.minitigerEpisodeHeroImage {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 7px;
+    background: #17191d;
+    box-shadow:
+        0 18px 52px
+        rgba(0, 0, 0, 0.48),
+        0 0 0 1px
+        rgba(255, 255, 255, 0.06);
+}
+
+.minitigerEpisodeHeroImage img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerSeasonEpisodeList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.minitigerSeasonEpisodeItem {
+    display: grid;
+    grid-template-columns:
+        44px
+        minmax(180px, 260px)
+        minmax(0, 1fr);
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.55rem;
+    border: 1px solid
+        rgba(255, 255, 255, 0.06);
+    border-radius: 6px;
+    background:
+        rgba(28, 30, 34, 0.88);
+    color: inherit;
+    text-decoration: none;
+    transition:
+        transform 140ms ease,
+        box-shadow 140ms ease,
+        background 140ms ease;
+}
+
+.minitigerSeasonEpisodeItem:hover,
+.minitigerSeasonEpisodeItem:focus-visible {
+    background:
+        rgba(36, 39, 44, 0.96);
+    box-shadow:
+        0 0
+        var(--mt-glow-size)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color)
+            40%,
+            transparent
+        );
+    transform:
+        translateY(-1px);
+    outline: none;
+}
+
+.minitigerSeasonEpisodeNumber {
+    color: #aaa;
+    font-size: 1rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+.minitigerSeasonEpisodeImage {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 5px;
+    background: #1b1d21;
+}
+
+.minitigerSeasonEpisodeImage img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerSeasonEpisodeInfo {
+    min-width: 0;
+}
+
+.minitigerSeasonEpisodeInfo strong,
+.minitigerSeasonEpisodeInfo small,
+.minitigerSeasonEpisodeInfo p {
+    display: block;
+}
+
+.minitigerSeasonEpisodeInfo strong {
+    color: #f2f2f2;
+    font-size: 0.94rem;
+}
+
+.minitigerSeasonEpisodeInfo small {
+    margin-top: 0.15rem;
+    color: #aaa;
+    font-size: 0.76rem;
+}
+
+.minitigerSeasonEpisodeInfo p {
+    margin: 0.36rem 0 0;
+    color: #bbb;
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='square']
+.minitigerDetailsCastCard > div {
+    aspect-ratio: 1 / 1;
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='landscape']
+.minitigerDetailsCastCard {
+    flex-basis:
+        min(
+            calc(
+                var(
+                    --mt-details-cast-width,
+                    148px
+                )
+                * 1.6
+            ),
+            48vw
+        );
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='landscape']
+.minitigerDetailsCastCard > div {
+    aspect-ratio: 16 / 9;
+}
+
+@media (max-width: 900px) {
+    .minitigerDetailsHero.isEpisode {
+        grid-template-columns: 1fr;
+    }
+
+    .minitigerEpisodeHeroImage {
+        width: min(
+            760px,
+            100%
+        );
+        margin: 0 auto;
+    }
+
+    .minitigerSeasonEpisodeItem {
+        grid-template-columns:
+            34px
+            minmax(130px, 190px)
+            minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .minitigerSeasonEpisodeItem {
+        grid-template-columns:
+            28px
+            120px
+            minmax(0, 1fr);
+        gap: 0.55rem;
+    }
+
+    .minitigerSeasonEpisodeInfo p {
+        display: none;
+    }
+}
+
+/* =========================================================
+   PHASE 17 - DETAILPAGE MEDIA PARITY + ARROW RAILS
+   ========================================================= */
+
+/* Horizontal rows now use old-Minitiger-style arrow navigation. */
+.minitigerRail {
+    position: relative;
+    min-width: 0;
+}
+
+.minitigerRailTrack {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding:
+        0.85rem
+        1.35rem
+        1.15rem;
+    margin:
+        -0.85rem
+        -1.35rem
+        -1.15rem;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+}
+
+.minitigerRailTrack::-webkit-scrollbar {
+    display: none;
+}
+
+.minitigerRailArrow {
+    position: absolute;
+    z-index: 12;
+    top: 50%;
+    width: 2.45rem;
+    height: 2.45rem;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background:
+        color-mix(
+            in srgb,
+            var(--mt-accent)
+            92%,
+            #111
+        );
+    color: var(--mt-accent-text);
+    box-shadow:
+        0 6px 20px
+        rgba(0, 0, 0, 0.38);
+    font-size: 1.65rem;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.94;
+    transform: translateY(-50%);
+    transition:
+        transform 130ms ease,
+        filter 130ms ease,
+        opacity 130ms ease;
+}
+
+.minitigerRailArrow:hover,
+.minitigerRailArrow:focus-visible {
+    filter: brightness(1.18);
+    opacity: 1;
+    outline: none;
+}
+
+.minitigerRailArrow.isLeft {
+    right: 3.15rem;
+}
+
+.minitigerRailArrow.isRight {
+    right: 0.25rem;
+}
+
+/* Existing row rules used overflow:auto; rail owns scrolling now. */
+.minitigerDetailsEpisodeRow,
+.minitigerDetailsSeasonRow,
+.minitigerDetailsCastRow,
+.minitigerMangaVolumeRow {
+    overflow: visible !important;
+    padding-top: 0.85rem !important;
+    padding-bottom: 1.15rem !important;
+    scrollbar-width: none !important;
+}
+
+/* Give the glow physical room – especially the leftmost card. */
+.minitigerDetailsEpisodeCard,
+.minitigerDetailsSeasonCard,
+.minitigerDetailsCastCard,
+.minitigerMangaVolumeCard,
+.minitigerMusicAlbumCard,
+.minitigerMusicVideoCard {
+    position: relative;
+    transition:
+        transform 150ms ease,
+        filter 150ms ease;
+}
+
+.minitigerDetailsEpisodeCard:hover,
+.minitigerDetailsEpisodeCard:focus-visible,
+.minitigerDetailsSeasonCard:hover,
+.minitigerDetailsSeasonCard:focus-visible,
+.minitigerDetailsCastCard:hover,
+.minitigerDetailsCastCard:focus-visible,
+.minitigerMangaVolumeCard:hover,
+.minitigerMangaVolumeCard:focus-visible,
+.minitigerMusicAlbumCard:hover,
+.minitigerMusicAlbumCard:focus-visible,
+.minitigerMusicVideoCard:hover,
+.minitigerMusicVideoCard:focus-visible {
+    transform: translateY(-4px);
+    filter: brightness(1.06);
+    outline: none;
+}
+
+.minitigerDetailsEpisodeCard:hover > div,
+.minitigerDetailsEpisodeCard:focus-visible > div,
+.minitigerDetailsSeasonCard:hover > div,
+.minitigerDetailsSeasonCard:focus-visible > div,
+.minitigerDetailsCastCard:hover > div,
+.minitigerDetailsCastCard:focus-visible > div,
+.minitigerMangaVolumeCard:hover > div,
+.minitigerMangaVolumeCard:focus-visible > div,
+.minitigerMusicAlbumCard:hover > div,
+.minitigerMusicAlbumCard:focus-visible > div,
+.minitigerMusicVideoCard:hover > div,
+.minitigerMusicVideoCard:focus-visible > div {
+    box-shadow:
+        0 0 var(--mt-glow-size)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color)
+            58%,
+            transparent
+        );
+}
+
+/* Parent title is now a real link on Season/Episode/Music/Manga pages. */
+a.minitigerDetailsParentTitle {
+    display: inline-block;
+    color: #eee;
+    text-decoration: none;
+    transition:
+        color 120ms ease,
+        transform 120ms ease;
+}
+
+a.minitigerDetailsParentTitle:hover,
+a.minitigerDetailsParentTitle:focus-visible {
+    color: var(--mt-accent);
+    transform: translateX(2px);
+    outline: none;
+}
+
+/* Buttons: active is visibly different from hover. */
+.minitigerDetailsActions button.isActive {
+    background:
+        color-mix(
+            in srgb,
+            var(--mt-button)
+            66%,
+            var(--mt-accent)
+        );
+    color: #fff;
+    box-shadow:
+        inset 0 0 0 1px
+        color-mix(
+            in srgb,
+            var(--mt-accent)
+            72%,
+            transparent
+        );
+}
+
+.minitigerDetailsActions button:hover,
+.minitigerDetailsActions button:focus-visible {
+    background: var(--mt-accent-hover);
+    color:
+        var(--mt-accent-text);
+}
+
+.minitigerDetailsActions button.isPrimary:hover,
+.minitigerDetailsActions button.isPrimary:focus-visible {
+    background: var(--mt-accent-hover);
+}
+
+.minitigerDetailsActions button:disabled {
+    opacity: 0.45;
+    cursor: default;
+    transform: none;
+}
+
+/* ---------------------------------------------------------
+   Season detail layout
+   --------------------------------------------------------- */
+
+.minitigerSeasonHero {
+    align-items: start;
+}
+
+.minitigerSeasonRightColumn {
+    min-width: 0;
+}
+
+.minitigerSeasonEmbeddedEpisodes {
+    margin-top: 2.2rem;
+}
+
+.minitigerSeasonEpisodeList {
+    gap: 0.62rem;
+}
+
+.minitigerSeasonEpisodeItem {
+    grid-template-columns:
+        42px
+        minmax(180px, 250px)
+        minmax(0, 1fr)
+        95px
+        44px;
+    min-height: 104px;
+    padding: 0.55rem;
+}
+
+.minitigerSeasonEpisodeItem:hover,
+.minitigerSeasonEpisodeItem:focus-within {
+    background:
+        color-mix(
+            in srgb,
+            #25282e 92%,
+            var(--mt-accent)
+        );
+    box-shadow:
+        0 0
+        var(--mt-glow-size)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color)
+            38%,
+            transparent
+        );
+    transform: translateY(-1px);
+}
+
+.minitigerSeasonEpisodeImage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 5px;
+    background: #1b1d21;
+}
+
+.minitigerSeasonEpisodeImageLink {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.minitigerSeasonEpisodeImageLink img,
+.minitigerSeasonEpisodeImageLink > span {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerSeasonEpisodePlay {
+    position: absolute;
+    z-index: 3;
+    top: 50%;
+    left: 50%;
+    width: 2.85rem;
+    height: 2.85rem;
+    display: grid;
+    place-items: center;
+    padding: 0 0 0 0.12rem;
+    border: 0;
+    border-radius: 50%;
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    font-size: 1.1rem;
+    cursor: pointer;
+    opacity: 0;
+    transform:
+        translate(-50%, -50%)
+        scale(0.86);
+    transition:
+        opacity 130ms ease,
+        transform 130ms ease,
+        background 130ms ease;
+}
+
+.minitigerSeasonEpisodeItem:hover
+.minitigerSeasonEpisodePlay,
+.minitigerSeasonEpisodePlay:focus-visible {
+    opacity: 1;
+    transform:
+        translate(-50%, -50%)
+        scale(1);
+}
+
+.minitigerSeasonEpisodePlay:hover,
+.minitigerSeasonEpisodePlay:focus-visible {
+    background: var(--mt-accent-hover);
+    outline: none;
+}
+
+.minitigerSeasonEpisodeInfo {
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerSeasonEpisodeInfo strong {
+    color: #f2f2f2;
+    font-size: 0.94rem;
+}
+
+.minitigerSeasonEpisodeInfo p {
+    display: -webkit-box;
+    margin: 0.38rem 0 0;
+    overflow: hidden;
+    color: #aaa;
+    font-size: 0.78rem;
+    line-height: 1.34;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.minitigerSeasonEpisodeRuntime {
+    justify-self: end;
+    color: #f0f0f0;
+    font-size: 0.9rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.minitigerSeasonEpisodeMenu {
+    width: 2.35rem;
+    height: 2.35rem;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--mt-button);
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 900;
+    cursor: pointer;
+    opacity: 0.72;
+    transition:
+        background 130ms ease,
+        color 130ms ease,
+        opacity 130ms ease;
+}
+
+.minitigerSeasonEpisodeItem:hover
+.minitigerSeasonEpisodeMenu,
+.minitigerSeasonEpisodeMenu:focus-visible {
+    opacity: 1;
+}
+
+.minitigerSeasonEpisodeMenu:hover,
+.minitigerSeasonEpisodeMenu:focus-visible {
+    background: var(--mt-accent-hover);
+    color: var(--mt-accent-text);
+    outline: none;
+}
+
+/* ---------------------------------------------------------
+   Music
+   --------------------------------------------------------- */
+
+.minitigerMusicHero {
+    grid-template-columns:
+        minmax(
+            260px,
+            min(
+                var(--mt-details-poster-width),
+                460px
+            )
+        )
+        minmax(0, 1fr);
+}
+
+.minitigerMusicSquarePoster {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 7px;
+    background: #17191d;
+    box-shadow:
+        0 18px 52px
+        rgba(0, 0, 0, 0.5),
+        0 0 0 1px
+        rgba(255, 255, 255, 0.06);
+}
+
+.minitigerMusicSquarePoster img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerMusicGenres {
+    margin-top: 1rem;
+}
+
+.minitigerMusicAlbumGrid,
+.minitigerMusicVideoGrid {
+    display: grid;
+    gap: 1rem;
+}
+
+.minitigerMusicAlbumGrid {
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                150px,
+                1fr
+            )
+        );
+}
+
+.minitigerMusicVideoGrid {
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                280px,
+                1fr
+            )
+        );
+}
+
+.minitigerMusicAlbumCard,
+.minitigerMusicVideoCard {
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerMusicAlbumCard > div {
+    width: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #1b1d21;
+}
+
+.minitigerMusicAlbumCard > div {
+    aspect-ratio: 1 / 1;
+}
+
+.minitigerMusicVideoCard > div {
+    aspect-ratio: 16 / 9;
+}
+
+.minitigerMusicAlbumCard img,
+.minitigerMusicVideoCard img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerMusicAlbumCard strong,
+.minitigerMusicAlbumCard small,
+.minitigerMusicVideoCard strong,
+.minitigerMusicVideoCard small {
+    display: block;
+}
+
+.minitigerMusicAlbumCard strong,
+.minitigerMusicVideoCard strong {
+    margin-top: 0.4rem;
+    overflow: hidden;
+    color: #eee;
+    font-size: 0.86rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.minitigerMusicAlbumCard small,
+.minitigerMusicVideoCard small {
+    margin-top: 0.12rem;
+    color: #888;
+    font-size: 0.72rem;
+}
+
+.minitigerMusicTrackList {
+    overflow: hidden;
+    border-top: 1px solid
+        rgba(255, 255, 255, 0.07);
+}
+
+.minitigerMusicTrackRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns:
+        46px
+        minmax(0, 1fr)
+        80px;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.72rem 0.5rem;
+    border: 0;
+    border-bottom: 1px solid
+        rgba(255, 255, 255, 0.07);
+    background: transparent;
+    color: #eee;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        background 120ms ease,
+        box-shadow 120ms ease;
+}
+
+.minitigerMusicTrackRow:hover,
+.minitigerMusicTrackRow:focus-visible {
+    background:
+        color-mix(
+            in srgb,
+            var(--mt-accent)
+            12%,
+            rgba(24, 26, 30, 0.9)
+        );
+    box-shadow:
+        inset 3px 0 0
+        var(--mt-accent);
+    outline: none;
+}
+
+.minitigerMusicTrackNumber {
+    color: #888;
+    text-align: right;
+}
+
+.minitigerMusicTrackRuntime {
+    color: #bbb;
+    font-weight: 800;
+    text-align: right;
+}
+
+/* ---------------------------------------------------------
+   Manga
+   --------------------------------------------------------- */
+
+.minitigerMangaVolumeCard {
+    flex:
+        0 0
+        min(
+            var(
+                --mt-details-season-width,
+                220px
+            ),
+            46vw
+        );
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerMangaVolumeCard > div {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #1b1d21;
+}
+
+.minitigerMangaVolumeCard img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerMangaVolumeCard strong {
+    display: block;
+    margin-top: 0.4rem;
+    overflow: hidden;
+    color: #eee;
+    font-size: 0.84rem;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 980px) {
+    .minitigerSeasonEpisodeItem {
+        grid-template-columns:
+            32px
+            160px
+            minmax(0, 1fr)
+            74px
+            40px;
+    }
+
+    .minitigerMusicHero {
+        grid-template-columns: 1fr;
+    }
+
+    .minitigerMusicSquarePoster {
+        width: min(
+            430px,
+            82vw
+        );
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 680px) {
+    .minitigerRailArrow {
+        width: 2.2rem;
+        height: 2.2rem;
+    }
+
+    .minitigerRailArrow.isLeft {
+        right: 2.85rem;
+    }
+
+    .minitigerSeasonEpisodeItem {
+        grid-template-columns:
+            26px
+            118px
+            minmax(0, 1fr)
+            40px;
+    }
+
+    .minitigerSeasonEpisodeRuntime {
+        display: none;
+    }
+
+    .minitigerSeasonEpisodeInfo p {
+        display: none;
+    }
+
+    .minitigerMusicVideoGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   PHASE 17.1 - RAIL PLACEMENT + SEASON BADGES
+   ========================================================= */
+
+/*
+ * Phase 17 had the row class overriding overflow-x:auto with
+ * overflow:visible. That made scrollBy() look like it did nothing.
+ * The track owns scrolling again, while inner padding keeps glow safe.
+ */
+.minitigerRail {
+    position: relative;
+    min-width: 0;
+    overflow: visible;
+}
+
+.minitigerRailTrack,
+.minitigerDetailsEpisodeRow,
+.minitigerDetailsSeasonRow,
+.minitigerDetailsCastRow,
+.minitigerMangaVolumeRow {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-behavior: smooth;
+    scrollbar-width: none !important;
+}
+
+.minitigerRailTrack::-webkit-scrollbar,
+.minitigerDetailsEpisodeRow::-webkit-scrollbar,
+.minitigerDetailsSeasonRow::-webkit-scrollbar,
+.minitigerDetailsCastRow::-webkit-scrollbar,
+.minitigerMangaVolumeRow::-webkit-scrollbar {
+    display: none;
+}
+
+/*
+ * Controls live visually in the section header.
+ * On rows with a season <select>, the select reserves room for them,
+ * so the arrows sit immediately to its right.
+ */
+.minitigerRailControls {
+    position: absolute;
+    z-index: 18;
+    top: -2.05rem;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.42rem;
+}
+
+.minitigerDetailsSectionHead select {
+    margin-right: 5.8rem;
+}
+
+.minitigerRailArrow {
+    position: static;
+    width: 2.2rem;
+    height: 2.2rem;
+    transform: none;
+    font-size: 1.45rem;
+}
+
+.minitigerRailArrow:hover,
+.minitigerRailArrow:focus-visible {
+    transform: translateY(-1px);
+}
+
+.minitigerRailArrow:disabled {
+    opacity: 0.28;
+    cursor: default;
+    filter: none;
+    transform: none;
+}
+
+/* No overflow = no controls at all (handled by React state). */
+.minitigerRail:not(.hasOverflow)
+.minitigerRailControls {
+    display: none;
+}
+
+/* Season poster metadata */
+.minitigerDetailsSeasonVisual {
+    position: relative;
+}
+
+.minitigerDetailsSeasonPlayed {
+    position: absolute;
+    z-index: 4;
+    top: 0;
+    right: 0;
+    min-width: 2.05rem;
+    height: 2.05rem;
+    display: grid;
+    place-items: center;
+    padding: 0 0.35rem;
+    border-radius:
+        0
+        5px
+        0
+        1.1rem;
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    font-size: 0.82rem;
+    font-weight: 900;
+    box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, 0.32);
+}
+
+.minitigerDetailsSeasonPlayed.isComplete {
+    font-size: 1rem;
+}
+
+.minitigerDetailsSeasonAudio {
+    position: absolute;
+    z-index: 4;
+    left: 0.35rem;
+    bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.18rem;
+}
+
+.minitigerDetailsSeasonAudio img {
+    width: 1.35rem;
+    height: 0.88rem;
+    display: block;
+    object-fit: cover;
+    border-radius: 1px;
+    box-shadow:
+        0 1px 5px
+        rgba(0, 0, 0, 0.75);
+}
+
+/* Watched badge on the compact season episode list. */
+.minitigerSeasonEpisodeSeen {
+    position: absolute;
+    z-index: 4;
+    top: 0.38rem;
+    right: 0.38rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    font-size: 0.95rem;
+    font-weight: 900;
+    box-shadow:
+        0 3px 10px
+        rgba(0, 0, 0, 0.42);
+}
+
+@media (max-width: 680px) {
+    .minitigerRailControls {
+        top: -1.95rem;
+    }
+
+    .minitigerDetailsSectionHead select {
+        margin-right: 5.15rem;
+        max-width: min(48vw, 210px);
+    }
+
+    .minitigerRailArrow {
+        width: 2rem;
+        height: 2rem;
+    }
+}
+
+
+/* =========================================================
+   PHASE 18 - CAST FIXED SIZES + SHAPES
+   ========================================================= */
+
+.minitigerDetailsCastCard {
+    flex: 0 0 var(--mt-details-cast-width, 148px) !important;
+    width: var(--mt-details-cast-width, 148px);
+    min-width: var(--mt-details-cast-width, 148px);
+    max-width: var(--mt-details-cast-width, 148px);
+}
+
+.minitigerDetailsCastCard > div {
+    width: var(--mt-details-cast-width, 148px);
+    height: calc(var(--mt-details-cast-width, 148px) * 1.5);
+    aspect-ratio: auto;
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='square']
+.minitigerDetailsCastCard > div,
+.minitigerVideoDetailsPage[data-cast-shape='circle']
+.minitigerDetailsCastCard > div,
+.minitigerVideoDetailsPage[data-cast-shape='star']
+.minitigerDetailsCastCard > div {
+    height: var(--mt-details-cast-width, 148px);
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='circle']
+.minitigerDetailsCastCard > div {
+    border-radius: 50%;
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='oval']
+.minitigerDetailsCastCard > div {
+    height: calc(var(--mt-details-cast-width, 148px) * 1.28);
+    border-radius: 50%;
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='star']
+.minitigerDetailsCastCard > div {
+    border-radius: 0;
+    clip-path: polygon(
+        50% 0%,
+        61% 35%,
+        98% 35%,
+        68% 57%,
+        79% 94%,
+        50% 72%,
+        21% 94%,
+        32% 57%,
+        2% 35%,
+        39% 35%
+    );
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='landscape']
+.minitigerDetailsCastCard {
+    flex-basis: calc(var(--mt-details-cast-width, 148px) * 1.6) !important;
+    width: calc(var(--mt-details-cast-width, 148px) * 1.6);
+    min-width: calc(var(--mt-details-cast-width, 148px) * 1.6);
+    max-width: calc(var(--mt-details-cast-width, 148px) * 1.6);
+}
+
+.minitigerVideoDetailsPage[data-cast-shape='landscape']
+.minitigerDetailsCastCard > div {
+    width: calc(var(--mt-details-cast-width, 148px) * 1.6);
+    height: calc(var(--mt-details-cast-width, 148px) * 0.9);
+}
+
+/* =========================================================
+   PHASE 18 - COMPACT MUSIC / OVERVIEW
+   ========================================================= */
+
+.minitigerMusicHero {
+    grid-template-columns:
+        minmax(
+            220px,
+            min(
+                330px,
+                var(--mt-details-poster-width, 330px)
+            )
+        )
+        minmax(0, 1fr);
+    gap: clamp(1.6rem, 2.5vw, 3rem);
+}
+
+.minitigerMusicSquarePoster {
+    width: min(
+        330px,
+        var(--mt-details-poster-width, 330px)
+    );
+    max-width: 100%;
+    justify-self: start;
+}
+
+.minitigerMusicVideoDetailHero {
+    grid-template-columns:
+        minmax(
+            320px,
+            min(
+                31vw,
+                520px
+            )
+        )
+        minmax(0, 1fr) !important;
+    align-items: start !important;
+}
+
+.minitigerExpandableOverview {
+    max-width: 1050px;
+}
+
+.minitigerExpandableOverview .minitigerDetailsOverview {
+    margin-bottom: 0;
+}
+
+.minitigerOverviewToggle {
+    margin-top: 0.55rem;
+    padding: 0.45rem 0.72rem;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 5px;
+    background: rgba(34, 36, 41, 0.92);
+    color: #eee;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.minitigerOverviewToggle:hover,
+.minitigerOverviewToggle:focus-visible {
+    border-color: var(--mt-accent);
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    outline: none;
+}
+
+@media (max-width: 980px) {
+    .minitigerMusicHero,
+    .minitigerMusicVideoDetailHero {
+        grid-template-columns: 1fr !important;
+    }
+
+    .minitigerMusicSquarePoster,
+    .minitigerMusicVideoDetailHero .minitigerEpisodeHeroImage {
+        width: min(420px, 82vw);
+        margin: 0 auto;
+    }
+}
+
+/* =========================================================
+   PHASE 18 - MANGA WRAPPING GRID
+   ========================================================= */
+
+.minitigerMangaVolumeGrid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                min(
+                    var(--mt-details-season-width, 220px),
+                    42vw
+                ),
+                1fr
+            )
+        );
+    align-items: start;
+    gap: 1.15rem 0.85rem;
+}
+
+.minitigerMangaVolumeGrid .minitigerMangaVolumeCard {
+    width: 100%;
+    min-width: 0;
+    max-width: var(--mt-details-season-width, 220px);
+    justify-self: start;
+}
+
+@media (max-width: 680px) {
+    .minitigerMangaVolumeGrid {
+        grid-template-columns:
+            repeat(
+                auto-fill,
+                minmax(135px, 1fr)
+            );
+    }
+}
+
+/* =========================================================
+   PHASE 18 - PERSON DETAILS
+   ========================================================= */
+
+.minitigerDetailsCastCard {
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerPersonHero {
+    grid-template-columns:
+        minmax(220px, 340px)
+        minmax(0, 1fr);
+}
+
+.minitigerPersonPortrait {
+    width: min(340px, 100%);
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 7px;
+    background: #17191d;
+    box-shadow:
+        0 18px 52px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.minitigerPersonPortrait img,
+.minitigerPersonPortrait .minitigerDetailsPosterFallback {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerPersonCreditsGrid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(150px, 1fr)
+        );
+    gap: 1rem;
+}
+
+.minitigerPersonCreditCard {
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerPersonCreditCard > div {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border-radius: 6px;
+    background: #1b1d21;
+    transition:
+        transform 150ms ease,
+        box-shadow 150ms ease;
+}
+
+.minitigerPersonCreditCard.isLandscape > div {
+    aspect-ratio: 16 / 9;
+}
+
+.minitigerPersonCreditCard img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.minitigerPersonCreditCard:hover > div,
+.minitigerPersonCreditCard:focus-visible > div {
+    transform: translateY(-4px);
+    box-shadow:
+        0 0 var(--mt-glow-size, 20px)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, var(--mt-accent)) 45%,
+            transparent
+        );
+}
+
+.minitigerPersonCreditCard strong,
+.minitigerPersonCreditCard small {
+    display: block;
+}
+
+.minitigerPersonCreditCard strong {
+    margin-top: 0.4rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.minitigerPersonCreditCard small {
+    margin-top: 0.12rem;
+    color: #999;
+}
+
+@media (max-width: 800px) {
+    .minitigerPersonHero {
+        grid-template-columns: 1fr;
+    }
+
+    .minitigerPersonPortrait {
+        margin: 0 auto;
+    }
+}
+
+/* =========================================================
+   PHASE 18.2.3 - FULL CARD GLOW + EPISODE TRACK SELECTORS
+   ========================================================= */
+
+/* Previously only the image child received the shadow. Put the shadow on the
+   same complete card that moves so image + title + metadata + overview glow
+   as one unit on episodes, seasons, albums, musicvideos and manga. */
+.minitigerDetailsEpisodeCard,
+.minitigerDetailsSeasonCard,
+.minitigerDetailsCastCard,
+.minitigerMangaVolumeCard,
+.minitigerMusicAlbumCard,
+.minitigerMusicVideoCard {
+    border-radius: 8px;
+    box-shadow: none;
+    transition:
+        transform 150ms ease,
+        filter 150ms ease,
+        box-shadow 150ms ease !important;
+}
+
+.minitigerDetailsEpisodeCard:hover > div,
+.minitigerDetailsEpisodeCard:focus-visible > div,
+.minitigerDetailsSeasonCard:hover > div,
+.minitigerDetailsSeasonCard:focus-visible > div,
+.minitigerDetailsCastCard:hover > div,
+.minitigerDetailsCastCard:focus-visible > div,
+.minitigerMangaVolumeCard:hover > div,
+.minitigerMangaVolumeCard:focus-visible > div,
+.minitigerMusicAlbumCard:hover > div,
+.minitigerMusicAlbumCard:focus-visible > div,
+.minitigerMusicVideoCard:hover > div,
+.minitigerMusicVideoCard:focus-visible > div {
+    box-shadow: none !important;
+}
+
+.minitigerDetailsEpisodeCard:hover,
+.minitigerDetailsEpisodeCard:focus-visible,
+.minitigerDetailsSeasonCard:hover,
+.minitigerDetailsSeasonCard:focus-visible,
+.minitigerDetailsCastCard:hover,
+.minitigerDetailsCastCard:focus-visible,
+.minitigerMangaVolumeCard:hover,
+.minitigerMangaVolumeCard:focus-visible,
+.minitigerMusicAlbumCard:hover,
+.minitigerMusicAlbumCard:focus-visible,
+.minitigerMusicVideoCard:hover,
+.minitigerMusicVideoCard:focus-visible {
+    box-shadow:
+        0 0 var(--mt-glow-size, 20px)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, var(--mt-accent))
+            calc(var(--mt-glow-opacity, 0.65) * 100%),
+            transparent
+        ),
+        0 0 calc(var(--mt-glow-size, 20px) * 1.45)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, var(--mt-accent))
+            calc(var(--mt-glow-opacity, 0.65) * 48%),
+            transparent
+        ) !important;
+}
+
+.minitigerEpisodeTrackSelectors {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 0.8rem;
+}
+
+.minitigerEpisodeTrackSelectors .minitigerDetailsVersion {
+    min-width: min(230px, 100%);
+    margin: 0;
+}
+
+
+/* =========================================================
+   PHASE 18.2.4 - EPISODE CARD SIZE CONSISTENCY
+   ========================================================= */
+
+/* Every episode card in a series rail gets the exact same width.  Some
+   Jellyfin images carry their own intrinsic ratio/size metadata; without an
+   explicit width/min/max trio the flex row can still shrink individual
+   links.  Keep the user-controlled content-width slider authoritative. */
+.minitigerDetailsEpisodeRow > .minitigerDetailsEpisodeCard {
+    width: min(
+        var(--mt-details-content-width, 380px),
+        78vw
+    ) !important;
+    min-width: min(
+        var(--mt-details-content-width, 380px),
+        78vw
+    ) !important;
+    max-width: min(
+        var(--mt-details-content-width, 380px),
+        78vw
+    ) !important;
+    flex: 0 0 min(
+        var(--mt-details-content-width, 380px),
+        78vw
+    ) !important;
+}
+
+.minitigerDetailsEpisodeRow > .minitigerDetailsEpisodeCard > div {
+    width: 100% !important;
+    min-width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 9 !important;
+}
+
+.minitigerDetailsEpisodeRow > .minitigerDetailsEpisodeCard img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* =========================================================
+   PHASE 18.2.5 - DETAIL CARD CONTEXT MENUS
+   ========================================================= */
+.minitigerDetailsSeasonVisual,
+.minitigerDetailsCastCard > div,
+.minitigerMangaVolumeCard > div,
+.minitigerMusicAlbumCard > div {
+    position: relative;
+}
+
+.minitigerDetailsCardMenu {
+    position: absolute;
+    top: 0.42rem;
+    left: 0.42rem;
+    z-index: 7;
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 999px;
+    background: rgba(10, 12, 15, 0.72);
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.92;
+    backdrop-filter: blur(5px);
+    transition:
+        transform 120ms ease,
+        background 120ms ease,
+        border-color 120ms ease,
+        opacity 120ms ease;
+}
+
+.minitigerDetailsCardMenu:hover,
+.minitigerDetailsCardMenu:focus-visible {
+    transform: scale(1.08);
+    border-color: color-mix(in srgb, var(--mt-accent) 70%, #fff 30%);
+    background: color-mix(in srgb, var(--mt-accent) 78%, #111 22%);
+    opacity: 1;
+    outline: none;
+}
+
+/* =========================================================
+   PHASE 18.2.9 - DETAIL GLOW ROOM + GLOBAL SEASON BADGES
+   ========================================================= */
+
+/* Detail rails scroll horizontally, so give their card glow enough vertical
+   room inside the scrollport while keeping the visible card position stable. */
+.minitigerRailTrack,
+.minitigerDetailsEpisodeRow,
+.minitigerDetailsSeasonRow,
+.minitigerDetailsCastRow,
+.minitigerMangaVolumeRow {
+    padding-top:
+        calc(0.85rem + var(--mt-glow-size, 20px) * 1.55) !important;
+    padding-bottom:
+        calc(1.15rem + var(--mt-glow-size, 20px) * 1.55) !important;
+    margin-top:
+        calc(var(--mt-glow-size, 20px) * -1.55) !important;
+    margin-bottom:
+        calc(var(--mt-glow-size, 20px) * -1.55) !important;
+}
+
+.minitigerDetailsSeasonPlayed {
+    width: var(--mt-played-indicator-size, 40px) !important;
+    min-width: 0 !important;
+    height: var(--mt-played-indicator-size, 40px) !important;
+    box-sizing: border-box;
+    display: flex !important;
+    padding: 3px 4px 0 0 !important;
+    font-size: var(--mt-played-indicator-font-size, 15px) !important;
+    line-height: 1;
+}
+
+.minitigerDetailsSeasonPlayed.isComplete {
+    font-size: var(--mt-played-indicator-font-size, 15px) !important;
+}
+
+:root[data-minitiger-played-shape='round'] .minitigerDetailsSeasonPlayed {
+    align-items: flex-start;
+    justify-content: flex-end;
+    border-radius: 0 0 0 100% !important;
+    clip-path: none;
+}
+
+:root[data-minitiger-played-shape='square'] .minitigerDetailsSeasonPlayed {
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    border-radius: 0 0 0 5px !important;
+    clip-path: none;
+}
+
+:root[data-minitiger-played-shape='triangle'] .minitigerDetailsSeasonPlayed {
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 3px 4px 0 0 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+/* =========================================================
+   PHASE 18.3.0 - EPISODE SEASON SWITCHER + CIRCLE BADGE
+   ========================================================= */
+
+/* On episode detail pages the season selector and rail arrows belong to one
+   toolbar. Make the rail controls position against the section itself so the
+   selector can sit immediately to their left and remain fully clickable. */
+.minitigerEpisodeSiblingSection {
+    position: relative;
+}
+
+.minitigerEpisodeSiblingSection .minitigerRail {
+    position: static !important;
+}
+
+.minitigerEpisodeSiblingSection .minitigerDetailsSectionHead {
+    position: relative;
+    z-index: 24;
+    min-height: 2.45rem;
+    align-items: center;
+}
+
+.minitigerEpisodeSiblingSection .minitigerRailControls {
+    top: 0 !important;
+    right: 0 !important;
+    z-index: 26 !important;
+}
+
+.minitigerEpisodeSiblingSection .minitigerEpisodeSeasonSwitcher {
+    position: relative;
+    z-index: 27;
+    min-width: 8.2rem;
+    margin-right: 5.45rem !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
+:root[data-minitiger-played-shape='circle'] .minitigerDetailsSeasonPlayed {
+    top: 0.38rem !important;
+    right: 0.38rem !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    clip-path: none !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.42);
+}
+
+@media (max-width: 680px) {
+    .minitigerEpisodeSiblingSection .minitigerEpisodeSeasonSwitcher {
+        min-width: 6.8rem;
+        max-width: min(45vw, 190px);
+        margin-right: 5rem !important;
+    }
+}
+
+
+/* =========================================================
+   PHASE 18.3.2 - INDEPENDENT ARROW / GENRE COLORS
+   ========================================================= */
+.minitigerRailArrow {
+    background: color-mix(
+        in srgb,
+        var(--mt-arrow-color, var(--mt-accent)) 92%,
+        #111 8%
+    ) !important;
+    color: var(--mt-arrow-text, var(--mt-accent-text)) !important;
+}
+
+.minitigerRailArrow:hover,
+.minitigerRailArrow:focus-visible {
+    background: color-mix(
+        in srgb,
+        var(--mt-arrow-color, var(--mt-accent)) 78%,
+        white 22%
+    ) !important;
+    color: var(--mt-arrow-text, var(--mt-accent-text)) !important;
+}
+
+.minitigerDetailsGenreChips em {
+    background: var(--mt-genre-tag-color, var(--mt-accent)) !important;
+    color: var(--mt-genre-tag-text, var(--mt-accent-text)) !important;
+}
+
+/* =========================================================
+   PHASE 18.3.3 - EPISODE SEASON SWITCHER ALIGNMENT
+   ========================================================= */
+
+/* Nudge the season switcher up just enough to share the exact visual baseline
+   with the two rail arrows on episode detail pages. */
+.minitigerEpisodeSiblingSection .minitigerEpisodeSeasonSwitcher {
+    top: -0.18rem !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_3_3_EPISODE_SWITCHER */
+
+/* =========================================================
+   PHASE 18.3.4 - EPISODE AUDIO FLAGS / DETAIL POLISH
+   ========================================================= */
+
+/* Landscape detail cards use the same horizontal audio-flag flow as other
+   landscape media cards: bottom-left, left-to-right. */
+.minitigerDetailsEpisodeCard > div,
+.minitigerSeasonEpisodeImage {
+    position: relative;
+}
+
+.minitigerDetailAudioFlags {
+    position: absolute;
+    z-index: 9;
+    left: 0.38rem;
+    bottom: 0.36rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.14rem;
+    pointer-events: none;
+}
+
+.minitigerDetailAudioFlags img {
+    width: 1.55rem;
+    height: 0.95rem;
+    display: block;
+    object-fit: cover;
+    border-radius: 1px;
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.48),
+        0 1px 4px rgba(0, 0, 0, 0.55);
+}
+
+/* On the focused episode the flags belong to the metadata line next to
+   runtime / season instead of floating over the hero image. */
+.minitigerDetailAudioFlags.isMeta {
+    position: static;
+    display: inline-flex;
+    align-self: center;
+    margin-left: 0.08rem;
+}
+
+.minitigerDetailAudioFlags.isMeta img {
+    width: 1.45rem;
+    height: 0.88rem;
+}
+
+/* Phase 18.2.4 gives every image inside horizontal episode cards 100%
+   width/height with !important.  Audio flags are images too, so they need a
+   more specific counter-rule or a single flag stretches over the complete
+   landscape artwork.  Keep this scoped to detail episode visuals only. */
+.minitigerDetailsEpisodeRow
+> .minitigerDetailsEpisodeCard
+.minitigerDetailAudioFlags img,
+.minitigerSeasonEpisodeImage
+.minitigerDetailAudioFlags img {
+    width: 1.55rem !important;
+    min-width: 1.55rem !important;
+    max-width: 1.55rem !important;
+    height: 0.95rem !important;
+    min-height: 0.95rem !important;
+    max-height: 0.95rem !important;
+    flex: 0 0 auto !important;
+}
+
+/* Manga publisher values sit a fraction lower than the label so their visual
+   baseline matches the rest of the detail metadata. */
+.minitigerDetailsExtraMeta.isPublisher span {
+    position: relative;
+    top: 0.08rem;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_3_5_DETAIL_FLAG_PUBLISHER */
+
+/* The user wanted the episode season selector a hair closer to the arrows. */
+.minitigerEpisodeSiblingSection .minitigerEpisodeSeasonSwitcher {
+    top: -0.28rem !important;
+}
+
+/* Action-placement item menus inherit the normal detail action-button styling
+   and must never receive the absolute card-menu positioning. */
+.minitigerDetailsActionMenu {
+    position: static !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_3_4_DETAIL_AUDIO_MENUS */

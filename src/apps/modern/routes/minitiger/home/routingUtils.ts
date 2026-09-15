@@ -12,6 +12,31 @@ export const normalizeJellyfinRoute = (route: string) => {
 export const getItemRoute = (
     item: ItemDto,
     options?: Record<string, unknown>
-) => normalizeJellyfinRoute(
-    appRouter.getRouteUrl(item, options)
-);
+) => {
+    const type =
+        String(item.Type ?? '').toLowerCase();
+
+    if (
+        item.Id
+        && (
+            type === 'series'
+            || type === 'movie'
+            || type === 'season'
+            || type === 'episode'
+            || type === 'musicartist'
+            || type === 'musicalbum'
+            || type === 'musicvideo'
+            || type === 'book'
+            || type === 'folder'
+            || type === 'boxset'
+        )
+    ) {
+        return `/minitigerdetails?id=${
+            encodeURIComponent(item.Id)
+        }`;
+    }
+
+    return normalizeJellyfinRoute(
+        appRouter.getRouteUrl(item, options)
+    );
+};

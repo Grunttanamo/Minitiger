@@ -9,7 +9,6 @@ import ServerButton from 'components/toolbar/ServerButton';
 import RemotePlayButton from './RemotePlayButton';
 import SyncPlayButton from './SyncPlayButton';
 import SearchButton from './SearchButton';
-import UserViewNav from './userViews/UserViewNav';
 
 interface AppToolbarProps {
     isDrawerAvailable: boolean
@@ -24,19 +23,43 @@ const AppToolbar: FC<AppToolbarProps> = ({
 }) => {
     const location = useLocation();
 
-    // The video osd does not show the standard toolbar
     if (location.pathname === '/video') return null;
 
-    // Only show the back button in apps when appropriate
     const isBackButtonAvailable = window.NativeShell && appRouter.canGoBack(location.pathname);
-
-    // Check if the current path is a public path to hide user content
     const isPublicPath = PUBLIC_PATHS.includes(location.pathname);
 
     return (
         <BaseToolbar
             buttons={!isPublicPath && (
                 <>
+                    <button
+                        type='button'
+                        title='Minitiger Einstellungen'
+                        aria-label='Minitiger Einstellungen'
+                        onClick={() => {
+                            window.dispatchEvent(
+                                new CustomEvent(
+                                    'minitiger:open-settings'
+                                )
+                            );
+                        }}
+                        style={{
+                            width: '2.5rem',
+                            height: '2.5rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: 0,
+                            border: 0,
+                            background: 'transparent',
+                            color: 'inherit',
+                            borderRadius: '50%',
+                            fontSize: '1.25rem',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        ⚙
+                    </button>
                     <SyncPlayButton />
                     <RemotePlayButton />
                     <SearchButton />
@@ -56,9 +79,6 @@ const AppToolbar: FC<AppToolbarProps> = ({
                 >
                     <ServerButton />
 
-                    {!isPublicPath && (
-                        <UserViewNav />
-                    )}
                 </Stack>
             )}
         </BaseToolbar>

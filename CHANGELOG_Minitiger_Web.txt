@@ -1,0 +1,21 @@
+Minitiger Web – Phase 18.3.7
+2026-09-15
+
+Manga/Bücher
+- Entfernt die klickbare Parent-/Bibliothekszeile oberhalb von "MANGA BAND".
+- Damit verschwindet z.B. "Comics" vollständig aus den Minitiger-Manga/Buch-Detailpages.
+- Navigation innerhalb echter Reihen über "Weitere Bände" bleibt unverändert.
+
+Docker / GitHub
+- Dockerfile.minitiger baut Minitiger Web direkt aus dem aktuellen Repository.
+- Basis ist absichtlich Jellyfin 12.0 statt latest.
+- Minitiger Virtual Sync wird in einer .NET-10-Buildstage gebaut.
+- Startup-Wrapper installiert die Plugin-DLL zuverlässig in das persistente Docker-/config-Volume.
+- GitHub Action veröffentlicht Multi-Arch-Images für amd64 und arm64 nach GHCR.
+- docker-compose.example.yml und DOCKER_GITHUB_SETUP.md für Tester hinzugefügt.
+
+Nicht verändert
+- Audioflaggen-System.
+- Trailer-Pipeline.
+- Virtual-Library-Row-Gap-Fix aus 18.3.6.
+- Manga-Root-/Weitere-Bände-Erkennung aus 18.3.6.

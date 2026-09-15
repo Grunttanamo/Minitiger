@@ -1,0 +1,326 @@
+.minitigerNativeLibraryCard {
+    transition:
+        transform 160ms ease,
+        filter 160ms ease !important;
+}
+
+/*
+ * Do not zoom the poster itself. Old Minitiger lifted the whole card.
+ */
+.minitigerNativeLibraryCard:hover,
+.minitigerNativeLibraryCard:focus-within {
+    transform: translateY(-5px) !important;
+}
+
+.minitigerNativeLibraryCard:hover .cardBox,
+.minitigerNativeLibraryCard:focus-within .cardBox,
+.minitigerNativeLibraryCard:hover .cardScalable,
+.minitigerNativeLibraryCard:focus-within .cardScalable,
+.minitigerNativeLibraryCard:hover .cardContent,
+.minitigerNativeLibraryCard:focus-within .cardContent {
+    transform: none !important;
+}
+
+.minitigerNativeLibraryCard .cardScalable {
+    position: relative;
+}
+
+.minitigerNativeLibraryCard:hover .cardScalable,
+.minitigerNativeLibraryCard:focus-within .cardScalable {
+    box-shadow:
+        0 0
+        calc(var(--mt-glow-size, 18px) * 1)
+        color-mix(
+            in srgb,
+            var(--mt-glow-color, #ffbf00)
+            calc(var(--mt-glow-opacity, 0.65) * 100%),
+            transparent
+        );
+}
+
+.minitigerNativeCardOverlay {
+    position: absolute;
+    z-index: 30;
+    inset: 0;
+    pointer-events: none;
+}
+
+.minitigerNativeVirtualAssign {
+    position: absolute;
+    z-index: 34;
+    top: 0.42rem;
+    left: 0.42rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(22, 24, 29, 0.92);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.38);
+}
+
+.minitigerNativeVirtualAssign:hover,
+.minitigerNativeVirtualAssign:focus-visible,
+.minitigerNativeVirtualAssign.isAssigned {
+    background: var(--mt-accent, #ffbf00);
+    color: var(--mt-accent-text, #000);
+    outline: none;
+}
+
+.minitigerNativePlayedCorner {
+    position: absolute;
+    z-index: 33;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 3px 4px 0 0;
+    border-radius: 0 0 0 100%;
+    background: var(--mt-accent, #ffbf00);
+    color: var(--mt-accent-text, #000);
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.minitigerNativeBadgeRow {
+    position: absolute;
+    left: 0.38rem;
+    right: 0.38rem;
+    bottom: 0.38rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.35rem;
+}
+
+.minitigerNativeAudioFlags {
+    display: flex;
+    align-items: center;
+    gap: 0.13rem;
+}
+
+.minitigerNativeAudioFlag {
+    display: inline-flex;
+    min-width: 1.5rem;
+    height: 1.05rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.58);
+    font-size: 0.95rem;
+    line-height: 1;
+}
+
+.minitigerNativeFsk {
+    display: inline-flex;
+    min-height: 1rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.05rem 0.22rem;
+    border-radius: 2px;
+    background: #27b24d;
+    color: #08120b;
+    font-size: 0.62rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.minitigerNativeFsk.fsk0 { background: #dedede; }
+.minitigerNativeFsk.fsk6 { background: #d9ef2f; }
+.minitigerNativeFsk.fsk12 { background: #35c65a; }
+.minitigerNativeFsk.fsk16 {
+    background: #2c9ce6;
+    color: #06121b;
+}
+.minitigerNativeFsk.fsk18 {
+    background: #e94a4a;
+    color: #fff;
+}
+
+/* =========================================================
+   PHASE 15 - STRICT HOVER MENU + REAL FLAG ASSETS
+   ========================================================= */
+
+/*
+ * A mouse click leaves focus on Jellyfin's native buttons. The original
+ * :focus state could therefore leave the hover controls visible after
+ * the pointer had already moved away. Minitiger desktop cards now show
+ * the native action layer strictly while the card is hovered.
+ */
+.minitigerNativeLibraryCard:not(:hover)
+.cardOverlayContainer {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.minitigerNativeLibraryCard:hover
+.cardOverlayContainer {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+.minitigerNativeAudioFlag {
+    width: 1.55rem;
+    height: 0.95rem;
+    display: block;
+    object-fit: cover;
+    border-radius: 1px;
+    background: transparent;
+    box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.48),
+        0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+
+/* Phase 18: the library page owns the glow pseudo element. Do not paint a
+   second stationary glow on cardScalable, otherwise the top/bottom glow
+   no longer follows the lifted card evenly. */
+.minitigerNativeLibraryCard:hover .cardScalable,
+.minitigerNativeLibraryCard:focus-within .cardScalable {
+    box-shadow: none !important;
+}
+
+/* Phase 18.2: flags are always visible and vertically stacked at bottom-left. */
+.minitigerNativeBadgeRow {
+    pointer-events: none;
+}
+
+.minitigerNativeAudioFlags {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 0.12rem;
+}
+
+.minitigerNativeAudioFlag {
+    width: 1.55rem;
+    height: 0.93rem;
+}
+
+/* =========================================================
+   PHASE 18.2.9 - GLOBAL PLAYED INDICATOR DESIGN
+   ========================================================= */
+
+.minitigerNativePlayedCorner {
+    width: var(--mt-played-indicator-size, 40px) !important;
+    height: var(--mt-played-indicator-size, 40px) !important;
+    min-width: 0 !important;
+    padding: 3px 4px 0 0 !important;
+    font-size: var(--mt-played-indicator-font-size, 15px) !important;
+    pointer-events: none;
+}
+
+:root[data-minitiger-played-shape='round'] .minitigerNativePlayedCorner {
+    align-items: flex-start;
+    justify-content: flex-end;
+    border-radius: 0 0 0 100% !important;
+    clip-path: none;
+}
+
+:root[data-minitiger-played-shape='square'] .minitigerNativePlayedCorner {
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+    border-radius: 0 0 0 5px !important;
+    clip-path: none;
+}
+
+:root[data-minitiger-played-shape='triangle'] .minitigerNativePlayedCorner {
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding: 3px 4px 0 0 !important;
+    border-radius: 0 !important;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+
+/* =========================================================
+   PHASE 18.3.0 - SINGLE INDICATOR PIPELINE
+   ========================================================= */
+
+/* Jellyfin still renders its own watched/unplayed indicator inside native
+   cards. Minitiger draws the same information itself, so hide only those
+   vanilla indicator nodes to avoid doubled numbers/checks. */
+.minitigerNativeLibraryCard .cardIndicators .countIndicator,
+.minitigerNativeLibraryCard .cardIndicators .playedIndicator,
+.minitigerNativeLibraryCard .cardIndicators .unplayedItemCount {
+    display: none !important;
+}
+
+:root[data-minitiger-played-shape='circle'] .minitigerNativePlayedCorner {
+    top: 0.38rem !important;
+    right: 0.38rem !important;
+    display: grid !important;
+    place-items: center !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    clip-path: none !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.42);
+}
+
+
+/* =========================================================
+   PHASE 18.3.2 - PRECISE INDICATOR CENTERING
+   ========================================================= */
+.minitigerNativePlayedCorner .minitigerPlayedCornerText {
+    display: block;
+    line-height: 1;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+:root[data-minitiger-played-shape='circle'] .minitigerNativePlayedCorner,
+:root[data-minitiger-played-shape='square'] .minitigerNativePlayedCorner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+
+:root[data-minitiger-played-shape='circle']
+.minitigerNativePlayedCorner .minitigerPlayedCornerText,
+:root[data-minitiger-played-shape='square']
+.minitigerNativePlayedCorner .minitigerPlayedCornerText {
+    transform: translateY(-0.02em);
+}
+
+:root[data-minitiger-played-shape='triangle'] .minitigerNativePlayedCorner {
+    position: absolute;
+    padding: 0 !important;
+}
+
+:root[data-minitiger-played-shape='triangle']
+.minitigerNativePlayedCorner .minitigerPlayedCornerText {
+    position: absolute;
+    top: 26%;
+    right: 22%;
+    transform: translate(50%, -50%);
+}
+
+/* =========================================================
+   PHASE 18.3.3 - LANDSCAPE AUDIO FLAG DIRECTION
+   ========================================================= */
+
+/* Poster cards keep the familiar bottom-to-top flag stack. Landscape/banner
+   cards have more horizontal room, so place the flags left-to-right instead. */
+.minitigerNativeLibraryCardLandscape .minitigerNativeAudioFlags {
+    flex-direction: row !important;
+    align-items: flex-end !important;
+    justify-content: flex-start !important;
+    gap: 0.13rem !important;
+}
+/* MINITIGER_PATCH_MARKER: PHASE_18_3_3_LANDSCAPE_AUDIO_FLAG_DIRECTION */
