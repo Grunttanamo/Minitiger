@@ -10,7 +10,6 @@ ok "Jellyfin-Web-Basis 12.1.0 erkannt"
 
 required=(
   Dockerfile.minitiger-sidecar
-  Dockerfile.minitiger-sidecar.dockerignore
   .github/workflows/minitiger-sidecar.yml
   docker/minitiger-sidecar.conf.template
   docker-compose.sidecar.example.yml
@@ -19,30 +18,24 @@ required=(
 for f in "${required[@]}"; do
   [[ -f "$f" ]] || fail "$f fehlt"
 done
-ok "Alle Sidecar-Dateien vorhanden"
+ok "Sidecar-Basis vorhanden"
 
-grep -q 'node:24-bookworm-slim' Dockerfile.minitiger-sidecar || fail "Node-24-Buildstage fehlt"
-grep -q 'nginx:1.29-alpine' Dockerfile.minitiger-sidecar || fail "nginx-Runtime fehlt"
-grep -q 'JELLYFIN_URL=http://host.docker.internal:8096' Dockerfile.minitiger-sidecar || fail "sicherer Standard-Jellyfin-Endpunkt fehlt"
-ok "Sidecar Dockerfile plausibel"
-
+grep -q 'return 302 /web/index.html;' docker/minitiger-sidecar.conf.template || fail "Browser-Entry-Redirect fehlt"
+count=$(grep -c 'return 302 /web/index.html;' docker/minitiger-sidecar.conf.template || true)
+[[ "$count" -ge 3 ]] || fail "Nicht alle Einstiege /, /web und /web/ werden normalisiert"
 grep -q 'location /web/' docker/minitiger-sidecar.conf.template || fail "/web/-Webroot fehlt"
 grep -q 'proxy_pass ${JELLYFIN_URL};' docker/minitiger-sidecar.conf.template || fail "Jellyfin-Reverse-Proxy fehlt"
 grep -q 'proxy_set_header Upgrade' docker/minitiger-sidecar.conf.template || fail "WebSocket-Upgrade fehlt"
-grep -q 'proxy_buffering off' docker/minitiger-sidecar.conf.template || fail "Streaming-Konfiguration fehlt"
-ok "nginx Web/API/WebSocket/Streaming-Routen vorhanden"
+ok "Browser-Entry + Web/API/WebSocket-Routen vorhanden"
 
-grep -q 'minitiger-v12.1' .github/workflows/minitiger-sidecar.yml || fail "Workflow lauscht nicht auf minitiger-v12.1"
-grep -q 'minitiger-web' .github/workflows/minitiger-sidecar.yml || fail "GHCR Sidecar-Image fehlt"
-grep -q 'linux/amd64,linux/arm64' .github/workflows/minitiger-sidecar.yml || fail "Multi-Arch fehlt"
-ok "GitHub Sidecar Workflow plausibel"
-
+grep -Fq '${MINITIGER_PORT:-8098}:80' docker-compose.sidecar.example.yml || fail "Konfigurierbarer Sidecar-Port fehlt"
 if grep -Eq '/config|/cache|:/media' docker-compose.sidecar.example.yml; then
   fail "Sidecar Compose darf keine Jellyfin-Daten-/Medien-Volumes mounten"
 fi
-grep -q '8097:80' docker-compose.sidecar.example.yml || fail "Sidecar-Port 8097:80 fehlt"
-grep -q 'host.docker.internal:host-gateway' docker-compose.sidecar.example.yml || fail "Docker-Host-Gateway fehlt"
-ok "Compose ist datenbank-/appdata-frei"
+ok "Compose bleibt datenbank-/appdata-frei und Port ist konfigurierbar"
+
+grep -q "docker/minitiger-sidecar.conf.template" .github/workflows/minitiger-sidecar.yml || fail "Workflow reagiert nicht auf nginx-Template"
+ok "GitHub Workflow wird durch diesen Hotfix ausgelöst"
 
 branch=$(git branch --show-current 2>/dev/null || true)
 if [[ "$branch" == "minitiger-v12.1" ]]; then
@@ -52,5 +45,5 @@ else
 fi
 
 echo
-echo "Phase 18.4.0 Sidecar-Dateien sind statisch verifiziert."
-echo "Der echte Multi-Arch-Build und der Lauf gegen Jellyfin 12.1 müssen noch getestet werden."
+echo "Phase 18.4.1 ist statisch verifiziert."
+echo "Der kurze Browser-Aufruf muss nach dem neuen GHCR-Build noch real getestet werden."

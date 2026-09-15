@@ -1,27 +1,27 @@
-Minitiger Web – Phase 18.4.0
-Jellyfin 12.1 Sidecar Preview
+Minitiger Web – Phase 18.4.1
+Sidecar Browser Entry Hotfix
 
-NEU
-- Eigenständiges Dockerfile `Dockerfile.minitiger-sidecar`.
-- Minitiger Web wird mit Node 24 gebaut und anschließend in einem kleinen
-  nginx-Container ausgeliefert.
-- Sidecar enthält keinen Jellyfin-Server und keine Jellyfin-Datenbank.
-- Bestehender Jellyfin-Server wird über `JELLYFIN_URL` reverse-proxied.
-- Standard: Jellyfin auf Host-Port 8096, Minitiger auf Host-Port 8097.
-- `/web/` wird lokal aus Minitiger bedient; API, WebSocket, Bilder und Streams
-  werden an den bestehenden Server weitergereicht.
-- Docker HEALTHCHECK über `/minitiger-health`.
-- Compose-Beispiel ohne Config-/Cache-/Media-Volumes.
-- Unraid-Schrittfolge ergänzt.
-- Neuer GitHub-Action-Workflow `Build Minitiger Sidecar` für amd64 + arm64.
-- GHCR-Ziel: `ghcr.io/grunttanamo/minitiger-web` mit `latest`, `12.1` und SHA-Tag.
+BESTÄTIGTE ERKENNTNISSE AUS 18.4.0
+- Sidecar-Container startet erfolgreich.
+- `/minitiger-health` liefert HTTP 200.
+- `/System/Info/Public` wird mit HTTP 200 an Jellyfin 12.1 weitergeleitet.
+- Jellyfin Desktop Client lädt Minitiger über den Sidecar.
+- Browser lädt Minitiger erfolgreich über `/web/index.html`.
+- Der kurze Browser-Aufruf nur über Host:Port landete dagegen auf Jellyfins
+  roter "Software Failure / Seite nicht gefunden"-Ansicht.
 
-SICHERHEIT / DESIGN
-- Stoppen oder Löschen des Sidecars verändert den bestehenden Jellyfin-Server
-  nicht.
-- Das Minitiger Virtual Sync Companion Plugin wird bewusst nicht automatisch
-  in fremde Jellyfin-Config-Verzeichnisse kopiert.
+FIX
+- `/`, `/web` und `/web/` werden explizit auf `/web/index.html` umgeleitet.
+- Der lokale `/web/`-Asset-/SPA-Fallback bleibt bestehen.
+- HEALTHCHECK nutzt nun `default_type text/plain` statt eines zusätzlichen
+  Content-Type-Headers.
+
+BEDIENUNG
+- Compose-Host-Port ist über `MINITIGER_PORT` konfigurierbar.
+- Beispiel-Default ist jetzt 8098, weil 8097 im Testsystem durch OpenMediaVault
+  belegt ist. Jeder andere freie Host-Port ist möglich.
 
 NICHT VERÄNDERT
 - Minitiger UI / Trailer / Audioflags / Manga / virtuelle Bibliothekslogik.
-- Bestehendes Full-Server-Docker-Image aus Phase 18.3.7.x.
+- Jellyfin Datenbank, Accounts, Appdata, Medien und normaler :8096-Endpunkt.
+- Virtual Sync Companion Plugin bleibt getrennt/optional.

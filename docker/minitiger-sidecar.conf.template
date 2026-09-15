@@ -9,18 +9,23 @@ server {
     # Tiny health endpoint used by Docker's HEALTHCHECK.
     location = /minitiger-health {
         access_log off;
-        add_header Content-Type text/plain;
+        default_type text/plain;
         return 200 "Minitiger Sidecar OK\n";
     }
 
-    # Match Jellyfin's normal web URL layout so the custom client behaves as
-    # close as possible to a web client bundled with the server.
+    # Always enter Jellyfin Web through the real HTML entry file.
+    # /web/ alone can leave browser clients on a route Jellyfin treats as
+    # missing, while desktop clients may normalize the URL automatically.
     location = / {
-        return 302 /web/;
+        return 302 /web/index.html;
     }
 
     location = /web {
-        return 302 /web/;
+        return 302 /web/index.html;
+    }
+
+    location = /web/ {
+        return 302 /web/index.html;
     }
 
     # Minitiger itself is completely local to this container.

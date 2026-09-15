@@ -1,9 +1,11 @@
-Phase 18.4.0 Patch: minitiger_native_phase18_4_0_jellyfin12_1_sidecar_preview.zip
-Separate memory: Minitiger_Gedaechtnis_2026-09-15_v37.zip
-Primary additions:
-- Dockerfile.minitiger-sidecar
-- Dockerfile.minitiger-sidecar.dockerignore
+Phase 18.4.1 Patch: minitiger_native_phase18_4_1_sidecar_browser_entry_hotfix.zip
+Separate memory: Minitiger_Gedaechtnis_2026-09-15_v38.zip
+Changed runtime files:
 - docker/minitiger-sidecar.conf.template
 - docker-compose.sidecar.example.yml
-- .github/workflows/minitiger-sidecar.yml
+Documentation/verification:
 - SIDECAR_SETUP.md
+- INSTALL.txt
+- CHANGELOG_Minitiger_Web.txt
+- files.txt
+- VERIFY_PATCH.sh

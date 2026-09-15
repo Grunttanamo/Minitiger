@@ -1,14 +1,19 @@
-MINITIGER WEB – PHASE 18.4.0
-Jellyfin 12.1 Sidecar Preview
+MINITIGER WEB – PHASE 18.4.1
+Sidecar Browser Entry Hotfix
 
 VORAUSSETZUNG
 - Branch: minitiger-v12.1
-- Jellyfin Web wurde bereits auf v12.1 gemerged.
-- package.json meldet Version 12.1.0.
-- Phase 18.3.7.1 / bisheriger Minitiger-Stand ist vorhanden.
+- Phase 18.4.0 Sidecar ist bereits vorhanden.
+- Jellyfin Server / Webbasis: 12.1.
 
-DIESER PATCH ÄNDERT KEINE MINITIGER-UI-DATEIEN.
-Er ergänzt ausschließlich den neuen, getrennten Sidecar-Docker-Weg.
+ÄNDERUNGEN
+- Browser-Aufruf von `/`, `/web` und `/web/` wird jetzt auf
+  `/web/index.html` normalisiert.
+- Damit soll die rote Jellyfin-Seite "Software Failure / Seite nicht gefunden"
+  beim kurzen Browser-Link verschwinden.
+- Compose-Beispiel bekommt einen frei konfigurierbaren Host-Port mit Default
+  8098. Der Container-Port bleibt immer 80.
+- Keine Minitiger-UI-, Datenbank-, Appdata- oder Serverdateien werden verändert.
 
 INSTALLATION AUF DEM RASPBERRY PI
 
@@ -16,38 +21,40 @@ INSTALLATION AUF DEM RASPBERRY PI
    cd ~/minitiger-web
 
 2) Patch entpacken:
-   unzip -o ~/minitiger_native_phase18_4_0_jellyfin12_1_sidecar_preview.zip -d ~/minitiger-web
+   unzip -o ~/minitiger_native_phase18_4_1_sidecar_browser_entry_hotfix.zip -d ~/minitiger-web
 
 3) Prüfen:
    chmod +x VERIFY_PATCH.sh
    ./VERIFY_PATCH.sh
 
-4) Git prüfen und committen:
-   git status
-   git add Dockerfile.minitiger-sidecar Dockerfile.minitiger-sidecar.dockerignore \
-     docker/minitiger-sidecar.conf.template docker-compose.sidecar.example.yml \
-     .github/workflows/minitiger-sidecar.yml SIDECAR_SETUP.md \
+4) Committen und pushen:
+   git add docker/minitiger-sidecar.conf.template \
+     docker-compose.sidecar.example.yml SIDECAR_SETUP.md \
      INSTALL.txt CHANGELOG_Minitiger_Web.txt files.txt VERIFY_PATCH.sh \
      Minitiger_Gedaechtnis
-   git commit -m "Add Minitiger Jellyfin 12.1 sidecar"
-
-5) Pushen:
+   git commit -m "Fix Minitiger sidecar browser entry"
    git push
 
-Der Push auf minitiger-v12.1 startet automatisch den Workflow:
-   Build Minitiger Sidecar
+Der Push löst automatisch `Build Minitiger Sidecar` aus, weil die nginx-
+Template-Datei geändert wurde.
 
-ERWARTETES GHCR-IMAGE NACH GRÜNEM BUILD
-- ghcr.io/grunttanamo/minitiger-web:latest
-- ghcr.io/grunttanamo/minitiger-web:12.1
-- ghcr.io/grunttanamo/minitiger-web:sha-<commit>
+5) Nach grünem GitHub-Workflow lokales Image aktualisieren:
+   docker pull ghcr.io/grunttanamo/minitiger-web:latest
+   docker stop minitiger-web 2>/dev/null || true
+   docker rm minitiger-web 2>/dev/null || true
 
-ERSTER LOKALER DOCKER-TEST (optional)
-Siehe SIDECAR_SETUP.md bzw. docker-compose.sidecar.example.yml.
+   docker run -d \
+     --name minitiger-web \
+     --restart unless-stopped \
+     -p 8098:80 \
+     -e JELLYFIN_URL="http://host.docker.internal:8096" \
+     --add-host=host.docker.internal:host-gateway \
+     ghcr.io/grunttanamo/minitiger-web:latest
 
-WICHTIG
-- Der Sidecar braucht KEIN /config, KEIN /cache und KEINE Medien-Volumes.
-- Bestehendes Jellyfin bleibt unangetastet.
-- Normal: Jellyfin :8096, Minitiger Sidecar :8097.
-- Virtual Sync Companion Plugin ist in diesem Sidecar bewusst NICHT automatisch
-  installiert; das folgt separat, damit der Sidecar keine Serverdaten verändert.
+6) Browser-Test:
+   http://192.168.178.50:8098
+
+ERWARTUNG
+- Der kurze Link soll direkt Minitiger laden.
+- Kein manuelles `/web/index.html` mehr nötig.
+- Normales Jellyfin auf :8096 bleibt unverändert.

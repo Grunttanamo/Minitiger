@@ -7,14 +7,15 @@ Jellyfin-Datenbank, keine Appdata und keine Medienordner. Er enthält nur den
 Minitiger-Webclient plus einen kleinen Reverse Proxy.
 
 - normales Jellyfin bleibt z.B. auf `http://SERVER:8096`
-- Minitiger läuft zusätzlich z.B. auf `http://SERVER:8097`
+- Minitiger läuft zusätzlich auf einem freien Port, Standard hier `8098`
 - Löschen/Stoppen des Sidecars verändert Jellyfin nicht
 - Accounts, Watch-Status, Bibliotheken und Einstellungen bleiben im normalen
   Jellyfin-Server
 
 Der Sidecar reicht API-, WebSocket- und Streaming-Anfragen an den bestehenden
-Jellyfin-Server weiter. Dadurch sieht der Browser Minitiger wie einen normalen
-Jellyfin-Webclient unter `/web/`.
+Jellyfin-Server weiter. Der Browser-Einstieg wird bewusst auf
+`/web/index.html` normalisiert. Damit funktionieren Browser und Jellyfin
+Desktop Client über dieselbe Sidecar-Adresse.
 
 ## Docker Compose – Standardfall
 
@@ -25,7 +26,7 @@ services:
     container_name: minitiger-web
     restart: unless-stopped
     ports:
-      - "8097:80"
+      - "${MINITIGER_PORT:-8098}:80"
     environment:
       JELLYFIN_URL: "http://host.docker.internal:8096"
     extra_hosts:
@@ -39,11 +40,29 @@ docker compose pull
 docker compose up -d
 ```
 
-Aufruf danach:
+Aufruf danach standardmäßig:
 
-`http://DEIN-SERVER:8097`
+`http://DEIN-SERVER:8098`
 
-Das normale Jellyfin bleibt parallel auf Port 8096 erhalten.
+Ist 8098 belegt, kann vor dem Start z.B. gesetzt werden:
+
+```bash
+MINITIGER_PORT=8099 docker compose up -d
+```
+
+Das normale Jellyfin bleibt parallel auf seinem bisherigen Port erhalten.
+
+## Direkter Docker-Run
+
+```bash
+docker run -d \
+  --name minitiger-web \
+  --restart unless-stopped \
+  -p 8098:80 \
+  -e JELLYFIN_URL="http://host.docker.internal:8096" \
+  --add-host=host.docker.internal:host-gateway \
+  ghcr.io/grunttanamo/minitiger-web:latest
+```
 
 ## Unraid – einfache manuelle Einrichtung
 
@@ -52,12 +71,13 @@ In Unraid unter **Docker -> Add Container**:
 - Name: `Minitiger Web`
 - Repository: `ghcr.io/grunttanamo/minitiger-web:latest`
 - Network Type: `Bridge`
-- Port: Host `8097` -> Container `80` / TCP
+- Port: einen **freien** Host-Port, z.B. `8098` -> Container `80` / TCP
 - Variable `JELLYFIN_URL`: `http://host.docker.internal:8096`
 - Extra Parameters: `--add-host=host.docker.internal:host-gateway`
 - **Keine** Appdata-, Config-, Cache- oder Medienpfade hinzufügen
 
-Danach `http://UNRAID-IP:8097` öffnen.
+Danach `http://UNRAID-IP:8098` öffnen. Wenn 8098 bereits verwendet wird,
+einfach einen anderen freien Host-Port wählen; der Container-Port bleibt 80.
 
 Wenn Jellyfin auf einem anderen Host-Port läuft, nur den Port in
 `JELLYFIN_URL` ändern. Wenn Jellyfin auf einem anderen Rechner läuft, dort die
@@ -68,17 +88,22 @@ LAN-Adresse eintragen, z.B. `http://192.168.1.50:8096`.
 Einfach den Container `Minitiger Web` stoppen oder löschen. Das normale
 Jellyfin wurde nicht verändert und bleibt über seinen bisherigen Port nutzbar.
 
-## Wichtige Grenzen des ersten Sidecar-Tests
+## Teststand Phase 18.4.1
 
-- Zielbasis ist Jellyfin 12.1.
-- Nicht-standardmäßige Jellyfin Base-URLs wie `/jellyfin` sind in Phase 18.4.0
-  noch nicht separat getestet.
-- HTTPS vor dem Sidecar sollte später über den vorhandenen Reverse Proxy des
-  Nutzers erfolgen. Der interne `JELLYFIN_URL` darf weiterhin HTTP sein.
-- Minitiger Virtual Sync ist **nicht automatisch im Sidecar installiert**.
-  Das ist Absicht: Der Sidecar soll den bestehenden Jellyfin-Server nicht
-  verändern. Das Companion Plugin wird später als optionale, getrennte
-  Installation/Plugin-Repository behandelt.
-- Wenn das GHCR-Paket privat ist, muss der Docker-Host bei GHCR angemeldet sein.
-  Für eine wirklich einfache öffentliche Installation sollte das Paket nach
-  erfolgreichem Test auf Public gestellt werden.
+Bestätigt im lokalen Test:
+- Sidecar HEALTHCHECK-Endpunkt liefert HTTP 200.
+- `/System/Info/Public` wird erfolgreich an Jellyfin 12.1 weitergeleitet.
+- Jellyfin Desktop Client lädt über den Sidecar.
+- Browser lädt Minitiger über `/web/index.html`.
+
+Phase 18.4.1 normalisiert deshalb `/`, `/web` und `/web/` automatisch auf
+`/web/index.html`.
+
+Noch zu testen:
+- neuer Root-Aufruf nur mit `http://SERVER:PORT` nach dem 18.4.1-Image-Build
+- längeres Playback / WebSocket-Session-Updates
+- Unraid-Test auf einem fremden System
+
+Minitiger Virtual Sync ist weiterhin **nicht automatisch im Sidecar
+installiert**. Das ist Absicht: Der Sidecar soll den bestehenden Jellyfin-Server
+nicht verändern. Das Companion Plugin folgt später als optionale Installation.

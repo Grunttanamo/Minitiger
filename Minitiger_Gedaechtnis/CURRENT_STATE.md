@@ -1,34 +1,26 @@
-# Aktueller Projektstand – Phase 18.4.0
+# Aktueller Projektstand – Phase 18.4.1
 
-## Bestätigt funktionierend
-- Minitiger Web 18.3.7.1 wurde auf Jellyfin Web 12.1 gemerged.
-- Offizieller Upstream-Merge `v12.1` lief ohne Konflikte.
-- Node 24.21.0 / npm 11.19.0 vorhanden; `npm ci` lief durch.
-- Nutzer hat Jellyfin Server selbst auf 12.1 aktualisiert.
-- Minitiger wurde gegen Jellyfin 12.1 getestet; Nutzerfeedback: „Scheint alles noch zu gehen“.
-- Production-Build/Git-Schritte aus dem vorherigen Schritt wurden laut Nutzer ebenfalls erfolgreich abgeschlossen.
-- GitHub Actions / GHCR Full-Server-Docker-Build aus 18.3.7.1 wurde grün; Multi-Arch Docker-Build funktioniert grundsätzlich.
-- Phase 18.3.6: Home-Reihenabstand und Manga-Library-Root-Fix bestätigt.
+## Jellyfin 12.1
+- Jellyfin Server läuft auf 12.1.0.
+- Offizieller Jellyfin-Web-Tag `v12.1` wurde konfliktfrei in `minitiger-v12.1` gemerged.
+- Minitiger-Funktionen wurden nach dem Update getestet; bisher keine Regression bestätigt.
 
-## Phase 18.4.0 – neuer Teststand
-- Neuer **Minitiger Web Sidecar** statt Austausch des bestehenden Jellyfin-Containers.
-- Sidecar baut nur Minitiger Web und liefert es über nginx unter `/web/` aus.
-- Alle anderen Requests werden an `JELLYFIN_URL` reverse-proxied.
-- Standardziel: `http://host.docker.internal:8096`.
-- Standard-Port außen: 8097 -> Container 80.
-- Keine `/config`, `/cache` oder Medien-Volumes.
-- Bestehende Jellyfin-Datenbank/Accounts/Appdata bleiben außerhalb des Sidecars.
-- Neuer GHCR-Name: `ghcr.io/grunttanamo/minitiger-web`.
-- Neuer Workflow: `Build Minitiger Sidecar`, Branch `minitiger-v12.1`, amd64 + arm64.
+## Sidecar – bestätigte Teile
+- GitHub Multi-Arch Build für `ghcr.io/grunttanamo/minitiger-web` ist grün.
+- GHCR-Package ist Public und lässt sich starten.
+- Sidecar läuft parallel zum normalen Jellyfin, ohne `/config`, `/cache` oder Medienmounts.
+- Lokaler Testport: 8098, da 8097 durch OpenMediaVault belegt ist.
+- `/minitiger-health` -> HTTP 200.
+- `/System/Info/Public` -> HTTP 200, Jellyfin 12.1.0.
+- Desktop Client lädt über die Sidecar-Adresse normal.
+- Browser lädt über `/web/index.html` normal.
 
-## Bewusst getrennt
-- Das Minitiger Virtual Sync Companion Plugin wird im Sidecar nicht automatisch installiert.
-- Ziel: bestehende Jellyfin-Installation nicht verändern.
-- Optionales Plugin-Repository / einfache Plugin-Installation ist ein späterer Schritt.
+## Phase 18.4.1 – Browser Entry Hotfix
+- `/`, `/web` und `/web/` werden auf `/web/index.html` umgeleitet.
+- Ziel: kurzer Browser-Link `http://SERVER:PORT` funktioniert genauso wie Desktop Client.
+- Compose-Port ist jetzt über `MINITIGER_PORT` konfigurierbar; Beispiel-Default 8098.
+- Fix ist noch nicht real bestätigt, bis neues GHCR-Image gebaut und kurzer Browser-Link getestet wurde.
 
-## Nicht verändert
-- Minitiger UI-Code.
-- Trailer-Pipeline.
-- Audioflaggen.
-- Manga-Logik.
-- Virtuelle Bibliothekslogik im Webclient.
+## Weiterhin bewusst getrennt
+- Virtual Sync Companion Plugin wird nicht automatisch in Jellyfin installiert.
+- Bestehende Jellyfin-Datenbank/Accounts/Appdata bleiben vollständig außerhalb des Sidecars.

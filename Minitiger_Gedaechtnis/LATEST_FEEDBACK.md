@@ -1,9 +1,11 @@
 # Letztes Nutzerfeedback – 2026-09-15
 
-1. GitHub Actions Docker-Build aus Phase 18.3.7.1 wurde vollständig grün.
-2. Jellyfin Web wurde konfliktfrei von 12.0 auf offiziellen Tag `v12.1` gemerged.
-3. `npm ci` unter Node 24.21.0 / npm 11.19.0 lief erfolgreich durch.
-4. Nutzer hat den Raspberry-Pi-Jellyfin-Server auf 12.1 aktualisiert.
-5. Nutzer hat Minitiger danach getestet: „Scheint alles noch zu gehen o:“.
-6. Nutzer möchte als nächsten Schritt eine möglichst idiotensichere universelle Docker-Lösung, bei der vorhandene Jellyfin-Daten, Accounts, Einstellungen und Appdata nicht geopfert werden.
-7. Gewünschte Architektur: Sidecar-Container neben bestehendem Jellyfin.
+1. Phase 18.4.0 Sidecar GitHub Action wurde grün; `minitiger-web` wurde als amd64/arm64 GHCR-Image gebaut.
+2. GHCR-Package `minitiger-web` war zunächst Private; Nutzer stellte es auf Public und konnte das Image danach starten.
+3. Port 8097 ist im lokalen Netz bereits durch OpenMediaVault belegt; lokaler Sidecar-Test läuft daher auf 8098.
+4. `curl http://127.0.0.1:8098/minitiger-health` liefert HTTP 200 `Minitiger Sidecar OK`.
+5. `curl http://127.0.0.1:8098/System/Info/Public` liefert HTTP 200 und Jellyfin Server 12.1.0; Reverse Proxy funktioniert.
+6. Jellyfin Desktop Client lädt bei Eingabe von `IP:8098` normal über den Sidecar.
+7. Browser mit kurzem Link `http://IP:8098` zeigte rote Jellyfin-Seite `Software Failure / Die angeforderte Seite wurde nicht gefunden`.
+8. Browser mit `http://IP:8098/web/index.html` lädt dagegen normal.
+9. Daraus folgt: Sidecar/Proxy funktionieren; Problem ist nur die Browser-Entry-Normalisierung von `/` bzw. `/web/`.

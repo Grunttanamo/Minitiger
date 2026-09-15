@@ -1,6 +1,3 @@
-Dockerfile.minitiger-sidecar
-Dockerfile.minitiger-sidecar.dockerignore
-.github/workflows/minitiger-sidecar.yml
 docker/minitiger-sidecar.conf.template
 docker-compose.sidecar.example.yml
 SIDECAR_SETUP.md

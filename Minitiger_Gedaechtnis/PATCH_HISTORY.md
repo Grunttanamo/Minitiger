@@ -27,3 +27,9 @@
 - Kein Zugriff auf Jellyfin-Appdata/Datenbank nötig.
 - Compose + Unraid-Anleitung.
 - Eigener GitHub-Workflow und GHCR-Image `minitiger-web`, amd64 + arm64.
+
+## Phase 18.4.1 – Sidecar Browser Entry Hotfix
+- Sidecar-Grundfunktion aus 18.4.0 im Test bestätigt: Health/API/Desktop Client funktionieren.
+- Browser funktioniert direkt über `/web/index.html`, kurzer Root-Link zuvor nicht.
+- `/`, `/web`, `/web/` werden deshalb explizit auf `/web/index.html` normalisiert.
+- Compose-Port wird über `MINITIGER_PORT` frei konfigurierbar; Default im Beispiel 8098.
