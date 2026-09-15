@@ -8,44 +8,52 @@ ok()   { echo "[ OK ] $*"; }
 grep -q '"version": "12.1.0"' package.json || fail "Jellyfin-Web-Basis ist nicht 12.1.0."
 ok "Jellyfin-Web-Basis 12.1.0 erkannt"
 
+PROJECT='tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj'
+[[ -f "$PROJECT" ]] || fail "Vorhandenes Minitiger Virtual Sync Projekt fehlt"
+grep -q '<TargetFramework>net10.0</TargetFramework>' "$PROJECT" || fail "Plugin targetet nicht net10.0"
+grep -q '<Version>1.0.3</Version>' "$PROJECT" || echo "[WARN] Plugin-Projektversion ist nicht mehr 1.0.3 – Release-Version bewusst prüfen."
+ok "Vorhandenes .NET-10-Pluginprojekt erkannt"
+
 required=(
   README.md
-  docs/assets/minitiger-banner.gif
-  docs/assets/minitiger-banner.png
-  .github/workflows/minitiger-sidecar.yml
-  .github/workflows/minitiger-package-metadata.yml
-  SIDECAR_SETUP.md
+  PLUGIN_SETUP.md
+  plugin-repository/manifest.json
+  .github/workflows/minitiger-plugin-build.yml
+  .github/workflows/minitiger-plugin-release.yml
+  .github/scripts/update_plugin_manifest.py
 )
 for f in "${required[@]}"; do
   [[ -f "$f" ]] || fail "$f fehlt"
 done
-ok "README, Banner und Workflows vorhanden"
+ok "Plugin-Repository-Dateien vorhanden"
 
-file docs/assets/minitiger-banner.gif | grep -q 'GIF image data' || fail "Banner-GIF ist kein echtes GIF"
-file docs/assets/minitiger-banner.png | grep -q 'PNG image data' || fail "Banner-PNG ist kein PNG"
-ok "Banner-Dateien plausibel"
+python3 -m json.tool plugin-repository/manifest.json >/dev/null || fail "plugin-repository/manifest.json ist kein gültiges JSON"
+python3 -m py_compile .github/scripts/update_plugin_manifest.py || fail "Manifest-Updater hat Python-Syntaxfehler"
+ok "Manifest und Updater syntaktisch plausibel"
 
-grep -q 'minitiger-banner.gif' README.md || fail "GIF-Banner fehlt in README"
-grep -q 'ghcr.io/grunttanamo/minitiger-web:latest' README.md || fail "README Quick Start fehlt"
-grep -q 'GPL-2.0-or-later' README.md || fail "README Lizenzhinweis fehlt"
-ok "Neue Minitiger README plausibel"
+grep -q 'e4e52bec-56f8-4c38-88e4-4b862a3cb93b' plugin-repository/manifest.json || fail "Plugin GUID fehlt im Manifest"
+grep -q '"name": "Minitiger Virtual Sync"' plugin-repository/manifest.json || fail "Plugin Name fehlt im Manifest"
+grep -q '"versions": \[\]' plugin-repository/manifest.json || echo "[WARN] Manifest enthält bereits Releases – das ist nach dem ersten Release normal."
+ok "Plugin-Metadaten plausibel"
 
-if grep -q -- "- 'README.md'" .github/workflows/minitiger-sidecar.yml; then
-  fail "README.md darf den langen Sidecar-Build nicht mehr triggern"
+grep -q '^name: Build Minitiger Virtual Sync Plugin' .github/workflows/minitiger-plugin-build.yml || fail "Plugin-Build-Workflow fehlt"
+grep -q 'dotnet-version:.*10.0.x' .github/workflows/minitiger-plugin-build.yml || fail ".NET 10 fehlt im Plugin-Build"
+grep -q '^name: Release Minitiger Virtual Sync Plugin' .github/workflows/minitiger-plugin-release.yml || fail "Plugin-Release-Workflow fehlt"
+grep -q 'workflow_dispatch:' .github/workflows/minitiger-plugin-release.yml || fail "Plugin-Release ist nicht manuell startbar"
+grep -q 'TARGET_ABI: 12.0.0.0' .github/workflows/minitiger-plugin-release.yml || fail "Jellyfin 12 Plugin ABI fehlt"
+grep -q 'md5sum' .github/workflows/minitiger-plugin-release.yml || fail "MD5-Prüfsumme fehlt"
+grep -q 'gh release create' .github/workflows/minitiger-plugin-release.yml || fail "GitHub Release Erstellung fehlt"
+grep -q 'update_plugin_manifest.py' .github/workflows/minitiger-plugin-release.yml || fail "Automatische Manifest-Aktualisierung fehlt"
+ok "Build-/Release-Workflows plausibel"
+
+grep -q 'https://raw.githubusercontent.com/Grunttanamo/Minitiger/minitiger-v12.1/plugin-repository/manifest.json' PLUGIN_SETUP.md || fail "Repository URL fehlt in PLUGIN_SETUP.md"
+grep -q 'Minitiger Virtual Sync' README.md || fail "README verweist nicht auf Companion Plugin"
+ok "Plugin-Dokumentation plausibel"
+
+if grep -q "tools/MinitigerVirtualSync" .github/workflows/minitiger-sidecar.yml 2>/dev/null; then
+  fail "Plugin-only Änderungen dürfen den langen Sidecar-Build nicht triggern"
 fi
-if grep -q -- "- 'docs/\*\*'" .github/workflows/minitiger-sidecar.yml; then
-  fail "docs/** darf den langen Sidecar-Build nicht triggern"
-fi
-ok "README/Doku triggern keinen Full Sidecar Build"
-
-grep -q '^name: Update Minitiger Package Metadata' .github/workflows/minitiger-package-metadata.yml || fail "Metadata-Workflow-Name fehlt"
-grep -q 'workflow_dispatch:' .github/workflows/minitiger-package-metadata.yml || fail "Metadata-Workflow ist nicht manuell startbar"
-grep -q 'docker buildx imagetools create' .github/workflows/minitiger-package-metadata.yml || fail "imagetools Metadata-Update fehlt"
-grep -q 'index:org.opencontainers.image.description=' .github/workflows/minitiger-package-metadata.yml || fail "Index Description Annotation fehlt"
-if grep -q 'build-push-action' .github/workflows/minitiger-package-metadata.yml; then
-  fail "Metadata-Workflow darf keinen Docker-Neubuild enthalten"
-fi
-ok "Metadata-only Workflow plausibel"
+ok "Plugin-Release ist vom Sidecar-Build getrennt"
 
 branch=$(git branch --show-current 2>/dev/null || true)
 if [[ "$branch" == "minitiger-v12.1" ]]; then
@@ -55,5 +63,5 @@ else
 fi
 
 echo
-echo "Phase 18.4.3 ist statisch verifiziert."
-echo "Nach dem Push Default Branch auf minitiger-v12.1 setzen und Package-Seite neu laden."
+echo "Phase 18.5.0 ist statisch verifiziert."
+echo "Nach dem Push erst den Plugin-Build grün abwarten, dann den Release-Workflow manuell starten."

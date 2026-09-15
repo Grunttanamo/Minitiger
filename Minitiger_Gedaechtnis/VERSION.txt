@@ -1,1 +1,2 @@
-Minitiger Gedächtnis v40 · 2026-09-15 · Phase 18.4.3 GitHub Hero + Fast GHCR Metadata
+Minitiger_Gedaechtnis_2026-09-15_v41
+Phase 18.5.0 – Minitiger Virtual Sync Plugin Repository

@@ -1,0 +1,11 @@
+[
+  {
+    "guid": "e4e52bec-56f8-4c38-88e4-4b862a3cb93b",
+    "name": "Minitiger Virtual Sync",
+    "description": "Server-side companion for Minitiger Web. Stores and serves Minitiger virtual-library configuration and custom virtual-library media.",
+    "overview": "Server-side virtual-library sync companion for Minitiger Web.",
+    "owner": "Grunttanamo",
+    "category": "General",
+    "versions": []
+  }
+]

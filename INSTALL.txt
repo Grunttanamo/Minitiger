@@ -1,71 +1,80 @@
-MINITIGER WEB – PHASE 18.4.3
-GitHub Hero Banner + Fast GHCR Metadata
+MINITIGER WEB – PHASE 18.5.0
+Minitiger Virtual Sync Plugin Repository
 
 VORAUSSETZUNG
 - Branch: minitiger-v12.1
-- Phase 18.4.2 ist bereits eingespielt.
-- Jellyfin Server / Webbasis: 12.1.
-- GHCR-Package `minitiger-web` ist Public.
+- Jellyfin Server / Webbasis: 12.1
+- Phase 18.4.3 ist bereits eingespielt.
+- GitHub Repository ist öffentlich, damit Jellyfin das Manifest und die Release-ZIPs ohne Login laden kann.
 
 ZIEL
-- Minitiger bekommt eine eigene hübsche README mit Banner statt der sichtbaren
-  Upstream-Jellyfin-Präsentation.
-- README-/Banner-Änderungen sollen KEINEN langen Docker-Multi-Arch-Build mehr
-  auslösen.
-- Die kurze GHCR-Package-Beschreibung kann künftig über einen manuellen,
-  schnellen Metadata-Workflow geändert werden, ohne Minitiger neu zu bauen.
+- Minitiger Virtual Sync als normales Jellyfin-Plugin verteilen.
+- Nutzer sollen nur einmal die Minitiger Repository-URL in Jellyfin hinzufügen und das Plugin danach aus dem Catalog installieren.
+- Plugin-Releases bleiben vollständig vom langen Sidecar-Docker-Build getrennt.
 
-NEU
-- docs/assets/minitiger-banner.gif
-  -> echtes animiertes 2-Frame-GIF aus den bereitgestellten Minitiger-Motiven.
-- docs/assets/minitiger-banner.png
-  -> statischer Fallback.
-- README.md
-  -> Hero-Banner, Badges, Sidecar-Erklärung, Quick Start, Unraid, Tags,
-     Kompatibilität, Credits/Lizenz.
-- .github/workflows/minitiger-package-metadata.yml
-  -> manueller Metadata-only Workflow für GHCR.
-- Build Minitiger Sidecar wird bei README-/Doku-Änderungen nicht mehr gestartet.
+INSTALLATION DES PATCHES AUF DEM RASPBERRY PI
 
-INSTALLATION AUF DEM RASPBERRY PI
-
-1) In das Repository wechseln:
+1) Repository öffnen:
    cd ~/minitiger-web
 
 2) Patch entpacken:
-   unzip -o ~/minitiger_native_phase18_4_3_github_hero_metadata_quickupdate.zip -d ~/minitiger-web
+   unzip -o ~/minitiger_native_phase18_5_0_plugin_repository.zip -d ~/minitiger-web
 
-3) Prüfen:
+3) Statisch prüfen:
    chmod +x VERIFY_PATCH.sh
    ./VERIFY_PATCH.sh
 
 4) Committen und pushen:
-   git add README.md docs/assets \
-     .github/workflows/minitiger-sidecar.yml \
-     .github/workflows/minitiger-package-metadata.yml \
-     SIDECAR_SETUP.md INSTALL.txt CHANGELOG_Minitiger_Web.txt \
-     files.txt VERIFY_PATCH.sh Minitiger_Gedaechtnis
+   git add README.md PLUGIN_SETUP.md \
+     plugin-repository/manifest.json \
+     .github/workflows/minitiger-plugin-build.yml \
+     .github/workflows/minitiger-plugin-release.yml \
+     .github/scripts/update_plugin_manifest.py \
+     INSTALL.txt CHANGELOG_Minitiger_Web.txt files.txt VERIFY_PATCH.sh \
+     Minitiger_Gedaechtnis
 
-   git commit -m "Add Minitiger banner and fast package metadata workflow"
+   git commit -m "Add Minitiger Virtual Sync plugin repository"
    git push
 
-WICHTIG NACH DEM PUSH
-Der sichtbare Package-README-Block hängt am verknüpften Repository. Damit die
-Minitiger-README statt der alten Jellyfin-README erscheint, den Default Branch
-auf `minitiger-v12.1` stellen:
+NACH DEM PUSH
+- In GitHub Actions sollte `Build Minitiger Virtual Sync Plugin` automatisch starten.
+- Dieser Build ist viel kleiner als der Minitiger Docker Multi-Arch Build.
+- Erst wenn dieser Workflow grün ist, das erste Repository-Release erstellen.
 
-GitHub -> Minitiger -> Settings -> Default branch -> Wechsel-Symbol
--> minitiger-v12.1 -> Update -> bestätigen.
+ERSTES PLUGIN-RELEASE ERSTELLEN
+GitHub -> Minitiger -> Actions -> Release Minitiger Virtual Sync Plugin
+-> Run workflow
 
-DAS LÖST KEINEN DOCKER-BUILD AUS.
+Branch:
+  minitiger-v12.1
 
-PACKAGE-BESCHREIBUNG OHNE DOCKER-BUILD ÄNDERN
-GitHub -> Minitiger -> Actions -> Update Minitiger Package Metadata
--> Run workflow -> Description bearbeiten -> Run workflow.
+Version:
+  1.0.3.0
 
-Dieser Workflow kompiliert Minitiger NICHT neu. Er verwendet das vorhandene
-Multi-Arch-Image und aktualisiert nur die GHCR-Index-Metadaten für `latest`
-und `12.1`.
+Changelog-Vorschlag:
+  Initial public Minitiger plugin repository release for Jellyfin 12.1.
 
-PACKAGE-SEITE
-https://github.com/Grunttanamo/Minitiger/pkgs/container/minitiger-web
+Der Workflow macht automatisch:
+- .NET-10-Build / Publish
+- `Minitiger.VirtualSync_1.0.3.0.zip`
+- MD5-Prüfsumme für Jellyfin
+- GitHub Release `plugin-v1.0.3.0`
+- Eintrag in `plugin-repository/manifest.json`
+- Commit + Push des aktualisierten Manifests
+
+PLUGIN DANACH IN JELLYFIN INSTALLIEREN
+Dashboard -> Plugins -> Repositories -> +
+
+Name:
+  Minitiger
+
+Repository URL:
+  https://raw.githubusercontent.com/Grunttanamo/Minitiger/minitiger-v12.1/plugin-repository/manifest.json
+
+Speichern -> Plugins -> Catalog -> Minitiger Virtual Sync -> Installieren
+-> Jellyfin neu starten.
+
+WICHTIG
+- Der Sidecar bleibt weiterhin separat.
+- Das Plugin wird nicht automatisch in /config kopiert.
+- Der Minitiger Docker Build muss für Plugin-Releases nicht neu laufen.

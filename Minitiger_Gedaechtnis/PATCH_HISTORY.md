@@ -51,3 +51,13 @@
 - Neuer manueller Workflow `Update Minitiger Package Metadata`.
 - Workflow nutzt `docker buildx imagetools create`, um bestehende amd64/arm64-Manifeste wiederzuverwenden und nur GHCR-Index-Metadaten zu ändern.
 - Default Branch `minitiger-v12.1` ist erforderlich/empfohlen, damit GitHub die neue README standardmäßig zeigt.
+
+
+## Phase 18.5.0 – Minitiger Virtual Sync Plugin Repository
+- Eigenes Jellyfin Plugin Repository Manifest.
+- Plugin-Setup-Dokumentation + README-Verlinkung.
+- Schneller .NET-10 Plugin-Build als separater GitHub Workflow.
+- Manueller Release-Workflow: Plugin-ZIP, MD5, GitHub Release, automatische Manifest-Aktualisierung.
+- Plugin-only Releases sind vom langen Sidecar Multi-Arch Docker Build getrennt.
+- Erstes vorgesehenes Repository-Release: 1.0.3.0.
+- targetAbi 12.0.0.0 bleibt bewusst die Jellyfin-12-Plugin-ABI-Linie, auch auf Testserver 12.1.

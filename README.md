@@ -21,6 +21,8 @@
   ·
   <a href="SIDECAR_SETUP.md"><strong>🧊 Sidecar Setup</strong></a>
   ·
+  <a href="PLUGIN_SETUP.md"><strong>🔌 Companion Plugin</strong></a>
+  ·
   <a href="CHANGELOG_Minitiger_Web.txt"><strong>📝 Changelog</strong></a>
 </p>
 
@@ -75,6 +77,18 @@ http://SERVER-IP:8098/web/index.html
 ```
 
 The external port `8098` is only an example. Pick any free port on your system.
+
+## 🔌 Optional companion plugin
+
+For server-synced Minitiger virtual libraries, install **Minitiger Virtual Sync** as a normal Jellyfin plugin. The sidecar remains separate; the plugin only provides the server-side storage/API used by Minitiger virtual-library sync.
+
+Add this repository in **Jellyfin Dashboard → Plugins → Repositories**:
+
+```text
+https://raw.githubusercontent.com/Grunttanamo/Minitiger/minitiger-v12.1/plugin-repository/manifest.json
+```
+
+Then open the Plugin Catalog, install **Minitiger Virtual Sync**, and restart Jellyfin. See [PLUGIN_SETUP.md](PLUGIN_SETUP.md) for the full setup and release flow.
 
 ## 🟩 Unraid
 

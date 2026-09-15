@@ -1,14 +1,15 @@
-Aktuelle Artefakte – Phase 18.4.3
+Aktuelle Artefakte – Phase 18.5.0
 
 Patch:
-- minitiger_native_phase18_4_3_github_hero_metadata_quickupdate.zip
+- minitiger_native_phase18_5_0_plugin_repository.zip
 
 Memory:
-- Minitiger_Gedaechtnis_2026-09-15_v40.zip
+- Minitiger_Gedaechtnis_2026-09-15_v41.zip
 
 Neue/maßgebliche Dateien:
+- PLUGIN_SETUP.md
+- plugin-repository/manifest.json
+- .github/workflows/minitiger-plugin-build.yml
+- .github/workflows/minitiger-plugin-release.yml
+- .github/scripts/update_plugin_manifest.py
 - README.md
-- docs/assets/minitiger-banner.gif
-- docs/assets/minitiger-banner.png
-- .github/workflows/minitiger-sidecar.yml
-- .github/workflows/minitiger-package-metadata.yml

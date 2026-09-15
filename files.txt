@@ -1,9 +1,9 @@
 README.md
-docs/assets/minitiger-banner.gif
-docs/assets/minitiger-banner.png
-.github/workflows/minitiger-sidecar.yml
-.github/workflows/minitiger-package-metadata.yml
-SIDECAR_SETUP.md
+PLUGIN_SETUP.md
+plugin-repository/manifest.json
+.github/workflows/minitiger-plugin-build.yml
+.github/workflows/minitiger-plugin-release.yml
+.github/scripts/update_plugin_manifest.py
 INSTALL.txt
 CHANGELOG_Minitiger_Web.txt
 files.txt

@@ -1,0 +1,42 @@
+name: Build Minitiger Virtual Sync Plugin
+
+on:
+  push:
+    branches:
+      - minitiger-v12.1
+    paths:
+      - 'tools/MinitigerVirtualSync/**'
+      - '.github/workflows/minitiger-plugin-build.yml'
+      - '.github/workflows/minitiger-plugin-release.yml'
+      - '.github/scripts/update_plugin_manifest.py'
+  pull_request:
+    branches:
+      - minitiger-v12.1
+    paths:
+      - 'tools/MinitigerVirtualSync/**'
+      - '.github/workflows/minitiger-plugin-build.yml'
+      - '.github/workflows/minitiger-plugin-release.yml'
+      - '.github/scripts/update_plugin_manifest.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore plugin
+        run: dotnet restore tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj
+
+      - name: Build plugin
+        run: dotnet build tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj --configuration Release --no-restore

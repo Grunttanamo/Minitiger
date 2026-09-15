@@ -1,7 +1,9 @@
-# Minitiger Gedächtnis v40
+# Minitiger Gedächtnis v41
 
-Stand: 2026-09-15 · Phase 18.4.3
+Aktueller Schwerpunkt: Phase 18.5.0 – normales Jellyfin Plugin Repository für `Minitiger Virtual Sync`.
 
-Wichtigster aktueller Punkt: Der Sidecar ist funktional bestätigt. Jetzt wird die öffentliche GitHub-/GHCR-Präsentation auf Minitiger umgestellt, inklusive Hero-Banner und schneller Package-Metadata-Aktualisierung ohne vollständigen Docker-Neubuild.
-
-Zuerst `CURRENT_STATE.md`, dann `NEXT_CHAT_HANDOFF.md` und `OPEN_ISSUES.md` lesen.
+Zuerst lesen:
+1. CURRENT_STATE.md
+2. OPEN_ISSUES.md
+3. NEXT_CHAT_HANDOFF.md
+4. PROJECT_RULES.md

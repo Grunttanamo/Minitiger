@@ -28,3 +28,10 @@
 - README-/Banner-/Dokumentationsänderungen dürfen keinen vollständigen Multi-Arch-Docker-Build auslösen.
 - Für reine GHCR-Beschreibungsänderungen den Metadata-only Workflow verwenden.
 - Aktuelle Projekt-README liegt auf `minitiger-v12.1`; dieser Branch soll Default sein.
+
+
+## Plugin-Verteilung
+- Minitiger Virtual Sync als normales Jellyfin Plugin Repository verteilen, nicht automatisch in `/config/plugins` kopieren.
+- Plugin-only Änderungen/Releases dürfen keinen vollständigen Minitiger Sidecar Multi-Arch Build auslösen.
+- Releases erst nach grünem separatem Plugin-Build veröffentlichen.
+- Jellyfin 12 Plugin targetAbi bleibt `12.0.0.0`, solange upstream die 12.x ABI-Linie nicht ändert.

@@ -1,52 +1,34 @@
-Minitiger Web – Phase 18.4.2
-GitHub / GHCR Package Page Polish
+Minitiger Web – Phase 18.5.0
+Minitiger Virtual Sync Plugin Repository
 
-BESTÄTIGTER SIDECAR-STAND
-- Jellyfin 12.1 + Minitiger funktionieren.
-- Sidecar startet öffentlich aus GHCR.
-- Health/API-Proxy funktionieren.
-- Jellyfin Desktop Client funktioniert über Host:8098.
-- Login, Home, Bibliotheken, Detailseiten und Playback funktionieren.
+BESTÄTIGTER AUSGANGSSTAND
+- Jellyfin Server / Web: 12.1.
+- Minitiger Sidecar funktioniert getrennt vom normalen Jellyfin.
+- Desktop Client, Login, Home, Bibliotheken, Detailseiten und Playback funktionieren über den Sidecar.
 - Browser funktioniert bestätigt über /web/index.html.
-- Kurzer Browser-Root-Link bleibt ein kleiner bekannter Komfortpunkt und ist
-  kein Blocker für die Sidecar-Nutzung.
 
 NEU
-- Eigene Minitiger-README statt Upstream-Jellyfin-README.
-- Klare Erklärung des sicheren Sidecar-Prinzips.
-- Docker Quick Start und Unraid-Kurzanleitung.
-- Kompatibilitäts-, Tag- und Lizenzhinweise.
-- OCI-Metadaten im Sidecar-Dockerfile erweitert.
-- Multi-Arch-Index-Annotations im GitHub-Workflow ergänzt, damit GHCR die
-  Package-Beschreibung bei amd64+arm64 sichtbar darstellen kann.
-- GPL-2.0-or-later wird explizit als Image-Lizenz gesetzt.
+- Eigenes Jellyfin-Plugin-Repository für `Minitiger Virtual Sync`.
+- Repository-Manifest unter `plugin-repository/manifest.json`.
+- Dokumentation `PLUGIN_SETUP.md` für normale Installation über Jellyfin Dashboard -> Plugins -> Repositories.
+- Separater schneller GitHub-Workflow `Build Minitiger Virtual Sync Plugin`.
+- Separater manueller Release-Workflow `Release Minitiger Virtual Sync Plugin`.
+- Release-Workflow baut das Plugin mit .NET 10, erzeugt ein Plugin-ZIP, berechnet den Jellyfin-Katalog-MD5,
+  erstellt einen GitHub Release und aktualisiert anschließend automatisch das Manifest.
+- README verweist nun direkt auf das Companion Plugin und seine Repository-URL.
+
+WICHTIG ZUR KOMPATIBILITÄT
+- Minitiger ist auf Jellyfin 12.1 getestet.
+- Jellyfin 12.x verwendet weiterhin die Plugin-ABI-Linie `12.0.0.0`.
+- Deshalb targetet das Plugin-Manifest absichtlich `12.0.0.0`, während der Server-Teststand 12.1 ist.
+- .NET-Ziel des vorhandenen Plugins bleibt `net10.0`.
+
+VERTEILUNG
+- Plugin-only Änderungen lösen KEINEN langen Minitiger-Sidecar-Docker-Build aus.
+- Erstes geplantes öffentliches Repository-Release: `1.0.3.0`.
+- Nach erfolgreichem Release-Workflow kann das Plugin über den normalen Jellyfin Plugin Catalog installiert werden.
 
 NICHT VERÄNDERT
-- Minitiger UI, Trailer, Audioflags, Manga und Virtual-Library-Logik.
-- Jellyfin Server, Datenbank, Accounts, Appdata, Medien und Plugins.
-- Sidecar-Netzwerk-/Proxy-Verhalten.
-
-
-Minitiger Web – Phase 18.4.3
-GitHub Hero Banner + Fast GHCR Metadata
-
-NEU
-- Minitiger Hero-Banner für die Repository-/Package-README.
-- Animiertes GIF aus den zwei bereitgestellten Minitiger-Motiven.
-- Statischer PNG-Fallback liegt daneben.
-- README optisch neu aufgebaut: Hero, Badges, Sidecar-Erklärung, Quick Start,
-  Unraid, Tags, Kompatibilität, Credits und GPL-Hinweis.
-- Neuer manueller GitHub-Workflow `Update Minitiger Package Metadata`.
-- GHCR Description kann damit ohne npm/Webpack/Docker-Multi-Arch-Neubuild
-  aktualisiert werden.
-- README-/Dokumentationsänderungen lösen den langen Sidecar-Build nicht mehr aus.
-
-WICHTIG
-- Damit GitHub auf Repository/Package die neue README statt der alten Upstream-
-  README nimmt, soll `minitiger-v12.1` als Default Branch gesetzt werden.
-- Default-Branch-Wechsel und README-Push bauen das Docker-Image nicht neu.
-
-NICHT VERÄNDERT
-- Minitiger UI / Playback / Trailer / Audioflags / Manga / Virtual Libraries.
-- Jellyfin Server, Datenbank, Accounts, Appdata oder Medien.
-- Funktionsfähiges Sidecar-Image selbst.
+- Minitiger UI, Playback, Trailer, Audioflags, Manga und Sidecar-Proxy.
+- Jellyfin Datenbank, Accounts, Appdata oder Medien.
+- Der Sidecar installiert das Plugin weiterhin nicht automatisch.
