@@ -1,34 +1,28 @@
-Minitiger Web – Phase 18.5.0
-Minitiger Virtual Sync Plugin Repository
+Minitiger Web – Phase 18.5.1
+Plugin Release ZIP Hotfix
 
-BESTÄTIGTER AUSGANGSSTAND
+AUSGANGSSTAND
 - Jellyfin Server / Web: 12.1.
-- Minitiger Sidecar funktioniert getrennt vom normalen Jellyfin.
-- Desktop Client, Login, Home, Bibliotheken, Detailseiten und Playback funktionieren über den Sidecar.
-- Browser funktioniert bestätigt über /web/index.html.
+- Separater Plugin-Build `Build Minitiger Virtual Sync Plugin` ist auf GitHub grün durchgelaufen.
+- Erster manueller Release-Workflow `Release Minitiger Virtual Sync Plugin` schlug fehl.
 
-NEU
-- Eigenes Jellyfin-Plugin-Repository für `Minitiger Virtual Sync`.
-- Repository-Manifest unter `plugin-repository/manifest.json`.
-- Dokumentation `PLUGIN_SETUP.md` für normale Installation über Jellyfin Dashboard -> Plugins -> Repositories.
-- Separater schneller GitHub-Workflow `Build Minitiger Virtual Sync Plugin`.
-- Separater manueller Release-Workflow `Release Minitiger Virtual Sync Plugin`.
-- Release-Workflow baut das Plugin mit .NET 10, erzeugt ein Plugin-ZIP, berechnet den Jellyfin-Katalog-MD5,
-  erstellt einen GitHub Release und aktualisiert anschließend automatisch das Manifest.
-- README verweist nun direkt auf das Companion Plugin und seine Repository-URL.
+FEHLERURSACHE
+- Der Workflow exportierte die Variable `ZIP=Minitiger.VirtualSync_1.0.3.0.zip`.
+- Das auf GitHub Actions verwendete Info-ZIP wertet die Umgebungsvariable `ZIP` selbst aus.
+- Dadurch wurde `Minitiger.VirtualSync_1.0.3.0.zip` an einem anderen Ort/Namen erzeugt als vom Workflow erwartet.
+- Der nachfolgende `md5sum` suchte deshalb vergeblich nach `$RUNNER_TEMP/Minitiger.VirtualSync_1.0.3.0.zip` und brach mit Exit Code 1 ab.
 
-WICHTIG ZUR KOMPATIBILITÄT
-- Minitiger ist auf Jellyfin 12.1 getestet.
-- Jellyfin 12.x verwendet weiterhin die Plugin-ABI-Linie `12.0.0.0`.
-- Deshalb targetet das Plugin-Manifest absichtlich `12.0.0.0`, während der Server-Teststand 12.1 ist.
-- .NET-Ziel des vorhandenen Plugins bleibt `net10.0`.
-
-VERTEILUNG
-- Plugin-only Änderungen lösen KEINEN langen Minitiger-Sidecar-Docker-Build aus.
-- Erstes geplantes öffentliches Repository-Release: `1.0.3.0`.
-- Nach erfolgreichem Release-Workflow kann das Plugin über den normalen Jellyfin Plugin Catalog installiert werden.
+FIX
+- Reservierte Umgebungsvariable `ZIP` vollständig entfernt.
+- Neuer neutraler Variablenname: `ARCHIVE_NAME`.
+- Publish, MD5, Source-URL, GitHub Release und Summary verwenden jetzt konsistent `ARCHIVE_NAME`.
+- Nach dem ZIP-Bau prüft `test -s`, dass das erwartete Release-Archiv tatsächlich existiert und nicht leer ist.
 
 NICHT VERÄNDERT
-- Minitiger UI, Playback, Trailer, Audioflags, Manga und Sidecar-Proxy.
-- Jellyfin Datenbank, Accounts, Appdata oder Medien.
-- Der Sidecar installiert das Plugin weiterhin nicht automatisch.
+- Plugin-Code / Virtual-Sync-Logik.
+- Jellyfin Plugin ABI (`12.0.0.0`).
+- Plugin-Version / geplantes erstes Release `1.0.3.0`.
+- Sidecar, UI, Trailer, Audioflags, Manga und Playback.
+
+STATUS
+- Fix ist statisch/lokal verifiziert, aber der echte GitHub Release-Workflow muss vom Nutzer erneut getestet werden.

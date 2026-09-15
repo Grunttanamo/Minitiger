@@ -61,3 +61,11 @@
 - Plugin-only Releases sind vom langen Sidecar Multi-Arch Docker Build getrennt.
 - Erstes vorgesehenes Repository-Release: 1.0.3.0.
 - targetAbi 12.0.0.0 bleibt bewusst die Jellyfin-12-Plugin-ABI-Linie, auch auf Testserver 12.1.
+
+## Phase 18.5.1 – Plugin Release ZIP Hotfix
+- Erster realer Release-Lauf scheiterte erst nach erfolgreichem .NET Publish beim MD5-Schritt.
+- GitHub Actions Log: `md5sum: .../Minitiger.VirtualSync_1.0.3.0.zip: No such file or directory`.
+- Ursache: Workflow exportierte `ZIP=...`; Info-ZIP verwendet `ZIP` selbst als spezielle Umgebungsvariable.
+- Variablenname auf `ARCHIVE_NAME` geändert und alle Release-/Checksum-/URL-Schritte konsistent angepasst.
+- Zusätzliche `test -s`-Prüfung stellt sicher, dass das erwartete Archiv tatsächlich erzeugt wurde.
+- Kein Plugin-Code, keine UI und kein Sidecar geändert.

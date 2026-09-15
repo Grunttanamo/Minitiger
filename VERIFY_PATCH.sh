@@ -8,52 +8,44 @@ ok()   { echo "[ OK ] $*"; }
 grep -q '"version": "12.1.0"' package.json || fail "Jellyfin-Web-Basis ist nicht 12.1.0."
 ok "Jellyfin-Web-Basis 12.1.0 erkannt"
 
-PROJECT='tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj'
-[[ -f "$PROJECT" ]] || fail "Vorhandenes Minitiger Virtual Sync Projekt fehlt"
-grep -q '<TargetFramework>net10.0</TargetFramework>' "$PROJECT" || fail "Plugin targetet nicht net10.0"
-grep -q '<Version>1.0.3</Version>' "$PROJECT" || echo "[WARN] Plugin-Projektversion ist nicht mehr 1.0.3 – Release-Version bewusst prüfen."
-ok "Vorhandenes .NET-10-Pluginprojekt erkannt"
+WF='.github/workflows/minitiger-plugin-release.yml'
+[[ -f "$WF" ]] || fail "$WF fehlt"
+grep -q '^name: Release Minitiger Virtual Sync Plugin' "$WF" || fail "Falscher Plugin-Release-Workflow"
 
-required=(
-  README.md
-  PLUGIN_SETUP.md
-  plugin-repository/manifest.json
-  .github/workflows/minitiger-plugin-build.yml
-  .github/workflows/minitiger-plugin-release.yml
-  .github/scripts/update_plugin_manifest.py
-)
-for f in "${required[@]}"; do
-  [[ -f "$f" ]] || fail "$f fehlt"
-done
-ok "Plugin-Repository-Dateien vorhanden"
-
-python3 -m json.tool plugin-repository/manifest.json >/dev/null || fail "plugin-repository/manifest.json ist kein gültiges JSON"
-python3 -m py_compile .github/scripts/update_plugin_manifest.py || fail "Manifest-Updater hat Python-Syntaxfehler"
-ok "Manifest und Updater syntaktisch plausibel"
-
-grep -q 'e4e52bec-56f8-4c38-88e4-4b862a3cb93b' plugin-repository/manifest.json || fail "Plugin GUID fehlt im Manifest"
-grep -q '"name": "Minitiger Virtual Sync"' plugin-repository/manifest.json || fail "Plugin Name fehlt im Manifest"
-grep -q '"versions": \[\]' plugin-repository/manifest.json || echo "[WARN] Manifest enthält bereits Releases – das ist nach dem ersten Release normal."
-ok "Plugin-Metadaten plausibel"
-
-grep -q '^name: Build Minitiger Virtual Sync Plugin' .github/workflows/minitiger-plugin-build.yml || fail "Plugin-Build-Workflow fehlt"
-grep -q 'dotnet-version:.*10.0.x' .github/workflows/minitiger-plugin-build.yml || fail ".NET 10 fehlt im Plugin-Build"
-grep -q '^name: Release Minitiger Virtual Sync Plugin' .github/workflows/minitiger-plugin-release.yml || fail "Plugin-Release-Workflow fehlt"
-grep -q 'workflow_dispatch:' .github/workflows/minitiger-plugin-release.yml || fail "Plugin-Release ist nicht manuell startbar"
-grep -q 'TARGET_ABI: 12.0.0.0' .github/workflows/minitiger-plugin-release.yml || fail "Jellyfin 12 Plugin ABI fehlt"
-grep -q 'md5sum' .github/workflows/minitiger-plugin-release.yml || fail "MD5-Prüfsumme fehlt"
-grep -q 'gh release create' .github/workflows/minitiger-plugin-release.yml || fail "GitHub Release Erstellung fehlt"
-grep -q 'update_plugin_manifest.py' .github/workflows/minitiger-plugin-release.yml || fail "Automatische Manifest-Aktualisierung fehlt"
-ok "Build-/Release-Workflows plausibel"
-
-grep -q 'https://raw.githubusercontent.com/Grunttanamo/Minitiger/minitiger-v12.1/plugin-repository/manifest.json' PLUGIN_SETUP.md || fail "Repository URL fehlt in PLUGIN_SETUP.md"
-grep -q 'Minitiger Virtual Sync' README.md || fail "README verweist nicht auf Companion Plugin"
-ok "Plugin-Dokumentation plausibel"
-
-if grep -q "tools/MinitigerVirtualSync" .github/workflows/minitiger-sidecar.yml 2>/dev/null; then
-  fail "Plugin-only Änderungen dürfen den langen Sidecar-Build nicht triggern"
+grep -q 'ARCHIVE_NAME=Minitiger.VirtualSync_\$VERSION.zip' "$WF" || fail "ARCHIVE_NAME wird nicht gesetzt"
+if grep -Eq '(^|[[:space:]])ZIP=' "$WF"; then
+  fail "Reservierte Info-ZIP-Umgebungsvariable ZIP wird noch gesetzt"
 fi
-ok "Plugin-Release ist vom Sidecar-Build getrennt"
+if grep -q '\$ZIP' "$WF"; then
+  fail "Alte \$ZIP-Referenz ist noch vorhanden"
+fi
+ok "Reservierte ZIP-Variable vollständig entfernt"
+
+grep -q 'zip -9 "\$RUNNER_TEMP/\$ARCHIVE_NAME"' "$WF" || fail "Archiv wird nicht mit ARCHIVE_NAME gebaut"
+grep -q 'test -s "\$RUNNER_TEMP/\$ARCHIVE_NAME"' "$WF" || fail "Archiv-Existenzprüfung fehlt"
+grep -q 'md5sum "\$RUNNER_TEMP/\$ARCHIVE_NAME"' "$WF" || fail "MD5 nutzt nicht ARCHIVE_NAME"
+grep -q 'releases/download/\${TAG}/\${ARCHIVE_NAME}' "$WF" || fail "Source URL nutzt nicht ARCHIVE_NAME"
+grep -q 'gh release create "\$TAG" "\$RUNNER_TEMP/\$ARCHIVE_NAME"' "$WF" || fail "GitHub Release nutzt nicht ARCHIVE_NAME"
+ok "Release-Archivpfad ist in allen Schritten konsistent"
+
+# Kleine lokale Regression: Info-ZIP reserviert die Variable ZIP. Mit ARCHIVE_NAME
+# darf der Workflow-Ansatz trotzdem exakt am gewünschten Pfad erzeugen.
+if command -v zip >/dev/null 2>&1; then
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' EXIT
+  printf 'test\n' > "$tmp/plugin.dll"
+  (
+    cd "$tmp"
+    export ARCHIVE_NAME='Minitiger.VirtualSync_test.zip'
+    zip -q -9 "$tmp/$ARCHIVE_NAME" plugin.dll
+  )
+  [[ -s "$tmp/Minitiger.VirtualSync_test.zip" ]] || fail "Lokaler ARCHIVE_NAME-ZIP-Test fehlgeschlagen"
+  ok "Lokaler ZIP-Pfadtest erfolgreich"
+  rm -rf "$tmp"
+  trap - EXIT
+else
+  echo "[WARN] zip lokal nicht installiert; nur Workflow-Textprüfung durchgeführt."
+fi
 
 branch=$(git branch --show-current 2>/dev/null || true)
 if [[ "$branch" == "minitiger-v12.1" ]]; then
@@ -63,5 +55,5 @@ else
 fi
 
 echo
-echo "Phase 18.5.0 ist statisch verifiziert."
-echo "Nach dem Push erst den Plugin-Build grün abwarten, dann den Release-Workflow manuell starten."
+echo "Phase 18.5.1 ist statisch verifiziert."
+echo "Der echte GitHub Release-Workflow muss anschließend erneut mit 1.0.3.0 getestet werden."

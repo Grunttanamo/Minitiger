@@ -1,6 +1,6 @@
-# Minitiger Gedächtnis v41
+# Minitiger Gedächtnis v42
 
-Aktueller Schwerpunkt: Phase 18.5.0 – normales Jellyfin Plugin Repository für `Minitiger Virtual Sync`.
+Aktueller Schwerpunkt: Phase 18.5.1 – Hotfix für den ersten `Minitiger Virtual Sync` GitHub Release-Workflow.
 
 Zuerst lesen:
 1. CURRENT_STATE.md

@@ -1,47 +1,33 @@
-MINITIGER WEB – PHASE 18.5.0
-Minitiger Virtual Sync Plugin Repository
+MINITIGER WEB – PHASE 18.5.1
+Plugin Release ZIP Hotfix
 
 VORAUSSETZUNG
 - Branch: minitiger-v12.1
-- Jellyfin Server / Webbasis: 12.1
-- Phase 18.4.3 ist bereits eingespielt.
-- GitHub Repository ist öffentlich, damit Jellyfin das Manifest und die Release-ZIPs ohne Login laden kann.
+- Phase 18.5.0 ist eingespielt.
+- `Build Minitiger Virtual Sync Plugin` war grün.
+- Der erste Release-Versuch `1.0.3.0` ist vor der GitHub-Release-Erstellung beim MD5-Schritt fehlgeschlagen.
 
-ZIEL
-- Minitiger Virtual Sync als normales Jellyfin-Plugin verteilen.
-- Nutzer sollen nur einmal die Minitiger Repository-URL in Jellyfin hinzufügen und das Plugin danach aus dem Catalog installieren.
-- Plugin-Releases bleiben vollständig vom langen Sidecar-Docker-Build getrennt.
-
-INSTALLATION DES PATCHES AUF DEM RASPBERRY PI
+INSTALLATION AUF DEM RASPBERRY PI
 
 1) Repository öffnen:
    cd ~/minitiger-web
 
 2) Patch entpacken:
-   unzip -o ~/minitiger_native_phase18_5_0_plugin_repository.zip -d ~/minitiger-web
+   unzip -o ~/minitiger_native_phase18_5_1_plugin_release_zip_hotfix.zip -d ~/minitiger-web
 
-3) Statisch prüfen:
+3) Prüfen:
    chmod +x VERIFY_PATCH.sh
    ./VERIFY_PATCH.sh
 
-4) Committen und pushen:
-   git add README.md PLUGIN_SETUP.md \
-     plugin-repository/manifest.json \
-     .github/workflows/minitiger-plugin-build.yml \
-     .github/workflows/minitiger-plugin-release.yml \
-     .github/scripts/update_plugin_manifest.py \
+4) Commit + Push:
+   git add .github/workflows/minitiger-plugin-release.yml \
      INSTALL.txt CHANGELOG_Minitiger_Web.txt files.txt VERIFY_PATCH.sh \
      Minitiger_Gedaechtnis
 
-   git commit -m "Add Minitiger Virtual Sync plugin repository"
+   git commit -m "Fix Minitiger plugin release archive"
    git push
 
-NACH DEM PUSH
-- In GitHub Actions sollte `Build Minitiger Virtual Sync Plugin` automatisch starten.
-- Dieser Build ist viel kleiner als der Minitiger Docker Multi-Arch Build.
-- Erst wenn dieser Workflow grün ist, das erste Repository-Release erstellen.
-
-ERSTES PLUGIN-RELEASE ERSTELLEN
+ERNEUTER RELEASE-TEST
 GitHub -> Minitiger -> Actions -> Release Minitiger Virtual Sync Plugin
 -> Run workflow
 
@@ -51,30 +37,13 @@ Branch:
 Version:
   1.0.3.0
 
-Changelog-Vorschlag:
+Changelog:
   Initial public Minitiger plugin repository release for Jellyfin 12.1.
 
-Der Workflow macht automatisch:
-- .NET-10-Build / Publish
-- `Minitiger.VirtualSync_1.0.3.0.zip`
-- MD5-Prüfsumme für Jellyfin
-- GitHub Release `plugin-v1.0.3.0`
-- Eintrag in `plugin-repository/manifest.json`
-- Commit + Push des aktualisierten Manifests
-
-PLUGIN DANACH IN JELLYFIN INSTALLIEREN
-Dashboard -> Plugins -> Repositories -> +
-
-Name:
-  Minitiger
-
-Repository URL:
-  https://raw.githubusercontent.com/Grunttanamo/Minitiger/minitiger-v12.1/plugin-repository/manifest.json
-
-Speichern -> Plugins -> Catalog -> Minitiger Virtual Sync -> Installieren
--> Jellyfin neu starten.
-
 WICHTIG
-- Der Sidecar bleibt weiterhin separat.
-- Das Plugin wird nicht automatisch in /config kopiert.
-- Der Minitiger Docker Build muss für Plugin-Releases nicht neu laufen.
+- Derselbe Versionswert `1.0.3.0` kann erneut verwendet werden, weil der fehlgeschlagene Lauf den Schritt `Create GitHub release` nie erreicht hat.
+- Wenn der Workflow grün wird, anschließend prüfen:
+  1. GitHub Release `plugin-v1.0.3.0` existiert.
+  2. Release enthält `Minitiger.VirtualSync_1.0.3.0.zip`.
+  3. `plugin-repository/manifest.json` enthält Version `1.0.3.0`.
+  4. Plugin im Jellyfin Catalog sichtbar/installierbar.

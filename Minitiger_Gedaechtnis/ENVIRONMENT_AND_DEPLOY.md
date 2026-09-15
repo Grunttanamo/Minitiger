@@ -1,4 +1,4 @@
-# Environment / Deploy – v41
+# Environment / Deploy – v42
 
 - Raspberry Pi Projekt: `~/minitiger-web`
 - Aktiver Branch: `minitiger-v12.1`
@@ -15,4 +15,5 @@
 - Plugin-Projekt: `tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj`
 - Framework: net10.0
 - Jellyfin 12 targetAbi: 12.0.0.0
-- Erstes geplantes Repository Release: 1.0.3.0
+- Erster Plugin-Build: real grün bestätigt.
+- Erstes Release: weiterhin geplant als 1.0.3.0; erster Versuch scheiterte vor Release-Erstellung am ZIP/MD5-Pfad.

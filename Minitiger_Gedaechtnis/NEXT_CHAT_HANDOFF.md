@@ -10,20 +10,19 @@ Aktueller Stand:
 - Desktop Client/Login/Home/Bibliotheken/Detailseiten/Playback funktionieren.
 - Browser bestätigt über `/web/index.html`.
 
-Aktueller Patch: Phase 18.5.0 `Minitiger Virtual Sync Plugin Repository`.
-- `plugin-repository/manifest.json`
-- `PLUGIN_SETUP.md`
-- schneller Plugin Build Workflow
-- manueller Plugin Release Workflow
-- Release erstellt ZIP + MD5 + GitHub Release + Manifest-Commit automatisch
-- erstes Release vorgesehen: `1.0.3.0`
-- targetAbi bewusst `12.0.0.0` (Jellyfin-12-Plugin-ABI), Testserver 12.1
+Plugin:
+- Repository-Infrastruktur Phase 18.5.0 vorhanden.
+- `Build Minitiger Virtual Sync Plugin` real grün bestätigt.
+- Erster Release `1.0.3.0` scheiterte beim MD5-Schritt.
+- Exakte Ursache aus Logs: reservierte Info-ZIP-Umgebungsvariable `ZIP` kollidierte mit Workflow-Variable.
+- Phase 18.5.1 ersetzt `ZIP` durch `ARCHIVE_NAME` und prüft das Archiv nach Erstellung.
+- Fehlversuch erreichte `Create GitHub release` nicht, daher `1.0.3.0` erneut verwenden.
 
-Nach dem Patch:
-1. Build Workflow grün abwarten.
-2. Release Workflow manuell starten.
-3. Repository URL in Jellyfin hinzufügen.
-4. Plugin installieren, Jellyfin neu starten und Minitiger-Sync testen.
+Nächster Test:
+1. 18.5.1 pushen.
+2. Release Workflow erneut mit 1.0.3.0 starten.
+3. Bei grünem Lauf Release/ZIP/Manifest prüfen.
+4. Danach Repository in Jellyfin hinzufügen und Plugin installieren.
 
 Regeln:
 - Zu jedem Patch PowerShell-SCP-Befehl.

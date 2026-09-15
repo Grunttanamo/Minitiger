@@ -1,4 +1,4 @@
-# Aktueller Projektstand – Phase 18.5.0
+# Aktueller Projektstand – Phase 18.5.1
 
 ## Jellyfin 12.1 / Sidecar – bestätigt
 - Jellyfin Server läuft auf 12.1.0.
@@ -10,22 +10,21 @@
 
 ## GitHub / GHCR
 - Eigene Minitiger README ist auf Repository/Package sichtbar.
-- GHCR Package-Beschreibung wurde auf Minitiger angepasst.
-- README-/Doku-Änderungen lösen keinen langen Sidecar-Docker-Build mehr aus.
+- GHCR Package-Beschreibung ist auf Minitiger angepasst.
+- README-/Doku-Änderungen lösen keinen langen Sidecar-Docker-Build aus.
 - Metadata-only Workflow für GHCR existiert.
 
-## Phase 18.5.0 – Plugin Repository
-- `Minitiger Virtual Sync` bleibt bewusst vom Sidecar getrennt.
-- Neues Jellyfin Plugin Repository unter `plugin-repository/manifest.json`.
-- Öffentliche Repository-URL: `https://raw.githubusercontent.com/Grunttanamo/Minitiger/minitiger-v12.1/plugin-repository/manifest.json`.
-- Neuer schneller CI-Workflow `Build Minitiger Virtual Sync Plugin`.
-- Neuer manueller Workflow `Release Minitiger Virtual Sync Plugin`.
-- Release-Workflow baut mit .NET 10, erstellt Plugin-ZIP, MD5, GitHub Release und aktualisiert das Jellyfin-Manifest automatisch.
-- Geplantes erstes Repository-Release: `1.0.3.0`.
-- Jellyfin 12.1 bleibt auf der Plugin-ABI-Linie `12.0.0.0`; genau diese targetAbi wird verwendet.
-- Plugin-only Releases lösen keinen Sidecar-Docker-Build aus.
+## Plugin Repository – aktueller Teststand
+- `Minitiger Virtual Sync` wird als separates Jellyfin Plugin Repository vorbereitet.
+- Repository-Manifest: `plugin-repository/manifest.json`.
+- Repository-URL: `https://raw.githubusercontent.com/Grunttanamo/Minitiger/minitiger-v12.1/plugin-repository/manifest.json`.
+- `Build Minitiger Virtual Sync Plugin` ist auf GitHub real **grün bestätigt**.
+- Erster manueller Release-Lauf für `1.0.3.0` schlug beim Schritt `Calculate Jellyfin catalog checksum` fehl.
+- Ursache real aus GitHub Actions Logs bestätigt: Umgebungsvariable `ZIP` kollidierte mit Info-ZIP. Das Archiv landete als `foo`/Default-Archiv statt am erwarteten `$RUNNER_TEMP/...zip`-Pfad; `md5sum` fand die erwartete Datei nicht.
+- Phase 18.5.1 ersetzt `ZIP` durch `ARCHIVE_NAME` und prüft das erzeugte Archiv explizit mit `test -s`.
+- Der Release-Schritt `Create GitHub release` wurde im Fehlversuch nie erreicht; Version `1.0.3.0` kann erneut verwendet werden.
 
 ## Noch nicht bestätigt
-- Phase-18.5.0-Plugin-Build auf GitHub muss real grün laufen.
-- Erstes Release `1.0.3.0` muss real erzeugt werden.
+- Phase-18.5.1-Release-Workflow muss real grün laufen.
+- GitHub Release `plugin-v1.0.3.0`, ZIP und Manifest-Eintrag müssen real entstehen.
 - Installation über Jellyfin Dashboard -> Plugins -> Repository/Catalog muss anschließend getestet werden.
