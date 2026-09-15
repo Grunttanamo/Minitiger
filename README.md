@@ -1,74 +1,97 @@
-<h1 align="center">Jellyfin Web</h1>
-<h3 align="center">Part of the <a href="https://jellyfin.org">Jellyfin Project</a></h3>
+# 🐯 Minitiger Web
 
----
+**Minitiger Web** is a custom Jellyfin Web frontend built for **Jellyfin 12.1**.  
+The recommended installation is a small **sidecar container**: your existing Jellyfin server, database, users, libraries, watch state, plugins and media paths stay untouched.
 
-<p align="center">
-<img alt="Logo Banner" src="https://raw.githubusercontent.com/jellyfin/jellyfin-ux/master/branding/SVG/banner-logo-solid.svg?sanitize=true"/>
-<br/>
-<br/>
-<a href="https://github.com/jellyfin/jellyfin-web">
-<img alt="GPL 2.0 License" src="https://img.shields.io/github/license/jellyfin/jellyfin-web.svg"/>
-</a>
-<a href="https://github.com/jellyfin/jellyfin-web/releases">
-<img alt="Current Release" src="https://img.shields.io/github/release/jellyfin/jellyfin-web.svg"/>
-</a>
-<a href="https://translate.jellyfin.org/projects/jellyfin/jellyfin-web/?utm_source=widget">
-<img src="https://translate.jellyfin.org/widgets/jellyfin/-/jellyfin-web/svg-badge.svg" alt="Translation Status"/>
-</a>
-<br/>
-<a href="https://opencollective.com/jellyfin">
-<img alt="Donate" src="https://img.shields.io/opencollective/all/jellyfin.svg?label=backers"/>
-</a>
-<a href="https://features.jellyfin.org">
-<img alt="Feature Requests" src="https://img.shields.io/badge/fider-vote%20on%20features-success.svg"/>
-</a>
-<a href="https://matrix.to/#/+jellyfin:matrix.org">
-<img alt="Chat on Matrix" src="https://img.shields.io/matrix/jellyfin:matrix.org.svg?logo=matrix"/>
-</a>
-<a href="https://www.reddit.com/r/jellyfin">
-<img alt="Join our Subreddit" src="https://img.shields.io/badge/reddit-r%2Fjellyfin-%23FF5700.svg"/>
-</a>
-</p>
+> Minitiger runs next to Jellyfin instead of replacing it.
 
-Jellyfin Web is the frontend used for most of the clients available for end users, such as desktop browsers, Android, and iOS. We welcome all contributions and pull requests! If you have a larger feature in mind please open an issue so we can discuss the implementation before you start. Translations can be improved very easily from our <a href="https://translate.jellyfin.org/projects/jellyfin/jellyfin-web">Weblate</a> instance. Look through the following graphic to see if your native language could use some work!
+## ✨ What you get
 
-<a href="https://translate.jellyfin.org/engage/jellyfin/?utm_source=widget">
-<img src="https://translate.jellyfin.org/widgets/jellyfin/-/jellyfin-web/multi-auto.svg" alt="Detailed Translation Status"/>
-</a>
+- Custom Minitiger home and detail-page design
+- Virtual libraries and Minitiger-specific UI features
+- Manga / comic improvements
+- Trailer and playback integrations
+- Audio-language flags and detail-page enhancements
+- Separate Docker sidecar: easy to test, easy to remove
+- Multi-architecture image for **amd64** and **arm64**
 
-## Build Process
+## 🧊 Safe sidecar design
 
-### Dependencies
+Your existing Jellyfin installation stays exactly where it is.
 
-- [Node.js](https://nodejs.org/en/download)
-- npm (included in Node.js)
+```text
+Existing Jellyfin              Minitiger Web Sidecar
+http://SERVER:8096             http://SERVER:8098
+        │                               │
+        ├── users                       ├── custom web frontend
+        ├── database                    ├── reverse proxy to Jellyfin
+        ├── libraries                   └── no /config or media mounts
+        ├── watch state
+        └── settings
+```
 
-### Getting Started
+Stopping or deleting the Minitiger container does **not** delete or migrate Jellyfin data.
 
-1. Clone or download this repository.
+## 🚀 Quick start
 
-   ```sh
-   git clone https://github.com/jellyfin/jellyfin-web.git
-   cd jellyfin-web
-   ```
+```bash
+docker run -d \
+  --name minitiger-web \
+  --restart unless-stopped \
+  -p 8098:80 \
+  -e JELLYFIN_URL="http://host.docker.internal:8096" \
+  --add-host=host.docker.internal:host-gateway \
+  ghcr.io/grunttanamo/minitiger-web:latest
+```
 
-2. Install build dependencies in the project directory.
+Then connect with the Jellyfin Desktop Client to:
 
-   ```sh
-   npm install
-   ```
+```text
+http://SERVER-IP:8098
+```
 
-3. Run the web client with webpack for local development.
+For a normal browser, the currently confirmed direct path is:
 
-   ```sh
-   npm start
-   ```
+```text
+http://SERVER-IP:8098/web/index.html
+```
 
-4. Build the client with sourcemaps available.
+The host port `8098` is only an example and can be changed freely.
 
-   ```sh
-   npm run build:development
-   ```
+## 🟩 Unraid
 
-Review the [Contributing Guide](./CONTRIBUTING.md) for more information on our process and tech stack.
+Create a new container and use:
+
+```text
+Repository:      ghcr.io/grunttanamo/minitiger-web:latest
+Network Type:    Bridge
+Host Port:       8098
+Container Port:  80 / TCP
+JELLYFIN_URL:    http://host.docker.internal:8096
+Extra Params:    --add-host=host.docker.internal:host-gateway
+```
+
+Do **not** add Jellyfin `/config`, `/cache`, appdata or media mounts to the Minitiger container.
+
+## 🔖 Image tags
+
+| Tag | Meaning |
+| --- | --- |
+| `latest` | Current recommended Minitiger sidecar build |
+| `12.1` | Build targeting Jellyfin 12.1 |
+| `sha-…` | Immutable build for a specific Git commit |
+
+## ⚠️ Compatibility
+
+Current target: **Jellyfin Server / Web 12.1**.  
+The sidecar has been tested with Jellyfin 12.1, the Jellyfin Desktop Client, login, home, libraries, detail pages and playback.
+
+Non-standard Jellyfin base URLs and unusual reverse-proxy/authentication setups may need additional configuration.
+
+## ❤️ About the project
+
+Minitiger Web is a community customization based on **Jellyfin Web**. It is not an official Jellyfin project and is not affiliated with the Jellyfin team.
+
+Jellyfin Web is licensed under **GPL-2.0-or-later**. Minitiger keeps the upstream license and attribution. See [`LICENSE`](LICENSE) for details.
+
+Upstream Jellyfin Web: https://github.com/jellyfin/jellyfin-web

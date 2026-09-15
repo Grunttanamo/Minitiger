@@ -42,7 +42,7 @@ docker compose up -d
 
 Aufruf danach standardmäßig:
 
-`http://DEIN-SERVER:8098`
+`http://DEIN-SERVER:8098/web/index.html`
 
 Ist 8098 belegt, kann vor dem Start z.B. gesetzt werden:
 
@@ -76,7 +76,7 @@ In Unraid unter **Docker -> Add Container**:
 - Extra Parameters: `--add-host=host.docker.internal:host-gateway`
 - **Keine** Appdata-, Config-, Cache- oder Medienpfade hinzufügen
 
-Danach `http://UNRAID-IP:8098` öffnen. Wenn 8098 bereits verwendet wird,
+Im Jellyfin Desktop Client reicht `http://UNRAID-IP:8098`. Im normalen Browser ist aktuell der bestätigte direkte Pfad `http://UNRAID-IP:8098/web/index.html`. Wenn 8098 bereits verwendet wird,
 einfach einen anderen freien Host-Port wählen; der Container-Port bleibt 80.
 
 Wenn Jellyfin auf einem anderen Host-Port läuft, nur den Port in
@@ -107,3 +107,19 @@ Noch zu testen:
 Minitiger Virtual Sync ist weiterhin **nicht automatisch im Sidecar
 installiert**. Das ist Absicht: Der Sidecar soll den bestehenden Jellyfin-Server
 nicht verändern. Das Companion Plugin folgt später als optionale Installation.
+
+
+## Öffentliche GitHub-/GHCR-Seite
+
+Das öffentliche Image liegt unter:
+
+`ghcr.io/grunttanamo/minitiger-web:latest`
+
+Die GitHub-Paketseite zeigt Metadaten direkt aus dem OCI-Image. Phase 18.4.2
+setzt deshalb Titel, Beschreibung, Source-Link und GPL-2.0-or-later-Lizenz sowohl
+als Image-Labels als auch als Multi-Arch-Index-Annotations.
+
+Die ausführliche Projektbeschreibung liegt in der neuen `README.md` des
+Repositories. Damit GitHub diese auf der normalen Repository-Startseite zeigt,
+sollte nach erfolgreichem Test `minitiger-v12.1` als Default Branch gesetzt
+werden.

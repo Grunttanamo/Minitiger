@@ -1,8 +1,9 @@
-Phase 18.4.1 Patch: minitiger_native_phase18_4_1_sidecar_browser_entry_hotfix.zip
-Separate memory: Minitiger_Gedaechtnis_2026-09-15_v38.zip
-Changed runtime files:
-- docker/minitiger-sidecar.conf.template
-- docker-compose.sidecar.example.yml
+Phase 18.4.2 Patch: minitiger_native_phase18_4_2_github_package_polish.zip
+Separate memory: Minitiger_Gedaechtnis_2026-09-15_v39.zip
+Changed runtime/build files:
+- README.md
+- Dockerfile.minitiger-sidecar
+- .github/workflows/minitiger-sidecar.yml
 Documentation/verification:
 - SIDECAR_SETUP.md
 - INSTALL.txt

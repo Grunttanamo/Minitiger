@@ -33,3 +33,11 @@
 - Browser funktioniert direkt über `/web/index.html`, kurzer Root-Link zuvor nicht.
 - `/`, `/web`, `/web/` werden deshalb explizit auf `/web/index.html` normalisiert.
 - Compose-Port wird über `MINITIGER_PORT` frei konfigurierbar; Default im Beispiel 8098.
+
+
+## Phase 18.4.2 – GitHub / GHCR Package Page Polish
+- Eigene Minitiger-README mit Sidecar-Konzept, Quick Start, Unraid, Tags, Kompatibilität und Lizenz.
+- OCI title/description/source/url/licenses/vendor im Sidecar-Dockerfile.
+- docker/metadata-action@v6 ergänzt.
+- Multi-Arch-Index-Annotations für GHCR Package-Beschreibung ergänzt.
+- Package-Seite bleibt GitHub-layoutgebunden; freie Gestaltung erfolgt über Repository-README.

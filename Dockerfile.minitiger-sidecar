@@ -19,9 +19,12 @@ RUN npm run build:production
 
 FROM nginx:1.29-alpine
 
-LABEL org.opencontainers.image.title="Minitiger Web Sidecar"
-LABEL org.opencontainers.image.description="Disposable Minitiger Web frontend for an existing Jellyfin server"
+LABEL org.opencontainers.image.title="Minitiger Web"
+LABEL org.opencontainers.image.description="Custom Jellyfin 12.1 web frontend delivered as a safe sidecar. Keep your existing Jellyfin server, database, users, libraries and settings untouched while using the Minitiger interface in a separate container."
 LABEL org.opencontainers.image.source="https://github.com/Grunttanamo/Minitiger"
+LABEL org.opencontainers.image.url="https://github.com/Grunttanamo/Minitiger/pkgs/container/minitiger-web"
+LABEL org.opencontainers.image.licenses="GPL-2.0-or-later"
+LABEL org.opencontainers.image.vendor="Grunttanamo"
 
 # Works out of the box for the common case where Jellyfin is published on the
 # Docker host at port 8096. Can be overridden at runtime.

@@ -1,27 +1,27 @@
-Minitiger Web – Phase 18.4.1
-Sidecar Browser Entry Hotfix
+Minitiger Web – Phase 18.4.2
+GitHub / GHCR Package Page Polish
 
-BESTÄTIGTE ERKENNTNISSE AUS 18.4.0
-- Sidecar-Container startet erfolgreich.
-- `/minitiger-health` liefert HTTP 200.
-- `/System/Info/Public` wird mit HTTP 200 an Jellyfin 12.1 weitergeleitet.
-- Jellyfin Desktop Client lädt Minitiger über den Sidecar.
-- Browser lädt Minitiger erfolgreich über `/web/index.html`.
-- Der kurze Browser-Aufruf nur über Host:Port landete dagegen auf Jellyfins
-  roter "Software Failure / Seite nicht gefunden"-Ansicht.
+BESTÄTIGTER SIDECAR-STAND
+- Jellyfin 12.1 + Minitiger funktionieren.
+- Sidecar startet öffentlich aus GHCR.
+- Health/API-Proxy funktionieren.
+- Jellyfin Desktop Client funktioniert über Host:8098.
+- Login, Home, Bibliotheken, Detailseiten und Playback funktionieren.
+- Browser funktioniert bestätigt über /web/index.html.
+- Kurzer Browser-Root-Link bleibt ein kleiner bekannter Komfortpunkt und ist
+  kein Blocker für die Sidecar-Nutzung.
 
-FIX
-- `/`, `/web` und `/web/` werden explizit auf `/web/index.html` umgeleitet.
-- Der lokale `/web/`-Asset-/SPA-Fallback bleibt bestehen.
-- HEALTHCHECK nutzt nun `default_type text/plain` statt eines zusätzlichen
-  Content-Type-Headers.
-
-BEDIENUNG
-- Compose-Host-Port ist über `MINITIGER_PORT` konfigurierbar.
-- Beispiel-Default ist jetzt 8098, weil 8097 im Testsystem durch OpenMediaVault
-  belegt ist. Jeder andere freie Host-Port ist möglich.
+NEU
+- Eigene Minitiger-README statt Upstream-Jellyfin-README.
+- Klare Erklärung des sicheren Sidecar-Prinzips.
+- Docker Quick Start und Unraid-Kurzanleitung.
+- Kompatibilitäts-, Tag- und Lizenzhinweise.
+- OCI-Metadaten im Sidecar-Dockerfile erweitert.
+- Multi-Arch-Index-Annotations im GitHub-Workflow ergänzt, damit GHCR die
+  Package-Beschreibung bei amd64+arm64 sichtbar darstellen kann.
+- GPL-2.0-or-later wird explizit als Image-Lizenz gesetzt.
 
 NICHT VERÄNDERT
-- Minitiger UI / Trailer / Audioflags / Manga / virtuelle Bibliothekslogik.
-- Jellyfin Datenbank, Accounts, Appdata, Medien und normaler :8096-Endpunkt.
-- Virtual Sync Companion Plugin bleibt getrennt/optional.
+- Minitiger UI, Trailer, Audioflags, Manga und Virtual-Library-Logik.
+- Jellyfin Server, Datenbank, Accounts, Appdata, Medien und Plugins.
+- Sidecar-Netzwerk-/Proxy-Verhalten.

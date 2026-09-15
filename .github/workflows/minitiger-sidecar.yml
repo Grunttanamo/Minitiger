@@ -14,6 +14,7 @@ on:
       - 'Dockerfile.minitiger-sidecar.dockerignore'
       - 'docker/minitiger-sidecar.conf.template'
       - '.github/workflows/minitiger-sidecar.yml'
+      - 'README.md'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +33,30 @@ jobs:
         id: image
         shell: bash
         run: echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/minitiger-web" >> "$GITHUB_OUTPUT"
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        env:
+          DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index
+        with:
+          images: ${{ steps.image.outputs.name }}
+          tags: |
+            type=raw,value=latest
+            type=raw,value=12.1
+            type=sha,prefix=sha-
+          labels: |
+            org.opencontainers.image.title=Minitiger Web
+            org.opencontainers.image.description=Custom Jellyfin 12.1 web frontend delivered as a safe sidecar. Keep your existing Jellyfin server, database, users, libraries and settings untouched while using the Minitiger interface in a separate container.
+            org.opencontainers.image.source=https://github.com/Grunttanamo/Minitiger
+            org.opencontainers.image.url=https://github.com/Grunttanamo/Minitiger/pkgs/container/minitiger-web
+            org.opencontainers.image.licenses=GPL-2.0-or-later
+            org.opencontainers.image.vendor=Grunttanamo
+          annotations: |
+            org.opencontainers.image.title=Minitiger Web
+            org.opencontainers.image.description=Custom Jellyfin 12.1 web frontend delivered as a safe sidecar. Keep your existing Jellyfin server, database, users, libraries and settings untouched while using the Minitiger interface in a separate container.
+            org.opencontainers.image.source=https://github.com/Grunttanamo/Minitiger
+            org.opencontainers.image.licenses=GPL-2.0-or-later
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -55,9 +80,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           build-args: |
             JELLYFIN_VERSION=12.1
-          tags: |
-            ${{ steps.image.outputs.name }}:latest
-            ${{ steps.image.outputs.name }}:12.1
-            ${{ steps.image.outputs.name }}:sha-${{ github.sha }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -1,19 +1,28 @@
-MINITIGER WEB – PHASE 18.4.1
-Sidecar Browser Entry Hotfix
+MINITIGER WEB – PHASE 18.4.2
+GitHub / GHCR Package Page Polish
 
 VORAUSSETZUNG
 - Branch: minitiger-v12.1
-- Phase 18.4.0 Sidecar ist bereits vorhanden.
+- Phase 18.4.1 ist bereits eingespielt.
 - Jellyfin Server / Webbasis: 12.1.
+- GHCR-Package `minitiger-web` ist Public.
+
+ZIEL
+- Die öffentliche GitHub-/GHCR-Präsentation soll nicht mehr wie ein nacktes
+  Jellyfin-/Docker-Paket wirken.
+- GHCR bekommt eine sichtbare, verständliche Beschreibung und Lizenz.
+- Das Repository bekommt eine eigene Minitiger-README mit Sidecar-Erklärung,
+  Quick Start, Unraid-Hinweisen, Tags und Kompatibilität.
 
 ÄNDERUNGEN
-- Browser-Aufruf von `/`, `/web` und `/web/` wird jetzt auf
-  `/web/index.html` normalisiert.
-- Damit soll die rote Jellyfin-Seite "Software Failure / Seite nicht gefunden"
-  beim kurzen Browser-Link verschwinden.
-- Compose-Beispiel bekommt einen frei konfigurierbaren Host-Port mit Default
-  8098. Der Container-Port bleibt immer 80.
-- Keine Minitiger-UI-, Datenbank-, Appdata- oder Serverdateien werden verändert.
+- README.md komplett auf Minitiger Web umgestellt.
+- Dockerfile.minitiger-sidecar bekommt aussagekräftige OCI-Metadaten:
+  title, description, source, url, licenses, vendor.
+- GitHub Action nutzt docker/metadata-action und schreibt dieselben Metadaten
+  zusätzlich als Multi-Arch-Index-Annotations. Das ist wichtig, damit GHCR die
+  Beschreibung bei amd64+arm64 tatsächlich auf der Package-Seite anzeigen kann.
+- Tags bleiben: latest, 12.1 und sha-...
+- README-Änderungen lösen künftig ebenfalls einen Sidecar-Build aus.
 
 INSTALLATION AUF DEM RASPBERRY PI
 
@@ -21,40 +30,38 @@ INSTALLATION AUF DEM RASPBERRY PI
    cd ~/minitiger-web
 
 2) Patch entpacken:
-   unzip -o ~/minitiger_native_phase18_4_1_sidecar_browser_entry_hotfix.zip -d ~/minitiger-web
+   unzip -o ~/minitiger_native_phase18_4_2_github_package_polish.zip -d ~/minitiger-web
 
 3) Prüfen:
    chmod +x VERIFY_PATCH.sh
    ./VERIFY_PATCH.sh
 
 4) Committen und pushen:
-   git add docker/minitiger-sidecar.conf.template \
-     docker-compose.sidecar.example.yml SIDECAR_SETUP.md \
+   git add README.md Dockerfile.minitiger-sidecar \
+     .github/workflows/minitiger-sidecar.yml SIDECAR_SETUP.md \
      INSTALL.txt CHANGELOG_Minitiger_Web.txt files.txt VERIFY_PATCH.sh \
      Minitiger_Gedaechtnis
-   git commit -m "Fix Minitiger sidecar browser entry"
+   git commit -m "Polish Minitiger GitHub package page"
    git push
 
-Der Push löst automatisch `Build Minitiger Sidecar` aus, weil die nginx-
-Template-Datei geändert wurde.
+5) Auf GitHub warten, bis `Build Minitiger Sidecar` grün ist.
 
-5) Nach grünem GitHub-Workflow lokales Image aktualisieren:
-   docker pull ghcr.io/grunttanamo/minitiger-web:latest
-   docker stop minitiger-web 2>/dev/null || true
-   docker rm minitiger-web 2>/dev/null || true
-
-   docker run -d \
-     --name minitiger-web \
-     --restart unless-stopped \
-     -p 8098:80 \
-     -e JELLYFIN_URL="http://host.docker.internal:8096" \
-     --add-host=host.docker.internal:host-gateway \
-     ghcr.io/grunttanamo/minitiger-web:latest
-
-6) Browser-Test:
-   http://192.168.178.50:8098
+6) Danach Package-Seite neu laden:
+   https://github.com/Grunttanamo/Minitiger/pkgs/container/minitiger-web
 
 ERWARTUNG
-- Der kurze Link soll direkt Minitiger laden.
-- Kein manuelles `/web/index.html` mehr nötig.
-- Normales Jellyfin auf :8096 bleibt unverändert.
+- Unter `minitiger-web` erscheint eine Minitiger-Beschreibung.
+- Source Repository ist sauber verknüpft.
+- Lizenz wird als GPL-2.0-or-later angezeigt.
+- Tags latest / 12.1 / sha-... bleiben vorhanden.
+
+OPTIONAL ABER EMPFOHLEN
+Damit die normale Repository-Startseite ebenfalls sofort Minitiger zeigt:
+GitHub -> Repository -> Settings -> Branches -> Default branch
+und `minitiger-v12.1` als Default setzen.
+
+HINWEIS
+Die GHCR Package-Seite selbst hat ein festes GitHub-Layout. Man kann dort keine
+beliebigen Banner, CSS oder freie Markdown-Seiten einbauen. Die sichtbaren
+Anpassungspunkte sind vor allem Description, License, Source und Tags. Für die
+richtig hübsche Projektseite ist die README.md zuständig.

@@ -1,5 +1,5 @@
-# Minitiger Gedächtnis v37
+# Minitiger Gedächtnis v39
 
 Startpunkt: `CURRENT_STATE.md`, dann `LATEST_FEEDBACK.md`, `OPEN_ISSUES.md` und `NEXT_CHAT_HANDOFF.md`.
 
-Aktuell: Jellyfin Server/Web 12.1 ist beim Nutzer funktionsfähig. Phase 18.4.0 führt als nächsten Test eine getrennte Minitiger-Web-Sidecar-Architektur ein, die keine bestehende Jellyfin-Datenbank/Appdata mountet oder ersetzt.
+Aktuell: Jellyfin 12.1 + Minitiger Sidecar sind funktional bestätigt. Phase 18.4.2 poliert nun die öffentliche GitHub-/GHCR-Präsentation mit eigener Minitiger-README und korrekten Multi-Arch-Package-Metadaten.

@@ -9,33 +9,33 @@ grep -q '"version": "12.1.0"' package.json || fail "Jellyfin-Web-Basis ist nicht
 ok "Jellyfin-Web-Basis 12.1.0 erkannt"
 
 required=(
+  README.md
   Dockerfile.minitiger-sidecar
   .github/workflows/minitiger-sidecar.yml
-  docker/minitiger-sidecar.conf.template
-  docker-compose.sidecar.example.yml
   SIDECAR_SETUP.md
 )
 for f in "${required[@]}"; do
   [[ -f "$f" ]] || fail "$f fehlt"
 done
-ok "Sidecar-Basis vorhanden"
+ok "GitHub-/Sidecar-Dateien vorhanden"
 
-grep -q 'return 302 /web/index.html;' docker/minitiger-sidecar.conf.template || fail "Browser-Entry-Redirect fehlt"
-count=$(grep -c 'return 302 /web/index.html;' docker/minitiger-sidecar.conf.template || true)
-[[ "$count" -ge 3 ]] || fail "Nicht alle Einstiege /, /web und /web/ werden normalisiert"
-grep -q 'location /web/' docker/minitiger-sidecar.conf.template || fail "/web/-Webroot fehlt"
-grep -q 'proxy_pass ${JELLYFIN_URL};' docker/minitiger-sidecar.conf.template || fail "Jellyfin-Reverse-Proxy fehlt"
-grep -q 'proxy_set_header Upgrade' docker/minitiger-sidecar.conf.template || fail "WebSocket-Upgrade fehlt"
-ok "Browser-Entry + Web/API/WebSocket-Routen vorhanden"
+grep -q '^# 🐯 Minitiger Web' README.md || fail "Neue Minitiger README fehlt"
+grep -q 'ghcr.io/grunttanamo/minitiger-web:latest' README.md || fail "README Quick-Start Image fehlt"
+grep -q 'GPL-2.0-or-later' README.md || fail "README Lizenzhinweis fehlt"
+ok "Minitiger README plausibel"
 
-grep -Fq '${MINITIGER_PORT:-8098}:80' docker-compose.sidecar.example.yml || fail "Konfigurierbarer Sidecar-Port fehlt"
-if grep -Eq '/config|/cache|:/media' docker-compose.sidecar.example.yml; then
-  fail "Sidecar Compose darf keine Jellyfin-Daten-/Medien-Volumes mounten"
-fi
-ok "Compose bleibt datenbank-/appdata-frei und Port ist konfigurierbar"
+grep -q 'org.opencontainers.image.description=' Dockerfile.minitiger-sidecar || fail "OCI Description Label fehlt"
+grep -q 'org.opencontainers.image.licenses="GPL-2.0-or-later"' Dockerfile.minitiger-sidecar || fail "OCI Lizenz-Label fehlt"
+grep -q 'org.opencontainers.image.source=' Dockerfile.minitiger-sidecar || fail "OCI Source Label fehlt"
+ok "Dockerfile OCI-Metadaten vorhanden"
 
-grep -q "docker/minitiger-sidecar.conf.template" .github/workflows/minitiger-sidecar.yml || fail "Workflow reagiert nicht auf nginx-Template"
-ok "GitHub Workflow wird durch diesen Hotfix ausgelöst"
+grep -q 'docker/metadata-action@v6' .github/workflows/minitiger-sidecar.yml || fail "docker/metadata-action fehlt"
+grep -q 'DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index' .github/workflows/minitiger-sidecar.yml || fail "Multi-Arch Index Annotation Level fehlt"
+grep -q 'annotations:.*' .github/workflows/minitiger-sidecar.yml || fail "Annotations fehlen"
+grep -q 'org.opencontainers.image.description=' .github/workflows/minitiger-sidecar.yml || fail "Workflow Description Metadata fehlt"
+grep -q 'org.opencontainers.image.licenses=GPL-2.0-or-later' .github/workflows/minitiger-sidecar.yml || fail "Workflow License Metadata fehlt"
+grep -q -- "- 'README.md'" .github/workflows/minitiger-sidecar.yml || fail "README triggert Sidecar-Build nicht"
+ok "GHCR Multi-Arch-Metadaten Workflow plausibel"
 
 branch=$(git branch --show-current 2>/dev/null || true)
 if [[ "$branch" == "minitiger-v12.1" ]]; then
@@ -45,5 +45,5 @@ else
 fi
 
 echo
-echo "Phase 18.4.1 ist statisch verifiziert."
-echo "Der kurze Browser-Aufruf muss nach dem neuen GHCR-Build noch real getestet werden."
+echo "Phase 18.4.2 ist statisch verifiziert."
+echo "Die sichtbare GHCR-Beschreibung muss nach dem neuen Multi-Arch-Build noch real geprüft werden."

@@ -1,5 +1,6 @@
-docker/minitiger-sidecar.conf.template
-docker-compose.sidecar.example.yml
+README.md
+Dockerfile.minitiger-sidecar
+.github/workflows/minitiger-sidecar.yml
 SIDECAR_SETUP.md
 INSTALL.txt
 CHANGELOG_Minitiger_Web.txt
