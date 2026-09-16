@@ -45,7 +45,7 @@ export const DEFAULT_HOME_ROW_ORDER: HomeRowId[] = [
 
 export type MinitigerCardSize = 'compact' | 'normal' | 'large';
 
-export type BannerRotationSeconds = 0 | 8 | 12 | 20 | 30;
+export type BannerRotationSeconds = 0 | 8 | 12 | 20 | 30 | 45 | 60;
 
 export type BannerItemLimit = 0 | 5 | 10 | 15 | 20 | 30 | 50 | 100;
 
@@ -68,12 +68,21 @@ export interface MinitigerHomeSettings {
     genreTagColor: string;
     glowStrength: number;
     glowSize: number;
+    customHomeRowsEnabled: boolean;
     bannerEnabled: boolean;
+    bannerHeightOffset: number;
+    bannerOverlayOffset: number;
+    bannerFadeSize: number;
+    bannerFadeStrength: number;
+    bannerNavigationVisible: boolean;
+    bannerFskVisible: boolean;
     bannerRotationSeconds: BannerRotationSeconds;
     bannerItemLimit: BannerItemLimit;
     cardSize: MinitigerCardSize;
     rowGap: number;
     libraryCardWidth: number;
+    libraryCardGap: number;
+    libraryVirtualGap: number;
     showLibraryNames: boolean;
     showAudioFlags: boolean;
     showFskBadges: boolean;
@@ -143,12 +152,21 @@ export const DEFAULT_HOME_SETTINGS: MinitigerHomeSettings = {
     genreTagColor: '#ffbf00',
     glowStrength: 100,
     glowSize: 20,
+    customHomeRowsEnabled: true,
     bannerEnabled: true,
+    bannerHeightOffset: 0,
+    bannerOverlayOffset: 0,
+    bannerFadeSize: 110,
+    bannerFadeStrength: 92,
+    bannerNavigationVisible: true,
+    bannerFskVisible: true,
     bannerRotationSeconds: 12,
     bannerItemLimit: 10,
     cardSize: 'normal',
     rowGap: 40,
     libraryCardWidth: 280,
+    libraryCardGap: 16,
+    libraryVirtualGap: 64,
     showLibraryNames: false,
     showAudioFlags: true,
     showFskBadges: true,
@@ -240,7 +258,9 @@ const isRotationSeconds = (
     || value === 8
     || value === 12
     || value === 20
-    || value === 30;
+    || value === 30
+    || value === 45
+    || value === 60;
 
 const isPlayedIndicatorShape = (
     value: unknown
@@ -395,7 +415,34 @@ export const normalizeHomeSettings = (
             0,
             40
         ),
+        customHomeRowsEnabled: source.customHomeRowsEnabled !== false,
         bannerEnabled: source.bannerEnabled !== false,
+        bannerHeightOffset: clampNumber(
+            source.bannerHeightOffset,
+            DEFAULT_HOME_SETTINGS.bannerHeightOffset,
+            -140,
+            280
+        ),
+        bannerOverlayOffset: clampNumber(
+            source.bannerOverlayOffset,
+            DEFAULT_HOME_SETTINGS.bannerOverlayOffset,
+            -120,
+            120
+        ),
+        bannerFadeSize: clampNumber(
+            source.bannerFadeSize,
+            DEFAULT_HOME_SETTINGS.bannerFadeSize,
+            0,
+            320
+        ),
+        bannerFadeStrength: clampNumber(
+            source.bannerFadeStrength,
+            DEFAULT_HOME_SETTINGS.bannerFadeStrength,
+            0,
+            100
+        ),
+        bannerNavigationVisible: source.bannerNavigationVisible !== false,
+        bannerFskVisible: source.bannerFskVisible !== false,
         bannerRotationSeconds:
             isRotationSeconds(source.bannerRotationSeconds)
                 ? source.bannerRotationSeconds
@@ -418,6 +465,18 @@ export const normalizeHomeSettings = (
             DEFAULT_HOME_SETTINGS.libraryCardWidth,
             180,
             480
+        ),
+        libraryCardGap: clampNumber(
+            source.libraryCardGap,
+            DEFAULT_HOME_SETTINGS.libraryCardGap,
+            0,
+            48
+        ),
+        libraryVirtualGap: clampNumber(
+            source.libraryVirtualGap,
+            DEFAULT_HOME_SETTINGS.libraryVirtualGap,
+            -120,
+            180
         ),
         showLibraryNames: source.showLibraryNames === true,
         showAudioFlags: source.showAudioFlags !== false,

@@ -1,59 +1,82 @@
 #!/usr/bin/env bash
 set -euo pipefail
+cd "$HOME/minitiger-web"
 
-fail() { echo "[FAIL] $*" >&2; exit 1; }
-ok()   { echo "[ OK ] $*"; }
+MODEL='src/apps/modern/routes/minitiger/home/config/homeSettings.ts'
+PANEL='src/apps/modern/routes/minitiger/home/components/MinitigerSettingsPanel.tsx'
+HERO='src/apps/modern/routes/minitiger/home/components/MinitigerHero.tsx'
+HOME='src/apps/modern/routes/minitiger/home/MinitigerHome.tsx'
+CSS='src/apps/modern/routes/minitiger/home/MinitigerHome.scss'
+DETAIL_CSS='src/apps/modern/routes/minitiger/details/MinitigerVideoDetails.scss'
+DETAILS='src/apps/modern/routes/minitiger/details/MinitigerVideoDetails.tsx'
+TOOLBAR='src/apps/modern/components/AppToolbar/index.tsx'
+VANILLA='src/apps/modern/routes/minitiger/home/components/MinitigerVanillaHomeSections.tsx'
+BUILDER='src/apps/modern/routes/minitiger/home/components/MinitigerHomeBuilderSettings.tsx'
 
-[[ -f package.json ]] || fail "package.json fehlt – Patch im Repo-Root ausführen."
-grep -q '"version": "12.1.0"' package.json || fail "Jellyfin-Web-Basis ist nicht 12.1.0."
-ok "Jellyfin-Web-Basis 12.1.0 erkannt"
+ok() { printf '[OK] %s\n' "$1"; }
+fail() { printf '[FAIL] %s\n' "$1" >&2; exit 1; }
 
-WF='.github/workflows/minitiger-plugin-release.yml'
-[[ -f "$WF" ]] || fail "$WF fehlt"
-grep -q '^name: Release Minitiger Virtual Sync Plugin' "$WF" || fail "Falscher Plugin-Release-Workflow"
+for f in "$MODEL" "$PANEL" "$HERO" "$HOME" "$CSS" "$DETAIL_CSS" "$DETAILS" "$TOOLBAR" "$VANILLA" "$BUILDER" .gitignore; do
+    [[ -f "$f" ]] || fail "Missing $f"
+done
 
-grep -q 'ARCHIVE_NAME=Minitiger.VirtualSync_\$VERSION.zip' "$WF" || fail "ARCHIVE_NAME wird nicht gesetzt"
-if grep -Eq '(^|[[:space:]])ZIP=' "$WF"; then
-  fail "Reservierte Info-ZIP-Umgebungsvariable ZIP wird noch gesetzt"
+# Optional custom home + independent hero.
+grep -q 'customHomeRowsEnabled' "$MODEL" || fail 'custom home switch missing'
+grep -q 'MinitigerVanillaHomeSections' "$VANILLA" || fail 'vanilla home fallback missing'
+grep -q 'showNavigation' "$HERO" || fail 'banner navigation toggle missing'
+grep -q 'showFsk' "$HERO" || fail 'banner FSK toggle missing'
+ok 'optional custom home / independent banner'
+
+# Banner controls and extra rotation times.
+for token in bannerHeightOffset bannerOverlayOffset bannerFadeSize bannerFadeStrength; do
+    grep -q "$token" "$MODEL" || fail "missing $token"
+done
+grep -q '45 Sekunden' "$PANEL" || fail '45 second rotation missing'
+grep -q '60 Sekunden' "$PANEL" || fail '60 second rotation missing'
+grep -q 'minitigerHeroMediaLayer' "$HERO" || fail 'composited transparent hero media layer missing'
+ok 'banner size/position/fade/navigation controls'
+
+# Main library gaps, including confirmed negative main -> virtual range.
+grep -q 'libraryCardGap' "$MODEL" || fail 'main library card gap missing'
+grep -q 'libraryVirtualGap' "$MODEL" || fail 'main -> virtual gap missing'
+grep -A7 'libraryVirtualGap: clampNumber' "$MODEL" | grep -q -- '-120' || fail 'main -> virtual minimum is not -120'
+grep -B4 -A9 'value={settings.libraryVirtualGap}' "$PANEL" | grep -q "min='-120'" || fail 'main -> virtual UI minimum is not -120'
+grep -q 'margin-top: var(--mt-library-virtual-gap, 64px)' "$CSS" || fail 'main -> virtual CSS wiring missing'
+ok 'library gaps'
+
+# Glow preview is live and Glow size no longer controls layout spacing.
+grep -q 'previewGlowStrength={settings.glowStrength}' "$PANEL" || fail 'live Glow strength preview missing'
+grep -q 'previewGlowSize={settings.glowSize}' "$PANEL" || fail 'live Glow size preview missing'
+grep -q -- '--mt-glow-layout-reserve: 72px' "$CSS" || fail 'fixed Glow layout reserve missing'
+TAIL="$(tail -n 150 "$CSS")"
+if printf '%s' "$TAIL" | grep -q -- 'mt-glow-size'; then
+    fail 'final Glow layout guards still depend on Glow size'
 fi
-if grep -q '\$ZIP' "$WF"; then
-  fail "Alte \$ZIP-Referenz ist noch vorhanden"
+ok 'Glow preview and layout spacing are decoupled'
+
+# Cast retry experiment must be completely gone.
+for token in IMAGE_REFRESH_STORAGE_KEY imageRefreshToken setImageRefreshToken MinitigerPersonImage minitiger:refresh-images refreshMinitigerImages imageRefreshMessage; do
+    if grep -q "$token" "$DETAILS" "$PANEL"; then
+        fail "stale cast image-refresh experiment remains: $token"
+    fi
+done
+ok 'cast image-refresh experiment removed'
+
+# Public release cleanup/version.
+grep -q '🐯 Minitiger Native · Phase 18.7.0' "$HOME" || fail 'footer is not Phase 18.7.0'
+if grep -q 'PHASE 18\.6\.[0-9].*TEST' "$CSS" "$DETAIL_CSS"; then
+    fail 'old 18.6 TEST source comment remains'
 fi
-ok "Reservierte ZIP-Variable vollständig entfernt"
+grep -Fxq 'Minitiger_Gedaechtnis/' .gitignore || fail 'Minitiger_Gedaechtnis is not ignored'
+grep -Fxq '.phase18_*_test_backup/' .gitignore || fail 'test backup directories are not ignored'
+for f in APPLY_TEST_PATCH.py ROLLBACK_TEST_PATCH.py CHANGELOG_Minitiger_Web_TEST.txt; do
+    [[ ! -e "$f" ]] || fail "test helper still exists: $f"
+done
+ok 'public release cleanup'
 
-grep -q 'zip -9 "\$RUNNER_TEMP/\$ARCHIVE_NAME"' "$WF" || fail "Archiv wird nicht mit ARCHIVE_NAME gebaut"
-grep -q 'test -s "\$RUNNER_TEMP/\$ARCHIVE_NAME"' "$WF" || fail "Archiv-Existenzprüfung fehlt"
-grep -q 'md5sum "\$RUNNER_TEMP/\$ARCHIVE_NAME"' "$WF" || fail "MD5 nutzt nicht ARCHIVE_NAME"
-grep -q 'releases/download/\${TAG}/\${ARCHIVE_NAME}' "$WF" || fail "Source URL nutzt nicht ARCHIVE_NAME"
-grep -q 'gh release create "\$TAG" "\$RUNNER_TEMP/\$ARCHIVE_NAME"' "$WF" || fail "GitHub Release nutzt nicht ARCHIVE_NAME"
-ok "Release-Archivpfad ist in allen Schritten konsistent"
+git diff --check || fail 'git diff --check reported whitespace errors'
+ok 'git diff --check'
 
-# Kleine lokale Regression: Info-ZIP reserviert die Variable ZIP. Mit ARCHIVE_NAME
-# darf der Workflow-Ansatz trotzdem exakt am gewünschten Pfad erzeugen.
-if command -v zip >/dev/null 2>&1; then
-  tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' EXIT
-  printf 'test\n' > "$tmp/plugin.dll"
-  (
-    cd "$tmp"
-    export ARCHIVE_NAME='Minitiger.VirtualSync_test.zip'
-    zip -q -9 "$tmp/$ARCHIVE_NAME" plugin.dll
-  )
-  [[ -s "$tmp/Minitiger.VirtualSync_test.zip" ]] || fail "Lokaler ARCHIVE_NAME-ZIP-Test fehlgeschlagen"
-  ok "Lokaler ZIP-Pfadtest erfolgreich"
-  rm -rf "$tmp"
-  trap - EXIT
-else
-  echo "[WARN] zip lokal nicht installiert; nur Workflow-Textprüfung durchgeführt."
-fi
-
-branch=$(git branch --show-current 2>/dev/null || true)
-if [[ "$branch" == "minitiger-v12.1" ]]; then
-  ok "Branch minitiger-v12.1"
-else
-  echo "[WARN] Aktueller Branch ist '${branch:-unbekannt}', erwartet wird minitiger-v12.1."
-fi
-
-echo
-echo "Phase 18.5.1 ist statisch verifiziert."
-echo "Der echte GitHub Release-Workflow muss anschließend erneut mit 1.0.3.0 getestet werden."
+printf '\n[18.7.0 PUBLIC] Verification passed.\n'
+printf 'UI behavior was already user-confirmed through Phase 18.6.9 TEST.\n'
+printf 'Next: untrack Minitiger_Gedaechtnis, stage the listed public files, commit, then push.\n'

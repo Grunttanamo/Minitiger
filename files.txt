@@ -1,6 +1,26 @@
-.github/workflows/minitiger-plugin-release.yml
-INSTALL.txt
-CHANGELOG_Minitiger_Web.txt
-files.txt
-VERIFY_PATCH.sh
-Minitiger_Gedaechtnis/
+Phase 18.7.0 PUBLIC RELEASE – Finalisierung des bestätigten 18.6.9-Teststands
+
+Patch-Inhalt:
+- FINALIZE_PUBLIC_RELEASE.py
+- VERIFY_PATCH.sh
+- INSTALL.txt
+- CHANGELOG_Minitiger_Web.txt
+- files.txt
+- Minitiger_Gedaechtnis/CURRENT_STATE.md  (lokal/ignored; NICHT committen)
+
+Vom bereits installierten 18.6.x-Teststand für den GitHub-Commit relevant:
+- .gitignore
+- src/apps/modern/components/AppToolbar/index.tsx
+- src/apps/modern/routes/minitiger/details/MinitigerVideoDetails.tsx
+- src/apps/modern/routes/minitiger/details/MinitigerVideoDetails.scss
+- src/apps/modern/routes/minitiger/home/MinitigerHome.tsx
+- src/apps/modern/routes/minitiger/home/MinitigerHome.scss
+- src/apps/modern/routes/minitiger/home/config/homeSettings.ts
+- src/apps/modern/routes/minitiger/home/components/MinitigerHero.tsx
+- src/apps/modern/routes/minitiger/home/components/MinitigerHomeBuilderSettings.tsx
+- src/apps/modern/routes/minitiger/home/components/MinitigerSettingsPanel.tsx
+- src/apps/modern/routes/minitiger/home/components/MinitigerVanillaHomeSections.tsx
+
+GitHub-Cleanup:
+- Minitiger_Gedaechtnis/ wird per `git rm -r --cached` aus dem aktuellen GitHub-Baum entfernt.
+- Lokal bleibt der Ordner bestehen und wird durch .gitignore geschützt.

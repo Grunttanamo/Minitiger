@@ -101,6 +101,7 @@ const MinitigerVideoDetails = () => {
         __legacyApiClient__: apiClient
     } = useApi();
 
+
     const {
         settings
     } = useMinitigerHomeSettings();

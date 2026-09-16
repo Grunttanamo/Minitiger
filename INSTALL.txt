@@ -1,49 +1,74 @@
-MINITIGER WEB – PHASE 18.5.1
-Plugin Release ZIP Hotfix
+MINITIGER WEB – PHASE 18.7.0 PUBLIC RELEASE
 
 VORAUSSETZUNG
 - Branch: minitiger-v12.1
-- Phase 18.5.0 ist eingespielt.
-- `Build Minitiger Virtual Sync Plugin` war grün.
-- Der erste Release-Versuch `1.0.3.0` ist vor der GitHub-Release-Erstellung beim MD5-Schritt fehlgeschlagen.
+- Die lokalen Testphasen 18.6.0 bis 18.6.9 wurden nacheinander eingespielt.
+- Phase 18.6.9 wurde vom Nutzer unter Dev-Server/Client bestätigt.
+- Dieser Patch ist die PUBLIC/GITHUB-Finalisierung des bereits getesteten Arbeitsstands.
 
-INSTALLATION AUF DEM RASPBERRY PI
+WICHTIG
+- Dieser Patch baut die 18.6.x-UI NICHT erneut von Null auf.
+- Er erwartet den bestätigten lokalen 18.6.9-Arbeitsstand und finalisiert ihn für GitHub.
+- `Minitiger_Gedaechtnis/` bleibt lokal, wird aber aus dem Git-Tracking entfernt und künftig ignoriert.
+
+INSTALLATION / FINALISIERUNG
 
 1) Repository öffnen:
    cd ~/minitiger-web
 
 2) Patch entpacken:
-   unzip -o ~/minitiger_native_phase18_5_1_plugin_release_zip_hotfix.zip -d ~/minitiger-web
+   unzip -o ~/minitiger_native_phase18_7_0_PUBLIC_RELEASE.zip -d ~/minitiger-web
 
-3) Prüfen:
-   chmod +x VERIFY_PATCH.sh
+3) Public-Finalisierung ausführen:
+   chmod +x FINALIZE_PUBLIC_RELEASE.py VERIFY_PATCH.sh
+   python3 FINALIZE_PUBLIC_RELEASE.py
    ./VERIFY_PATCH.sh
 
-4) Commit + Push:
-   git add .github/workflows/minitiger-plugin-release.yml \
-     INSTALL.txt CHANGELOG_Minitiger_Web.txt files.txt VERIFY_PATCH.sh \
-     Minitiger_Gedaechtnis
+4) Gedächtnis aus dem Git-Tracking entfernen (lokale Dateien bleiben erhalten):
+   git rm -r --cached --ignore-unmatch Minitiger_Gedaechtnis
 
-   git commit -m "Fix Minitiger plugin release archive"
-   git push
+5) Optional prüfen, dass der Ordner lokal weiterhin existiert:
+   ls -la Minitiger_Gedaechtnis
 
-ERNEUTER RELEASE-TEST
-GitHub -> Minitiger -> Actions -> Release Minitiger Virtual Sync Plugin
--> Run workflow
+6) Finalizer-Helfer lokal entfernen (wird nicht committed):
+   rm -f FINALIZE_PUBLIC_RELEASE.py
 
-Branch:
-  minitiger-v12.1
+7) Öffentliche 18.7.0-Dateien stagen:
+   git add .gitignore \
+     CHANGELOG_Minitiger_Web.txt INSTALL.txt files.txt VERIFY_PATCH.sh \
+     src/apps/modern/components/AppToolbar/index.tsx \
+     src/apps/modern/routes/minitiger/details/MinitigerVideoDetails.tsx \
+     src/apps/modern/routes/minitiger/details/MinitigerVideoDetails.scss \
+     src/apps/modern/routes/minitiger/home/MinitigerHome.tsx \
+     src/apps/modern/routes/minitiger/home/MinitigerHome.scss \
+     src/apps/modern/routes/minitiger/home/config/homeSettings.ts \
+     src/apps/modern/routes/minitiger/home/components/MinitigerHero.tsx \
+     src/apps/modern/routes/minitiger/home/components/MinitigerHomeBuilderSettings.tsx \
+     src/apps/modern/routes/minitiger/home/components/MinitigerSettingsPanel.tsx \
+     src/apps/modern/routes/minitiger/home/components/MinitigerVanillaHomeSections.tsx
 
-Version:
-  1.0.3.0
+8) Kontrollieren, WAS zu GitHub gehen wird:
+   git status --short
+   git diff --cached --stat
 
-Changelog:
-  Initial public Minitiger plugin repository release for Jellyfin 12.1.
+   Erwartet:
+   - 18.6.x UI-Änderungen / neuer Vanilla-Home-Wrapper
+   - 18.7.0 Changelog/Install/Verifier/.gitignore
+   - `D  Minitiger_Gedaechtnis/...` als Entfernung AUS GITHUB
+   - KEINE `.phase18_*_test_backup/`-Ordner
+   - KEINE APPLY_TEST_PATCH.py / ROLLBACK_TEST_PATCH.py
 
-WICHTIG
-- Derselbe Versionswert `1.0.3.0` kann erneut verwendet werden, weil der fehlgeschlagene Lauf den Schritt `Create GitHub release` nie erreicht hat.
-- Wenn der Workflow grün wird, anschließend prüfen:
-  1. GitHub Release `plugin-v1.0.3.0` existiert.
-  2. Release enthält `Minitiger.VirtualSync_1.0.3.0.zip`.
-  3. `plugin-repository/manifest.json` enthält Version `1.0.3.0`.
-  4. Plugin im Jellyfin Catalog sichtbar/installierbar.
+9) Commit:
+   git commit -m "Release Minitiger Web 18.7.0 UI controls"
+
+10) Push:
+    git push
+
+DANACH
+- GitHub Actions sollte den Minitiger Sidecar wegen der geänderten Web-Source neu bauen.
+- Erst nach grünem Workflow ist `ghcr.io/grunttanamo/minitiger-web:latest` auf dem neuen Public-Stand.
+- Das Virtual-Sync-Plugin bleibt bei 1.0.3.0 und muss für dieses UI-Release nicht neu veröffentlicht werden.
+
+HINWEIS ZUM GITHUB-GEDÄCHTNIS
+- Die Dateien verschwinden mit diesem Commit aus dem aktuellen Branch/Dateibaum.
+- Frühere Commits enthalten sie weiterhin. Für eine vollständige Löschung aus der gesamten Git-Historie wäre ein separater History-Rewrite + Force-Push nötig.

@@ -19,6 +19,7 @@ import type { ItemDto } from 'types/base/models/item-dto';
 
 import MinitigerCustomRow from './components/MinitigerCustomRow';
 import MinitigerHero from './components/MinitigerHero';
+import MinitigerVanillaHomeSections from './components/MinitigerVanillaHomeSections';
 import MinitigerMediaRow from './components/MinitigerMediaRow';
 import MinitigerSettingsPanel from './components/MinitigerSettingsPanel';
 import MinitigerVirtualAssignModal from './components/MinitigerVirtualAssignModal';
@@ -733,6 +734,16 @@ const MinitigerHome = () => {
         '--mt-played-indicator-font-size':
             `${settings.playedIndicatorFontSize}px`,
         '--mt-row-gap': `${settings.rowGap}px`,
+        '--mt-library-card-gap': `${settings.libraryCardGap}px`,
+        '--mt-library-virtual-gap': `${settings.libraryVirtualGap}px`,
+        '--mt-banner-height-offset': `${settings.bannerHeightOffset}px`,
+        '--mt-banner-content-shift': `${Math.max(0, Math.round(settings.bannerHeightOffset * 0.62))}px`,
+        '--mt-banner-fsk-shift': `${Math.max(0, Math.round(settings.bannerHeightOffset * 0.70))}px`,
+        '--mt-banner-nav-shift': `${Math.max(0, Math.round(settings.bannerHeightOffset * 0.78))}px`,
+        '--mt-banner-overlay-offset': `${settings.bannerOverlayOffset}px`,
+        '--mt-banner-fade-size': `${settings.bannerFadeSize}px`,
+        '--mt-banner-fade-strength': `${settings.bannerFadeStrength}%`,
+        '--mt-banner-fade-end-opacity': `${100 - settings.bannerFadeStrength}%`,
         '--mt-library-card-width': `${settings.libraryCardWidth}px`,
         '--mt-virtual-card-width':
             `${virtualConfig.homeCardWidth}px`,
@@ -749,7 +760,14 @@ const MinitigerHome = () => {
     return (
         <Page
             id='indexPage'
-            className='mainAnimatedPage homePage minitigerHome'
+            className={[
+                'mainAnimatedPage',
+                'homePage',
+                'minitigerHome',
+                !settings.customHomeRowsEnabled && !activeVirtualLibrary
+                    ? 'libraryPage allLibraryPage pageWithAbsoluteTabs withTabs minitigerVanillaRowsMode'
+                    : ''
+            ].filter(Boolean).join(' ')}
             isBackButtonEnabled={false}
             style={homeStyle}
             data-card-size={settings.cardSize}
@@ -760,6 +778,7 @@ const MinitigerHome = () => {
             data-show-played={settings.showPlayedIndicators}
             data-show-library-names={settings.showLibraryNames}
             data-side-row-titles={settings.sideRowTitlesEnabled}
+            data-custom-home={settings.customHomeRowsEnabled}
         >
             {!activeVirtualLibrary && settings.bannerEnabled && (
                 <MinitigerHero
@@ -769,6 +788,8 @@ const MinitigerHome = () => {
                     maxItems={settings.bannerItemLimit}
                     debugEnabled={settings.trailerDebugEnabled}
                     youtubeTrailersEnabled={settings.youtubeTrailersEnabled}
+                    showNavigation={settings.bannerNavigationVisible}
+                    showFsk={settings.bannerFskVisible}
                 />
             )}
 
@@ -781,6 +802,8 @@ const MinitigerHome = () => {
                         isAssigned={isVirtuallyAssigned}
                         onAssign={setAssignTarget}
                     />
+                ) : !settings.customHomeRowsEnabled ? (
+                    <MinitigerVanillaHomeSections />
                 ) : (<>
 
                 {settings.visibleSections.libraries
@@ -793,7 +816,7 @@ const MinitigerHome = () => {
                 ))}
 
                 <footer className='minitigerDevFooter'>
-                    🐯 Minitiger Native · Phase 18.3.1
+                    🐯 Minitiger Native · Phase 18.7.0
                 </footer>
                 </>)}
             </div>

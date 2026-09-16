@@ -47,13 +47,17 @@ interface MinitigerHeroProps {
     maxItems?: number;
     debugEnabled?: boolean;
     youtubeTrailersEnabled?: boolean;
+    showNavigation?: boolean;
+    showFsk?: boolean;
 }
 
 const MinitigerHero = ({
     autoRotateMs = 12000,
     maxItems = 10,
     debugEnabled = true,
-    youtubeTrailersEnabled = true
+    youtubeTrailersEnabled = true,
+    showNavigation = true,
+    showFsk = true
 }: MinitigerHeroProps) => {
     const {
         __legacyApiClient__: apiClient
@@ -384,7 +388,8 @@ const MinitigerHero = ({
         <section
             className='minitigerHero'
         >
-            <div className='minitigerHeroBackdrop'>
+            <div className='minitigerHeroMediaLayer'>
+                <div className='minitigerHeroBackdrop'>
                 {backdropUrl && !backdropFailed && (
                     <img
                         key={`${heroItem.Id}-backdrop`}
@@ -402,9 +407,14 @@ const MinitigerHero = ({
                     onLoadingChange={setTrailerLoading}
                     allowYouTube={youtubeTrailersEnabled}
                 />
-            </div>
+                </div>
 
-            <div className='minitigerHeroShade' />
+                <div className='minitigerHeroShade' />
+            </div>
+            <div
+                className='minitigerHeroBottomFade'
+                aria-hidden='true'
+            />
 
             <div className='minitigerHeroContent'>
                 <div className='minitigerHeroLogoHost'>
@@ -528,13 +538,13 @@ const MinitigerHero = ({
                 </div>
             </div>
 
-            {ratingLabel && (
+            {showFsk && ratingLabel && (
                 <div className='minitigerHeroFskFloating'>
                     {ratingLabel}
                 </div>
             )}
 
-            {candidates.length > 1 && (
+            {showNavigation && candidates.length > 1 && (
                 <div className='minitigerHeroNavigation'>
                     <button
                         type='button'

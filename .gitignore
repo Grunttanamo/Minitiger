@@ -21,3 +21,11 @@ config.json
 
 # environment related
 .envrc
+
+# Minitiger local-only project data
+Minitiger_Gedaechtnis/
+.phase18_*_test_backup/
+
+# Python cache
+__pycache__/
+*.py[cod]

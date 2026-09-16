@@ -55,10 +55,22 @@ const AppToolbar: FC<AppToolbarProps> = ({
                             color: 'inherit',
                             borderRadius: '50%',
                             fontSize: '1.25rem',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            alignSelf: 'center',
+                            margin: 0,
+                            lineHeight: 1
                         }}
                     >
-                        ⚙
+                        <span
+                            aria-hidden='true'
+                            style={{
+                                display: 'block',
+                                lineHeight: 1,
+                                transform: 'translateY(1px)'
+                            }}
+                        >
+                            ⚙
+                        </span>
                     </button>
                     <SyncPlayButton />
                     <RemotePlayButton />

@@ -4550,3 +4550,493 @@ iframe.minitigerInlineTrailer {
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_3_6_UNIFIED_ROW_GAP */
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - OPTIONAL HOME + HERO SIZE
+   ========================================================= */
+.minitigerHome {
+    --mt-banner-height-offset: 0px;
+}
+
+.minitigerHome .minitigerHero {
+    height: clamp(
+        calc(390px + var(--mt-banner-height-offset)),
+        calc(31vw + var(--mt-banner-height-offset)),
+        calc(640px + var(--mt-banner-height-offset))
+    );
+    min-height: 0;
+    margin-bottom: calc(
+        2.2rem - max(0px, var(--mt-banner-height-offset))
+    );
+    z-index: 1;
+}
+
+.minitigerHomeContent {
+    position: relative;
+    z-index: 6;
+}
+
+.minitigerHome[data-custom-home='false'] .minitigerHomeContent {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.minitigerVanillaHomeHost {
+    position: relative;
+    z-index: 6;
+}
+
+.minitigerHomeBuilderDisabledScope {
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.minitigerHomeBuilderDisabledScope:disabled {
+    opacity: 0.42;
+    filter: saturate(0.55);
+}
+
+.minitigerHomeBuilderDisabledScope:disabled * {
+    cursor: not-allowed !important;
+}
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - HERO OVERLAY ANCHOR + ADJUSTABLE FADE
+   ========================================================= */
+.minitigerHome {
+    --mt-banner-content-shift: 0px;
+    --mt-banner-fsk-shift: 0px;
+    --mt-banner-nav-shift: 0px;
+    --mt-banner-fade-size: 110px;
+    --mt-banner-fade-strength: 92%;
+}
+
+/* 18.6.0 enlarged the physical hero downward while keeping the library row
+   in place. Counter that extra growth for the overlay UI so logo/text/buttons
+   on the left and FSK/navigation on the right never sink into the library row. */
+.minitigerHome .minitigerHeroContent {
+    transform: translateY(calc(-1 * var(--mt-banner-content-shift)));
+}
+
+.minitigerHome .minitigerHeroFskFloating {
+    transform: translateY(calc(-1 * var(--mt-banner-fsk-shift)));
+}
+
+.minitigerHome .minitigerHeroNavigation {
+    transform: translateY(calc(-1 * var(--mt-banner-nav-shift)));
+}
+
+/* The original hero had a hard-coded mask fade. Disable it here so the two
+   sliders below are the single source of truth and content/buttons stay crisp. */
+.minitigerHome .minitigerHero {
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+.minitigerHeroBottomFade {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--mt-banner-fade-size);
+    pointer-events: none;
+    background: linear-gradient(
+        180deg,
+        transparent 0%,
+        color-mix(
+            in srgb,
+            #08090b var(--mt-banner-fade-strength),
+            transparent
+        ) 100%
+    );
+}
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - TRUE TRANSPARENT HERO FADE
+   ========================================================= */
+.minitigerHome {
+    --mt-banner-fade-end-opacity: 8%;
+}
+
+/* The hero box itself must not paint an opaque dark background in the fade
+   area. The backdrop layer already owns the fallback background and artwork. */
+.minitigerHome .minitigerHero {
+    background: transparent;
+}
+
+/* Fade the actual banner media + its cinematic shade by alpha. This lets the
+   home background / media-library row underneath show through naturally.
+   Size controls where the fade begins; strength controls final opacity:
+   0% strength => fully opaque, 100% => fully transparent at the bottom. */
+.minitigerHome .minitigerHeroBackdrop,
+.minitigerHome .minitigerHeroShade {
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgb(0 0 0 / 100%) 0,
+        rgb(0 0 0 / 100%) calc(100% - var(--mt-banner-fade-size)),
+        rgb(0 0 0 / var(--mt-banner-fade-end-opacity)) 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        rgb(0 0 0 / 100%) 0,
+        rgb(0 0 0 / 100%) calc(100% - var(--mt-banner-fade-size)),
+        rgb(0 0 0 / var(--mt-banner-fade-end-opacity)) 100%
+    );
+}
+
+/* 18.6.1 used a dark overlay gradient. Disable it: the fade is now genuine
+   transparency and does not darken the picture artificially. */
+.minitigerHome .minitigerHeroBottomFade {
+    display: none;
+}
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - COMPOSITED TRANSPARENT HERO FADE
+   ========================================================= */
+/* Backdrop/trailer and the cinematic dark shade must fade as ONE composed
+   picture. Masking them individually made the shade vanish during the fade,
+   briefly exposing a much brighter image and producing a horizontal band. */
+.minitigerHome .minitigerHeroMediaLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        rgb(0 0 0 / 100%) 0,
+        rgb(0 0 0 / 100%) calc(100% - var(--mt-banner-fade-size)),
+        rgb(0 0 0 / var(--mt-banner-fade-end-opacity)) 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        rgb(0 0 0 / 100%) 0,
+        rgb(0 0 0 / 100%) calc(100% - var(--mt-banner-fade-size)),
+        rgb(0 0 0 / var(--mt-banner-fade-end-opacity)) 100%
+    );
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+}
+
+/* Child layers are no longer faded independently. Their shading relationship
+   stays intact all the way through the transparency transition. */
+.minitigerHome .minitigerHeroMediaLayer .minitigerHeroBackdrop,
+.minitigerHome .minitigerHeroMediaLayer .minitigerHeroShade {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+}
+
+/* Preserve original internal layer order inside the new media wrapper. */
+.minitigerHome .minitigerHeroMediaLayer .minitigerHeroBackdrop {
+    z-index: 1;
+}
+
+.minitigerHome .minitigerHeroMediaLayer .minitigerHeroShade {
+    z-index: 2;
+}
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - UI POLISH / SETTINGS / LIBRARY GAP
+   ========================================================= */
+.minitigerHome {
+    --mt-library-card-gap: 16px;
+    --mt-banner-overlay-offset: 0px;
+}
+
+/* Positive banner growth may visually extend behind the media libraries.
+   The automatic anchor keeps the overlay lower than 18.6.1, while the new
+   settings slider provides a final per-user vertical trim. */
+.minitigerHome .minitigerHeroContent {
+    transform: translateY(calc(
+        -1 * var(--mt-banner-content-shift)
+        + var(--mt-banner-overlay-offset)
+    ));
+}
+
+.minitigerHome .minitigerHeroFskFloating {
+    transform: translateY(calc(
+        -1 * var(--mt-banner-fsk-shift)
+        + var(--mt-banner-overlay-offset)
+    ));
+}
+
+.minitigerHome .minitigerHeroNavigation {
+    transform: translateY(calc(
+        -1 * var(--mt-banner-nav-shift)
+        + var(--mt-banner-overlay-offset)
+    ));
+}
+
+/* Main/original media-library spacing now behaves like virtual libraries. */
+.minitigerHome .minitigerLibraryGrid {
+    gap: var(--mt-library-card-gap) !important;
+}
+
+/* Settings cards become compact collapsible groups. */
+.minitigerSettingsCard > .minitigerSettingsCardToggle {
+    position: relative;
+    margin: 0 0 0.8rem;
+    padding-right: 2rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.minitigerSettingsCard > .minitigerSettingsCardToggle::after {
+    content: '⌃';
+    position: absolute;
+    top: 50%;
+    right: 0.2rem;
+    transform: translateY(-50%);
+    opacity: 0.68;
+    font-size: 1.05rem;
+}
+
+.minitigerSettingsCard.isCollapsed > .minitigerSettingsCardToggle {
+    margin-bottom: 0;
+}
+
+.minitigerSettingsCard.isCollapsed > .minitigerSettingsCardToggle::after {
+    content: '⌄';
+}
+
+.minitigerSettingsCard.isCollapsed > :not(.minitigerSettingsCardToggle) {
+    display: none !important;
+}
+
+.minitigerColorSetting > .minitigerColorPreview {
+    width: 100%;
+    min-height: 3.45rem;
+    box-sizing: border-box;
+    display: flex !important;
+    grid-template-columns: none !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.55rem;
+    margin-top: 0.35rem;
+    padding: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.035),
+            rgba(0, 0, 0, 0.24)
+        );
+    overflow: hidden;
+}
+
+.minitigerColorExampleButton {
+    min-height: 2.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.42rem 0.8rem;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.35);
+}
+
+.minitigerColorExampleButton.isHoverPreview {
+    transform: translateY(-1px);
+    box-shadow:
+        0 3px 10px rgba(0, 0, 0, 0.42),
+        0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+}
+
+.minitigerColorExampleNavigation {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.minitigerColorExampleNavigation i {
+    width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    font-style: normal;
+    font-size: 1.35rem;
+    font-weight: 900;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, 0.35);
+}
+
+.minitigerColorExampleNavigation b {
+    min-width: 2.7rem;
+    padding: 0.38rem 0.45rem;
+    border-radius: 5px;
+    background: rgba(7, 8, 11, 0.76);
+    color: #eee;
+    text-align: center;
+    font-size: 0.68rem;
+}
+
+.minitigerColorExampleGenre {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.9rem;
+    padding: 0.24rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 850;
+}
+
+.minitigerColorExampleLibraryBar {
+    min-width: 9rem;
+    min-height: 2.25rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.8rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 950;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.minitigerColorExampleLibraryBar.isTextPreview {
+    background:
+        linear-gradient(
+            135deg,
+            #23272d,
+            #0f1114
+        );
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.minitigerColorExampleMeta {
+    max-width: 100%;
+    padding: 0.4rem 0.55rem;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    font-size: 0.72rem;
+    font-weight: 800;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.minitigerColorExampleGlow {
+    min-width: 10rem;
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 0.9rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.minitigerColorExampleGlow i {
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background:
+        radial-gradient(circle at 72% 28%, #a6c9ff 0 12%, transparent 13%),
+        linear-gradient(145deg, #374355 0 35%, #171b22 36% 58%, #69523a 59% 100%);
+}
+
+.minitigerColorExampleGlow .isPoster {
+    width: 2.25rem;
+    height: 3.35rem;
+    border-radius: 4px;
+}
+
+.minitigerColorExampleGlow .isLandscape {
+    width: 5rem;
+    height: 2.8rem;
+    border-radius: 4px;
+}
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - REAL COLOR PREVIEWS / CAST RETRY REMOVED
+   ========================================================= */
+/* Phase marker only; functional preview styles replace the 18.6.4 block. */
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - COMPILE REPAIR / GLOW SPACING DECOUPLE
+   ========================================================= */
+/* Reserve enough scrollport breathing room for the MAX configured glow once.
+   Changing Glow size now changes only the aura, never row/library spacing. */
+.minitigerHome {
+    --mt-glow-layout-reserve: 72px;
+}
+
+.minitigerHome[data-glow-enabled='true'] .minitigerVirtualHomeRow {
+    padding-top:
+        calc(var(--mt-glow-layout-reserve) + 0.65rem) !important;
+    padding-bottom:
+        calc(var(--mt-glow-layout-reserve) + 0.85rem) !important;
+    margin-top:
+        calc(-1 * var(--mt-glow-layout-reserve)) !important;
+    margin-bottom:
+        calc(-1 * var(--mt-glow-layout-reserve)) !important;
+}
+
+.minitigerHome[data-glow-enabled='true'] .minitigerMediaRow {
+    padding-top:
+        calc(30px + var(--mt-glow-layout-reserve)) !important;
+    padding-bottom:
+        calc(31px + var(--mt-glow-layout-reserve)) !important;
+    margin-top:
+        calc(-30px - var(--mt-glow-layout-reserve)) !important;
+    margin-bottom:
+        calc(-30px - var(--mt-glow-layout-reserve)) !important;
+}
+
+.minitigerHome[data-glow-enabled='true'] .minitigerLibraryGrid {
+    padding-top:
+        calc(1.2rem + var(--mt-glow-layout-reserve)) !important;
+    padding-bottom:
+        calc(1.1rem + var(--mt-glow-layout-reserve)) !important;
+    margin-top:
+        calc(-1 * var(--mt-glow-layout-reserve)) !important;
+    margin-bottom:
+        calc(-1 * var(--mt-glow-layout-reserve)) !important;
+}
+
+/* Side-title mode gets the same fixed reserve horizontally, so Glow size
+   cannot alter the apparent left/right spacing either. */
+.minitigerHome[data-side-row-titles='true'][data-glow-enabled='true']
+.minitigerMediaRow,
+.minitigerHome[data-side-row-titles='true'][data-glow-enabled='true']
+.minitigerVirtualHomeRow {
+    padding-left:
+        calc(0.25rem + var(--mt-glow-layout-reserve)) !important;
+    padding-right:
+        calc(0.25rem + var(--mt-glow-layout-reserve)) !important;
+    margin-left:
+        calc(-1 * var(--mt-glow-layout-reserve)) !important;
+    margin-right:
+        calc(-1 * var(--mt-glow-layout-reserve)) !important;
+    width:
+        calc(100% + var(--mt-glow-layout-reserve) + var(--mt-glow-layout-reserve)) !important;
+}
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - MAIN -> VIRTUAL LIBRARY GAP
+   ========================================================= */
+/* Only take over spacing when a virtual row is directly adjacent. This keeps
+   system/custom row spacing independent while making 0px genuinely compact. */
+.minitigerLibrarySection:has(+ .minitigerVirtualHomeSection) {
+    margin-bottom: 0 !important;
+}
+
+.minitigerLibrarySection + .minitigerVirtualHomeSection {
+    margin-top: var(--mt-library-virtual-gap, 64px) !important;
+}

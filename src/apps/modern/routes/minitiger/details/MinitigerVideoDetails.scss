@@ -2238,3 +2238,35 @@ a.minitigerDetailsParentTitle:focus-visible {
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_3_4_DETAIL_AUDIO_MENUS */
+
+
+/* PHASE 18.7.0 PUBLIC - season switcher / rail navigation alignment */
+.minitigerVideoDetailsPage .minitigerDetailsSectionHead select {
+    transform: translateY(-0.65rem);
+}
+
+@media (max-width: 680px) {
+    .minitigerVideoDetailsPage .minitigerDetailsSectionHead select {
+        transform: translateY(-0.55rem);
+    }
+}
+
+
+/* =========================================================
+   PHASE 18.7.0 PUBLIC - EPISODE SWITCHER CENTERING
+   ========================================================= */
+/* 18.6.0 moved every season select too far upward. On episode pages the
+   selector now sits vertically centered against the rail arrow buttons. */
+.minitigerVideoDetailsPage
+.minitigerEpisodeSiblingSection
+.minitigerEpisodeSeasonSwitcher {
+    transform: translateY(-0.15rem) !important;
+}
+
+@media (max-width: 680px) {
+    .minitigerVideoDetailsPage
+    .minitigerEpisodeSiblingSection
+    .minitigerEpisodeSeasonSwitcher {
+        transform: translateY(-0.1rem) !important;
+    }
+}

@@ -25,6 +25,7 @@ import {
 } from '../config/virtualLibraries';
 
 interface MinitigerHomeBuilderSettingsProps {
+    disabled?: boolean;
     settings: MinitigerHomeSettings;
     libraries: ItemDto[];
     customConfig: MinitigerCustomRowsConfig;
@@ -120,6 +121,7 @@ const LibrarySelect = ({
 );
 
 const MinitigerHomeBuilderSettings = ({
+    disabled = false,
     settings,
     libraries,
     customConfig,
@@ -244,7 +246,10 @@ const MinitigerHomeBuilderSettings = ({
     };
 
     return (
-        <>
+        <fieldset
+            className='minitigerHomeBuilderDisabledScope'
+            disabled={disabled}
+        >
             <section className='minitigerSettingsCard'>
                 <h4>Custom Startseiten-Reihen</h4>
 
@@ -986,7 +991,7 @@ const MinitigerHomeBuilderSettings = ({
                     ))}
                 </div>
             </section>
-        </>
+        </fieldset>
     );
 };
 

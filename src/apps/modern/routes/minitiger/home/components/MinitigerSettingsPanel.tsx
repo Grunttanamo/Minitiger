@@ -21,6 +21,7 @@ import {
 } from '../config/virtualLibraries';
 import {
     ACCENT_PRESETS,
+    getContrastTextColor,
     type BannerItemLimit,
     type BannerRotationSeconds,
     type HomeRowId,
@@ -149,7 +150,9 @@ const ROTATION_OPTIONS: Array<{
     { value: 8, label: '8 Sekunden' },
     { value: 12, label: '12 Sekunden' },
     { value: 20, label: '20 Sekunden' },
-    { value: 30, label: '30 Sekunden' }
+    { value: 30, label: '30 Sekunden' },
+    { value: 45, label: '45 Sekunden' },
+    { value: 60, label: '60 Sekunden' }
 ];
 
 const BANNER_ITEM_LIMIT_OPTIONS: Array<{
@@ -203,11 +206,15 @@ const parseAZMode = (value: string): MinitigerAZMode => {
 const ColorField = ({
     label,
     value,
-    onChange
+    onChange,
+    previewGlowStrength = 100,
+    previewGlowSize = 16
 }: {
     label: string;
     value: string;
     onChange: (value: string) => void;
+    previewGlowStrength?: number;
+    previewGlowSize?: number;
 }) => {
     const [ draft, setDraft ] = useState(
         value.toUpperCase()
@@ -256,6 +263,131 @@ const ColorField = ({
                         }
                     }}
                 />
+            </div>
+            <div
+                className='minitigerColorPreview'
+                style={{
+                    '--minitiger-preview-color': value
+                } as React.CSSProperties}
+            >
+                {label === 'Button 1 · Normal' && (
+                    <span
+                        className='minitigerColorExampleButton isPrimary'
+                        style={{
+                            backgroundColor: value,
+                            borderColor: value,
+                            color: getContrastTextColor(value)
+                        }}
+                    >
+                        ▶ Hauptbutton
+                    </span>
+                )}
+
+                {label === 'Button 1 · Hover' && (
+                    <span
+                        className='minitigerColorExampleButton isPrimary isHoverPreview'
+                        style={{
+                            backgroundColor: value,
+                            borderColor: value,
+                            color: getContrastTextColor(value)
+                        }}
+                    >
+                        ▶ Hauptbutton · Hover
+                    </span>
+                )}
+
+                {label === 'Button 2 · Normal' && (
+                    <span
+                        className='minitigerColorExampleButton isSecondary'
+                        style={{
+                            backgroundColor: value,
+                            borderColor: value,
+                            color: getContrastTextColor(value)
+                        }}
+                    >
+                        ♡ Nebenbutton
+                    </span>
+                )}
+
+                {label === 'Button 2 · Hover' && (
+                    <span
+                        className='minitigerColorExampleButton isSecondary isHoverPreview'
+                        style={{
+                            backgroundColor: value,
+                            borderColor: value,
+                            color: getContrastTextColor(value)
+                        }}
+                    >
+                        ♡ Nebenbutton · Hover
+                    </span>
+                )}
+
+                {label === 'Pfeile / Navigation' && (
+                    <span className='minitigerColorExampleNavigation'>
+                        <i style={{ backgroundColor: value, color: getContrastTextColor(value) }}>‹</i>
+                        <b>3/10</b>
+                        <i style={{ backgroundColor: value, color: getContrastTextColor(value) }}>›</i>
+                    </span>
+                )}
+
+                {label === 'Genre-Tags' && (
+                    <span
+                        className='minitigerColorExampleGenre'
+                        style={{
+                            backgroundColor: value,
+                            color: getContrastTextColor(value)
+                        }}
+                    >
+                        Action
+                    </span>
+                )}
+
+                {label === 'Bibliotheks-Leiste · Hintergrund' && (
+                    <span
+                        className='minitigerColorExampleLibraryBar'
+                        style={{
+                            backgroundColor: value,
+                            color: getContrastTextColor(value)
+                        }}
+                    >
+                        ANIME
+                    </span>
+                )}
+
+                {label === 'Bibliotheks-Leiste · Text' && (
+                    <span
+                        className='minitigerColorExampleLibraryBar isTextPreview'
+                        style={{ color: value }}
+                    >
+                        ANIME
+                    </span>
+                )}
+
+                {label === 'Banner · Audio / Untertitel' && (
+                    <span
+                        className='minitigerColorExampleMeta'
+                        style={{ color: value }}
+                    >
+                        Audio: Deutsch · Untertitel: Deutsch
+                    </span>
+                )}
+
+                {label === 'Glow-Farbe' && (
+                    <span className='minitigerColorExampleGlow'>
+                        <i
+                            className='isPoster'
+                            style={{
+                                boxShadow: `0 0 ${previewGlowSize}px color-mix(in srgb, ${value} ${previewGlowStrength}%, transparent)`
+                            }}
+                        />
+                        <i
+                            className='isLandscape'
+                            style={{
+                                boxShadow: `0 0 ${previewGlowSize}px color-mix(in srgb, ${value} ${previewGlowStrength}%, transparent)`
+                            }}
+                        />
+                    </span>
+                )}
             </div>
         </label>
     );
@@ -318,6 +450,66 @@ const MinitigerSettingsPanel = ({
             window.removeEventListener('keydown', onKeyDown);
         };
     }, [onClose]);
+
+    useEffect(() => {
+        const host = document.querySelector<HTMLElement>(
+            '.minitigerAdminSettingsContent'
+        );
+
+        if (!host) {
+            return;
+        }
+
+        const cleanup: Array<() => void> = [];
+
+        host.querySelectorAll<HTMLElement>(
+            '.minitigerSettingsCard'
+        ).forEach(card => {
+            const heading = card.querySelector<HTMLElement>(
+                ':scope > h4'
+            );
+
+            if (!heading) {
+                return;
+            }
+
+            heading.classList.add('minitigerSettingsCardToggle');
+            heading.tabIndex = 0;
+            heading.setAttribute('role', 'button');
+
+            const syncExpanded = () => {
+                heading.setAttribute(
+                    'aria-expanded',
+                    card.classList.contains('isCollapsed')
+                        ? 'false'
+                        : 'true'
+                );
+            };
+
+            const toggle = () => {
+                card.classList.toggle('isCollapsed');
+                syncExpanded();
+            };
+
+            const onKeyDown = (event: KeyboardEvent) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggle();
+                }
+            };
+
+            syncExpanded();
+            heading.addEventListener('click', toggle);
+            heading.addEventListener('keydown', onKeyDown);
+
+            cleanup.push(() => {
+                heading.removeEventListener('click', toggle);
+                heading.removeEventListener('keydown', onKeyDown);
+            });
+        });
+
+        return () => cleanup.forEach(dispose => dispose());
+    }, [activeTab]);
 
     const downloadBackup = () => {
         const payload = {
@@ -606,6 +798,23 @@ const MinitigerSettingsPanel = ({
                                 </p>
 
                                 <section className='minitigerSettingsCard'>
+                                    <h4>Startseiten-Modus</h4>
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={settings.customHomeRowsEnabled}
+                                            onChange={event => onUpdate({
+                                                customHomeRowsEnabled: event.currentTarget.checked
+                                            })}
+                                        />
+                                        <span>
+                                            <strong>Custom Startseiten-Reihen aktivieren</strong>
+                                            <small>Aus = originale Jellyfin-Startseiten-Reihen. Der Minitiger-Banner bleibt davon unabhängig.</small>
+                                        </span>
+                                    </label>
+                                </section>
+
+                                <section className='minitigerSettingsCard'>
                                     <h4>Banner</h4>
 
                                     <label className='minitigerSettingsToggle'>
@@ -622,6 +831,100 @@ const MinitigerSettingsPanel = ({
                                         <span>
                                             <strong>Banner aktivieren</strong>
                                             <small>Blendet den großen Minitiger-Banner ein oder aus.</small>
+                                        </span>
+                                    </label>
+
+                                    <label className='minitigerSettingsField'>
+                                        <span>Banner-Höhe · {settings.bannerHeightOffset === 0 ? 'Standard' : `${settings.bannerHeightOffset > 0 ? '+' : ''}${settings.bannerHeightOffset}px`}</span>
+                                        <input
+                                            type='range'
+                                            min='-140'
+                                            max='280'
+                                            step='10'
+                                            value={settings.bannerHeightOffset}
+                                            disabled={!settings.bannerEnabled}
+                                            onChange={event => onUpdate({
+                                                bannerHeightOffset: Number(event.currentTarget.value)
+                                            })}
+                                        />
+                                        <small>Positive Werte vergrößern den Banner nach unten hinter die Medien-Bibliotheken, ohne deren Grundposition mitzuschieben.</small>
+                                    </label>
+
+                                    <label className='minitigerSettingsField'>
+                                        <span>Banner-Inhalte vertikal · {settings.bannerOverlayOffset > 0 ? '+' : ''}{settings.bannerOverlayOffset}px</span>
+                                        <input
+                                            type='range'
+                                            min='-120'
+                                            max='120'
+                                            step='5'
+                                            value={settings.bannerOverlayOffset}
+                                            disabled={!settings.bannerEnabled}
+                                            onChange={event => onUpdate({
+                                                bannerOverlayOffset: Number(event.currentTarget.value)
+                                            })}
+                                        />
+                                        <small>Feinjustierung für Logo/Text sowie FSK/Pfeile. Positive Werte schieben die Banner-UI Richtung Medien-Bibliotheken, negative Werte nach oben.</small>
+                                    </label>
+
+                                    <label className='minitigerSettingsField'>
+                                        <span>Fade-out Größe · {settings.bannerFadeSize}px</span>
+                                        <input
+                                            type='range'
+                                            min='0'
+                                            max='320'
+                                            step='10'
+                                            value={settings.bannerFadeSize}
+                                            disabled={!settings.bannerEnabled}
+                                            onChange={event => onUpdate({
+                                                bannerFadeSize: Number(event.currentTarget.value)
+                                            })}
+                                        />
+                                        <small>Bestimmt, wie hoch der weiche Verlauf am unteren Banner-Rand ist. 0px deaktiviert den Verlauf vollständig.</small>
+                                    </label>
+
+                                    <label className='minitigerSettingsField'>
+                                        <span>Fade-out Stärke · {settings.bannerFadeStrength}%</span>
+                                        <input
+                                            type='range'
+                                            min='0'
+                                            max='100'
+                                            step='5'
+                                            value={settings.bannerFadeStrength}
+                                            disabled={!settings.bannerEnabled || settings.bannerFadeSize === 0}
+                                            onChange={event => onUpdate({
+                                                bannerFadeStrength: Number(event.currentTarget.value)
+                                            })}
+                                        />
+                                        <small>Steuert die Transparenz am unteren Rand. 0% = keine Transparenz, 100% = der Banner wird unten vollständig transparent.</small>
+                                    </label>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={settings.bannerNavigationVisible}
+                                            disabled={!settings.bannerEnabled}
+                                            onChange={event => onUpdate({
+                                                bannerNavigationVisible: event.currentTarget.checked
+                                            })}
+                                        />
+                                        <span>
+                                            <strong>Banner-Pfeile und Zähler anzeigen</strong>
+                                            <small>Blendet Links/Rechts-Navigation inklusive 1/10-Anzeige ein oder aus.</small>
+                                        </span>
+                                    </label>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={settings.bannerFskVisible}
+                                            disabled={!settings.bannerEnabled}
+                                            onChange={event => onUpdate({
+                                                bannerFskVisible: event.currentTarget.checked
+                                            })}
+                                        />
+                                        <span>
+                                            <strong>FSK-Sticker im Banner anzeigen</strong>
+                                            <small>Unabhängig von den FSK-Stickern auf normalen Karten.</small>
                                         </span>
                                     </label>
 
@@ -736,6 +1039,50 @@ const MinitigerSettingsPanel = ({
                                             />
                                             <output>{settings.libraryCardWidth}</output>
                                         </div>
+                                    </label>
+
+                                    <label className='minitigerRangeField'>
+                                        <span>Abstand der Hauptbibliotheken</span>
+                                        <div>
+                                            <input
+                                                type='range'
+                                                min='0'
+                                                max='48'
+                                                step='2'
+                                                value={settings.libraryCardGap}
+                                                onChange={event =>
+                                                    onUpdate({
+                                                        libraryCardGap: Number(
+                                                            event.currentTarget.value
+                                                        )
+                                                    })
+                                                }
+                                            />
+                                            <output>{settings.libraryCardGap}px</output>
+                                        </div>
+                                        <small>Wie bei virtuellen Bibliotheken: 0px = direkt aneinander, höhere Werte erzeugen mehr Luft zwischen den Karten.</small>
+                                    </label>
+
+                                    <label className='minitigerRangeField'>
+                                        <span>Abstand Haupt- → virtuelle Bibliotheken</span>
+                                        <div>
+                                            <input
+                                                type='range'
+                                                min='-120'
+                                                max='180'
+                                                step='4'
+                                                value={settings.libraryVirtualGap}
+                                                onChange={event =>
+                                                    onUpdate({
+                                                        libraryVirtualGap: Number(
+                                                            event.currentTarget.value
+                                                        )
+                                                    })
+                                                }
+                                            />
+                                            <output>{settings.libraryVirtualGap}px</output>
+                                        </div>
+                                        <small>Steuert nur den Abstand, wenn direkt unter den Hauptbibliotheken eine virtuelle Bibliotheks-Reihe folgt. Negative Werte ziehen die virtuelle Reihe näher an die Hauptbibliotheken heran; andere Reihenabstände bleiben unverändert.</small>
                                     </label>
 
                                     <label className='minitigerSettingsToggle'>
@@ -1050,6 +1397,7 @@ const MinitigerSettingsPanel = ({
                                     && onSetVirtualHomeCardWidth
                                     ? (
                                         <MinitigerHomeBuilderSettings
+                                            disabled={!settings.customHomeRowsEnabled}
                                             settings={settings}
                                             libraries={libraries}
                                             customConfig={customConfig}
@@ -1544,6 +1892,8 @@ const MinitigerSettingsPanel = ({
                                         <ColorField
                                             label='Glow-Farbe'
                                             value={settings.glowColor}
+                                            previewGlowStrength={settings.glowStrength}
+                                            previewGlowSize={settings.glowSize}
                                             onChange={value => onUpdate({
                                                 glowColor: value
                                             })}

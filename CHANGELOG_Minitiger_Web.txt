@@ -1,3 +1,61 @@
+Minitiger Web – Phase 18.7.0
+Public UI Controls & Home Customization Release
+
+BASIS / STATUS
+- Jellyfin Server / Web: 12.1.
+- Phase 18.6.0 bis 18.6.9 wurden lokal auf dem Dev-Server und anschließend im normalen Jellyfin/Desktop-Client getestet.
+- Der Stand aus Phase 18.6.9 wurde vom Nutzer visuell bestätigt und wird mit 18.7.0 als Public/GitHub-Stand eingefroren.
+
+STARTSEITE
+- Minitiger Custom-Startseiten-Reihen können vollständig ein-/ausgeschaltet werden.
+- Bei deaktivierten Custom-Reihen kehren die originalen Jellyfin-Home-Reihen zurück.
+- Einstellungen, die nur die Custom-Reihen betreffen, werden im deaktivierten Zustand ausgegraut.
+- Der Minitiger-Banner ist davon unabhängig und kann weiterhin separat aktiviert werden.
+
+BANNER
+- Banner-Höhe kann verkleinert oder nach unten vergrößert werden.
+- Große Banner dürfen hinter die Medien-Bibliotheken wachsen, ohne deren Grundposition mitzuschieben.
+- Banner-Inhalte (Logo/Text/Buttons sowie rechte Banner-Navigation) besitzen eine eigene vertikale Feinjustierung.
+- Banner-Navigation/Zähler und Banner-FSK können separat ausgeblendet werden.
+- Transparenter unterer Fade mit einstellbarer Größe und Stärke.
+- Backdrop/Trailer + Shade werden für den Fade gemeinsam behandelt, um helle Übergangsbalken zu vermeiden.
+- Banner-Rotation zusätzlich mit 45 und 60 Sekunden.
+
+BIBLIOTHEKEN / ABSTÄNDE
+- Größe der Hauptbibliotheken bleibt einstellbar.
+- Horizontaler Kartenabstand der Hauptbibliotheken ist separat einstellbar.
+- Abstand Hauptbibliotheken -> virtuelle Bibliotheken ist separat einstellbar.
+- Bestätigter Bereich für Haupt -> virtuell: -120px bis +180px; negative Werte können internes Padding optisch kompensieren.
+- Glow-Größe ist vom Reihen-/Bibliotheksabstand entkoppelt.
+
+EINSTELLUNGEN / FARBEN
+- Einstellungsgruppen sind ein-/ausklappbar, damit deutlich weniger gescrollt werden muss.
+- Farboptionen besitzen echte kleine UI-Beispiele statt generischer Farbbalken.
+- Button-, Hover-, Navigation-, Genre-, Bibliotheks- und Banner-Beispiele reagieren auf ihre jeweilige Farbe.
+- Glow-Beispiel enthält Poster + Landscape und reagiert live auf Glow-Farbe, Glow-Stärke und Glow-Größe.
+
+UI-FIXES
+- Minitiger-Einstellungszahnrad in der Toolbar vertikal an die Vanilla-Icons angepasst.
+- Staffel-Umschalter auf Folgen-Detailpages näher an die Höhe der Rail-Navigationspfeile gesetzt.
+
+VERWORFENER TEST
+- Experiment zum erzwungenen Neu-Anfordern von Cast-/Personenbildern wurde vollständig entfernt, da es das gemeldete Verhalten nicht zuverlässig behoben hat.
+- Keine IMAGE_REFRESH-/Cast-Retry-Logik ist Bestandteil von 18.7.0.
+
+GITHUB / LOKALE PROJEKTDATEN
+- `Minitiger_Gedaechtnis/` wird ab 18.7.0 über `.gitignore` nur noch lokal gehalten.
+- Bereits getrackte Gedächtnisdateien werden beim Release mit `git rm -r --cached` aus dem aktuellen GitHub-Baum entfernt, ohne sie lokal zu löschen.
+- Lokale `.phase18_*_test_backup/`-Verzeichnisse werden ebenfalls ignoriert.
+- Alte Git-Commits können die früher veröffentlichten Gedächtnisdateien weiterhin enthalten; 18.7.0 führt bewusst keinen History-Rewrite durch.
+
+NICHT VERÄNDERT
+- Minitiger Virtual Sync Plugin 1.0.3.0.
+- Trailer-Kernlogik / Playback-Pipeline.
+- Audioflag-Kernlogik.
+- Manga-/Comic-Kernlogik außerhalb der bereits bestätigten vorherigen Phasen.
+
+==============================================================================
+
 Minitiger Web – Phase 18.5.1
 Plugin Release ZIP Hotfix
 
@@ -17,12 +75,3 @@ FIX
 - Neuer neutraler Variablenname: `ARCHIVE_NAME`.
 - Publish, MD5, Source-URL, GitHub Release und Summary verwenden jetzt konsistent `ARCHIVE_NAME`.
 - Nach dem ZIP-Bau prüft `test -s`, dass das erwartete Release-Archiv tatsächlich existiert und nicht leer ist.
-
-NICHT VERÄNDERT
-- Plugin-Code / Virtual-Sync-Logik.
-- Jellyfin Plugin ABI (`12.0.0.0`).
-- Plugin-Version / geplantes erstes Release `1.0.3.0`.
-- Sidecar, UI, Trailer, Audioflags, Manga und Playback.
-
-STATUS
-- Fix ist statisch/lokal verifiziert, aber der echte GitHub Release-Workflow muss vom Nutzer erneut getestet werden.
