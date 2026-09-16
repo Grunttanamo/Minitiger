@@ -2270,3 +2270,24 @@ a.minitigerDetailsParentTitle:focus-visible {
         transform: translateY(-0.1rem) !important;
     }
 }
+
+
+/* =========================================================
+   PHASE 18.7.1 TEST - SERIES SWITCHER / USER PERMISSIONS
+   ========================================================= */
+/* Series and episode season selectors now share the same final visual offset.
+   This overrides the older generic select transform from 18.7.0. */
+.minitigerVideoDetailsPage
+.minitigerDetailsSectionHead
+.minitigerEpisodeSeasonSwitcher {
+    transform: translateY(-0.15rem) !important;
+}
+
+@media (max-width: 680px) {
+    .minitigerVideoDetailsPage
+    .minitigerDetailsSectionHead
+    .minitigerEpisodeSeasonSwitcher {
+        transform: translateY(-0.1rem) !important;
+    }
+}
+

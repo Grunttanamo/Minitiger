@@ -150,7 +150,8 @@ export const writeMinitigerServerPreference = async (
 export const broadcastMinitigerServerPreference = async (
     apiClient: ApiClient,
     key: string,
-    value: unknown
+    value: unknown,
+    preserveObjectKeys: readonly string[] = []
 ) => {
     let users: Array<{ Id?: string | null }> = [];
 
@@ -185,15 +186,62 @@ export const broadcastMinitigerServerPreference = async (
         .map(user => user.Id)
         .filter((id): id is string => Boolean(id));
 
+    const sourceUserId =
+        apiClient.getCurrentUserId();
+
     const results = await Promise.allSettled(
-        ids.map(userId =>
-            writeMinitigerServerPreference(
+        ids.map(async userId => {
+            let nextValue = value;
+
+            if (
+                userId !== sourceUserId
+                && preserveObjectKeys.length > 0
+                && value
+                && typeof value === 'object'
+                && !Array.isArray(value)
+            ) {
+                const existing =
+                    await readMinitigerServerPreference<
+                        Record<string, unknown>
+                    >(
+                        apiClient,
+                        userId,
+                        key
+                    );
+
+                if (
+                    existing
+                    && typeof existing === 'object'
+                    && !Array.isArray(existing)
+                ) {
+                    const preserved = Object.fromEntries(
+                        preserveObjectKeys
+                            .filter(preserveKey =>
+                                Object.prototype.hasOwnProperty.call(
+                                    existing,
+                                    preserveKey
+                                )
+                            )
+                            .map(preserveKey => [
+                                preserveKey,
+                                existing[preserveKey]
+                            ])
+                    );
+
+                    nextValue = {
+                        ...(value as Record<string, unknown>),
+                        ...preserved
+                    };
+                }
+            }
+
+            return writeMinitigerServerPreference(
                 apiClient,
                 userId,
                 key,
-                value
-            )
-        )
+                nextValue
+            );
+        })
     );
 
     const failed = results.filter(

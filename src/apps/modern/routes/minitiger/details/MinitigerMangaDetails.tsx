@@ -73,6 +73,64 @@ const getVolumeNumber = (
         : null;
 };
 
+const getVisibleMangaVolumeIdentity = (
+    value?: ItemDto
+) => {
+    const name =
+        String(
+            value?.Name
+            ?? ''
+        ).trim();
+
+    const match = name.match(
+        /^(.*?)(?:\s+(?:band|bd\.?|vol(?:ume)?\.?)\s*)?0*(\d{1,3})\s*$/i
+    );
+
+    if (
+        !match
+        || !match[1]
+        || !match[2]
+    ) {
+        return null;
+    }
+
+    return {
+        stem: match[1]
+            .trim()
+            .toLocaleLowerCase()
+            .replace(/\s+/g, ' '),
+        number: Number(match[2])
+    };
+};
+
+const isOtherVolumeOfSameVisibleSeries = (
+    current: ItemDto,
+    candidate: ItemDto
+) => {
+    const currentIdentity =
+        getVisibleMangaVolumeIdentity(
+            current
+        );
+
+    const candidateIdentity =
+        getVisibleMangaVolumeIdentity(
+            candidate
+        );
+
+    if (
+        !currentIdentity
+        || !candidateIdentity
+        || currentIdentity.stem
+            !== candidateIdentity.stem
+    ) {
+        return false;
+    }
+
+    return candidateIdentity.number
+        !== currentIdentity.number;
+};
+
+
 const sortVolumes = (
     values: ItemDto[]
 ) => (
@@ -168,13 +226,15 @@ const MangaShell = ({
 
 const MangaVolumeCards = ({
     volumes,
-    apiClient
+    apiClient,
+    isAdmin
 }: {
     volumes: ItemDto[];
     apiClient:
         ReturnType<typeof useApi>[
             '__legacyApiClient__'
         ];
+    isAdmin: boolean;
 }) => (
     <div
         className='minitigerMangaVolumeGrid'
@@ -197,11 +257,14 @@ const MangaVolumeCards = ({
                     className='minitigerMangaVolumeCard'
                 >
                     <div>
-                        <MinitigerItemMenuButton
-                            apiClient={apiClient}
-                            item={volume}
-                            title='Band-Menü'
-                        />
+                        {isAdmin && (
+                            <MinitigerItemMenuButton
+                                apiClient={apiClient}
+                                item={volume}
+                                title='Band-Menü'
+                                allowDelete={false}
+                            />
+                        )}
 
                         {poster ? (
                             <img
@@ -231,6 +294,7 @@ export const MinitigerMangaSeriesDetails = ({
     itemId
 }: Props) => {
     const {
+        user,
         __legacyApiClient__: apiClient
     } = useApi();
 
@@ -260,10 +324,16 @@ export const MinitigerMangaSeriesDetails = ({
         apiClient?.getCurrentUserId()
         ?? '';
 
+    const isAdmin =
+        Boolean(
+            user?.Policy?.IsAdministrator
+        );
+
     const volumesQuery = useQuery({
         queryKey: [
             'Minitiger',
             'MangaSeries',
+            userId,
             itemId
         ],
         queryFn: async () => {
@@ -417,12 +487,14 @@ export const MinitigerMangaSeriesDetails = ({
                     </p>
 
                     <div className='minitigerDetailsActions'>
-                        <MinitigerItemMenuButton
-                            apiClient={apiClient}
-                            item={item}
-                            placement='action'
-                            title='Manga-Menü'
-                        />
+                        {isAdmin && (
+                            <MinitigerItemMenuButton
+                                apiClient={apiClient}
+                                item={item}
+                                placement='action'
+                                title='Manga-Menü'
+                            />
+                        )}
                     </div>
                 </div>
             </section>
@@ -440,6 +512,7 @@ export const MinitigerMangaSeriesDetails = ({
                 <MangaVolumeCards
                     volumes={volumes}
                     apiClient={apiClient}
+                    isAdmin={isAdmin}
                 />
             </section>
         </MangaShell>
@@ -450,6 +523,7 @@ export const MinitigerMangaVolumeDetails = ({
     itemId
 }: Props) => {
     const {
+        user,
         __legacyApiClient__: apiClient
     } = useApi();
 
@@ -495,17 +569,32 @@ export const MinitigerMangaVolumeDetails = ({
 
     const parentLooksLikeLibraryRoot =
         parentType === 'collectionfolder'
+        || parentType === 'userview'
+        || parentType === 'aggregatefolder'
         || Boolean(parentCollectionType);
+
+    /* Jellyfin exposes BaseItemDto.ParentId as DisplayParentId. For normal
+       users a standalone Book can therefore point directly at the visible
+       UserView rather than at the physical CollectionFolder. UserView and
+       AggregateFolder are library roots, never manga-series folders. */
 
     const userId =
         apiClient?.getCurrentUserId()
         ?? '';
 
+    const isAdmin =
+        Boolean(
+            user?.Policy?.IsAdministrator
+        );
+
     const siblingVolumesQuery = useQuery({
         queryKey: [
             'Minitiger',
             'MangaVolumeSiblings',
-            item?.ParentId ?? ''
+            'deterministic-j2',
+            userId,
+            item?.ParentId ?? '',
+            itemId
         ],
         queryFn: async () => {
             if (
@@ -518,17 +607,153 @@ export const MinitigerMangaVolumeDetails = ({
                 return [] as ItemDto[];
             }
 
+            /* Normal users cannot rely on Jellyfin's admin-only
+               virtual-folder endpoint. Their own UserViews are the
+               permission-safe source for visible library roots. If the
+               current parent is one of those roots, this is a standalone
+               volume and every other book in that library must NOT appear
+               under "Weitere Bände". */
+            try {
+                const userViews =
+                    await apiClient.getUserViews(
+                        {},
+                        userId
+                    );
+
+                const visibleViews =
+                    (
+                        userViews?.Items
+                        ?? []
+                    ) as ItemDto[];
+
+                const parentId =
+                    String(
+                        parent.Id
+                        ?? item.ParentId
+                        ?? ''
+                    );
+
+                const parentName =
+                    String(
+                        parent.Name
+                        ?? ''
+                    ).trim().toLocaleLowerCase();
+
+                const parentPath =
+                    normalizeLibraryPath(
+                        parent.Path
+                    );
+
+                const matchesParentRoot = (
+                    candidate?: ItemDto | null
+                ) => {
+                    if (!candidate) {
+                        return false;
+                    }
+
+                    const candidateId =
+                        String(
+                            candidate.Id
+                            ?? ''
+                        );
+
+                    const candidateName =
+                        String(
+                            candidate.Name
+                            ?? ''
+                        ).trim().toLocaleLowerCase();
+
+                    const candidatePath =
+                        normalizeLibraryPath(
+                            candidate.Path
+                        );
+
+                    return (
+                        Boolean(parentId)
+                        && candidateId === parentId
+                    ) || (
+                        Boolean(parentPath)
+                        && Boolean(candidatePath)
+                        && candidatePath === parentPath
+                    ) || (
+                        Boolean(parentName)
+                        && Boolean(candidateName)
+                        && candidateName === parentName
+                        && (
+                            String(
+                                candidate.Type
+                                ?? ''
+                            ).toLowerCase()
+                            === 'collectionfolder'
+                            || Boolean(
+                                candidate.CollectionType
+                            )
+                        )
+                    );
+                };
+
+                /* Jellyfin may expose a user's library View with an ID that is
+                   different from the physical Folder used as Book.ParentId.
+                   First compare the lightweight UserViews response by ID,
+                   path and library name/type. */
+                if (
+                    visibleViews.some(
+                        matchesParentRoot
+                    )
+                ) {
+                    return [] as ItemDto[];
+                }
+
+                /* Some servers omit Path/CollectionType from UserViews.
+                   Resolve the user's visible library items themselves and
+                   compare again. This endpoint is usable by the logged-in
+                   user and avoids the admin-only VirtualFolders API. */
+                const detailedViews =
+                    await Promise.allSettled(
+                        visibleViews
+                            .filter(view =>
+                                Boolean(
+                                    view.Id
+                                )
+                            )
+                            .map(view =>
+                                apiClient.getItem(
+                                    userId,
+                                    view.Id ?? ''
+                                ) as Promise<ItemDto>
+                            )
+                    );
+
+                const parentIsResolvedUserLibraryRoot =
+                    detailedViews.some(result =>
+                        result.status === 'fulfilled'
+                        && matchesParentRoot(
+                            result.value
+                        )
+                    );
+
+                if (
+                    parentIsResolvedUserLibraryRoot
+                ) {
+                    return [] as ItemDto[];
+                }
+            } catch {
+                // Best effort; admins still get the stronger check below.
+            }
+
+
             /* Jellyfin 12 does not always expose a physical Books/Comics
                library root as Type=CollectionFolder (or with CollectionType).
-               Compare the parent against the server's configured virtual-folder
-               ItemId/Locations as a second, authoritative root check. */
+               Admins can additionally compare against configured virtual
+               folders as a second root check. */
             const virtualFolderClient = apiClient as unknown as {
                 getVirtualFolders?: () => Promise<VirtualFolderRootInfo[]>;
             };
 
             if (
-                typeof virtualFolderClient.getVirtualFolders
-                === 'function'
+                isAdmin
+                && typeof virtualFolderClient.getVirtualFolders
+                    === 'function'
             ) {
                 try {
                     const virtualFolders =
@@ -581,10 +806,22 @@ export const MinitigerMangaVolumeDetails = ({
                 }
             );
 
+            const currentIdentity =
+                getVisibleMangaVolumeIdentity(
+                    item
+                );
+
+            if (!currentIdentity) {
+                return [] as ItemDto[];
+            }
+
             return sortVolumes(
                 (result?.Items ?? []) as ItemDto[]
             ).filter(volume =>
-                volume.Id !== item.Id
+                isOtherVolumeOfSameVisibleSeries(
+                    item,
+                    volume
+                )
             );
         },
         enabled: Boolean(
@@ -594,7 +831,9 @@ export const MinitigerMangaVolumeDetails = ({
             && parent
             && !parentLooksLikeLibraryRoot
         ),
-        staleTime: 10 * 60_000
+        staleTime: 0,
+        gcTime: 0,
+        refetchOnMount: 'always'
     });
 
     const favoriteMutation =
@@ -654,6 +893,17 @@ export const MinitigerMangaVolumeDetails = ({
             </Page>
         );
     }
+
+    const visibleSiblingVolumes =
+        (
+            siblingVolumesQuery.data
+            ?? []
+        ).filter(volume =>
+            isOtherVolumeOfSameVisibleSeries(
+                item,
+                volume
+            )
+        );
 
     const poster =
         getPrimaryImageUrl(
@@ -835,32 +1085,34 @@ export const MinitigerMangaVolumeDetails = ({
                             }
                         </button>
 
-                        <MinitigerItemMenuButton
-                            apiClient={apiClient}
-                            item={item}
-                            placement='action'
-                            title='Band-Menü'
-                        />
+                        {isAdmin && (
+                            <MinitigerItemMenuButton
+                                apiClient={apiClient}
+                                item={item}
+                                placement='action'
+                                title='Band-Menü'
+                            />
+                        )}
                     </div>
                 </div>
             </section>
 
-            {siblingVolumesQuery.data
-                && siblingVolumesQuery.data.length > 0
+            {visibleSiblingVolumes.length > 0
                 && (
                     <section className='minitigerDetailsSection'>
                         <div className='minitigerDetailsSectionHead'>
                             <div>
                                 <h2>Weitere Bände</h2>
                                 <span>
-                                    {siblingVolumesQuery.data.length} Bände
+                                    {visibleSiblingVolumes.length} Bände
                                 </span>
                             </div>
                         </div>
 
                         <MangaVolumeCards
-                            volumes={siblingVolumesQuery.data}
+                            volumes={visibleSiblingVolumes}
                             apiClient={apiClient}
+                            isAdmin={isAdmin}
                         />
                     </section>
                 )}

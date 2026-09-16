@@ -3,6 +3,7 @@ import { ImageType } from '@jellyfin/sdk/lib/generated-client/models/image-type'
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by';
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order';
 import Box from '@mui/material/Box';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import classNames from 'classnames';
 import React, {
     type FC,
@@ -42,6 +43,7 @@ import type { ListOptions } from 'types/listOptions';
 
 import 'apps/modern/routes/minitiger/home/MinitigerHome.scss';
 
+import AlphabetPicker from './AlphabetPicker';
 import FilterButton from './filter/FilterButton';
 
 const LETTER_VALUES = [
@@ -217,6 +219,11 @@ const ItemsView: FC = () => {
         isBtnFilterEnabled
     } = content ?? {};
 
+    const isAlphabetPickerSupported = useMediaQuery(t => [
+        `${t.breakpoints.down('sm')} and (min-height: 575px)`,
+        `(min-width: ${t.breakpoints.values.sm}px) and (min-height: 610px)`
+    ].join(', '));
+
     const {
         __legacyApiClient__,
         user
@@ -294,6 +301,12 @@ const ItemsView: FC = () => {
                 azDockTimer.current = null;
             }
         };
+
+        if (!minitigerLibrarySettings.customNavigationEnabled) {
+            clearDockTimer();
+            setAzDockPhase('top');
+            return;
+        }
 
         if (minitigerLibrarySettings.azMode === 'side') {
             clearDockTimer();
@@ -429,7 +442,10 @@ const ItemsView: FC = () => {
                 true
             );
         };
-    }, [minitigerLibrarySettings.azMode]);
+    }, [
+        minitigerLibrarySettings.azMode,
+        minitigerLibrarySettings.customNavigationEnabled
+    ]);
 
     useEffect(() => {
         const onCardClick = (
@@ -798,7 +814,19 @@ const ItemsView: FC = () => {
     return (
         <>
         <Box className='padded-bottom-page'>
-            {showAlphabetBar && (
+            {!minitigerLibrarySettings.customNavigationEnabled
+                && isAlphabetPickerSupported
+                && showAlphabetBar
+                && (
+                    <AlphabetPicker
+                        value={libraryViewSettings.Alphabet}
+                        onChange={handleAlphabetChange}
+                    />
+                )}
+
+            {minitigerLibrarySettings.customNavigationEnabled
+                && showAlphabetBar
+                && (
                 <div
                     className={[
                         'minitigerLibraryAZBar',

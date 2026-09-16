@@ -14,6 +14,7 @@ export interface MinitigerLibrarySettings {
     otherDisplay: MinitigerLibraryDisplay;
     posterSize: number;
     landscapeSize: number;
+    customNavigationEnabled: boolean;
     azMode: MinitigerAZMode;
 }
 
@@ -23,6 +24,7 @@ export const DEFAULT_LIBRARY_SETTINGS: MinitigerLibrarySettings = {
     otherDisplay: 'poster',
     posterSize: 320,
     landscapeSize: 520,
+    customNavigationEnabled: true,
     azMode: 'auto'
 };
 
@@ -100,6 +102,8 @@ export const normalizeLibrarySettings = (
             260,
             760
         ),
+        customNavigationEnabled:
+            source.customNavigationEnabled !== false,
         azMode: parseAZMode(source.azMode)
     };
 };

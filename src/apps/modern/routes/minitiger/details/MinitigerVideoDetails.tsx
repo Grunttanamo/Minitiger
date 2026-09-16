@@ -911,6 +911,7 @@ const MinitigerVideoDetails = () => {
 
                                 {seasons.length > 0 && (
                                     <select
+                                        className='minitigerEpisodeSeasonSwitcher'
                                         value={
                                             selectedSeasonId
                                         }

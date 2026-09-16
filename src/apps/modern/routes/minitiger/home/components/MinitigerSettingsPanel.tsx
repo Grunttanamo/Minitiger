@@ -399,8 +399,8 @@ const MinitigerSettingsPanel = ({
     detailSettings,
     customConfig,
     libraries,
-    onUpdate,
-    onUpdateLibrarySettings,
+    onUpdate: onUpdateRaw,
+    onUpdateLibrarySettings: onUpdateLibrarySettingsRaw,
     onUpdateDetailSettings,
     onUpdateCustomRow,
     onReplaceCustomConfig,
@@ -436,6 +436,83 @@ const MinitigerSettingsPanel = ({
     const [ activeTab, setActiveTab ] = useState<SettingsTab>('general');
     const [ importMessage, setImportMessage ] = useState('');
     const [ virtualMediaMessage, setVirtualMediaMessage ] = useState('');
+
+    const onUpdate = (
+        patch: Partial<MinitigerHomeSettings>
+    ) => {
+        if (isAdmin) {
+            onUpdateRaw(patch);
+            return;
+        }
+
+        const allowed = new Set<keyof MinitigerHomeSettings>([
+            'accentColor',
+            'primaryHoverColor',
+            'secondaryColor',
+            'secondaryHoverColor',
+            'libraryBarColor',
+            'libraryBarTextColor',
+            'bannerMetaColor',
+            'glowColor',
+            'arrowColor',
+            'genreTagColor',
+            'glowStrength',
+            'glowSize',
+            'bannerFskVisible',
+            'showAudioFlags',
+            'showFskBadges',
+            'showPlayedIndicators',
+            'playedIndicatorSize',
+            'playedIndicatorFontSize',
+            'playedIndicatorShape',
+            'hoverEnabled',
+            'glowEnabled',
+            'previewEnabled'
+        ]);
+
+        const filtered = Object.fromEntries(
+            Object.entries(patch).filter(([ key ]) =>
+                allowed.has(
+                    key as keyof MinitigerHomeSettings
+                )
+            )
+        ) as Partial<MinitigerHomeSettings>;
+
+        if (Object.keys(filtered).length > 0) {
+            onUpdateRaw(filtered);
+        }
+    };
+
+    const onUpdateLibrarySettings = (
+        patch: Partial<MinitigerLibrarySettings>
+    ) => {
+        if (isAdmin) {
+            onUpdateLibrarySettingsRaw(patch);
+            return;
+        }
+
+        const filtered = Object.fromEntries(
+            Object.entries(patch).filter(([ key ]) =>
+                key === 'customNavigationEnabled'
+                || key === 'azMode'
+            )
+        ) as Partial<MinitigerLibrarySettings>;
+
+        if (Object.keys(filtered).length > 0) {
+            onUpdateLibrarySettingsRaw(filtered);
+        }
+    };
+
+    useEffect(() => {
+        if (
+            !isAdmin
+            && activeTab !== 'general'
+            && activeTab !== 'libraries'
+            && activeTab !== 'colors'
+        ) {
+            setActiveTab('general');
+        }
+    }, [ activeTab, isAdmin ]);
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
@@ -643,11 +720,11 @@ const MinitigerSettingsPanel = ({
                 <div className='minitigerAdminSettingsBody'>
                     <nav className='minitigerAdminSettingsNav'>
                         {tabButton('general', 'General')}
-                        {tabButton('home', 'Startseite')}
+                        {isAdmin && tabButton('home', 'Startseite')}
                         {tabButton('libraries', 'Bibliotheken')}
-                        {tabButton('details', 'Detailpages')}
+                        {isAdmin && tabButton('details', 'Detailpages')}
                         {tabButton('colors', 'Farben')}
-                        {tabButton('backup', 'Backup & Import')}
+                        {isAdmin && tabButton('backup', 'Backup & Import')}
                     </nav>
 
                     <main className='minitigerAdminSettingsContent'>
@@ -655,7 +732,9 @@ const MinitigerSettingsPanel = ({
                             <>
                                 <h3>General</h3>
                                 <p className='minitigerSettingsIntro'>
-                                    Globale Standard-Einstellungen für die komplette Minitiger-Oberfläche.
+                                    {isAdmin
+                                        ? 'Globale Standard-Einstellungen für die komplette Minitiger-Oberfläche.'
+                                        : 'Persönliche kosmetische Einstellungen für deinen Minitiger-Account.'}
                                 </p>
 
                                 <section className='minitigerSettingsCard'>
@@ -697,7 +776,12 @@ const MinitigerSettingsPanel = ({
                                             'Glow-Effekt aktivieren',
                                             'Schaltet den Karten-Glow global ein oder aus.'
                                         ]
-                                    ].map(([key, label, hint]) => (
+                                    ]
+                                        .filter(([ key ]) =>
+                                            isAdmin
+                                            || key !== 'trailerDebugEnabled'
+                                        )
+                                        .map(([key, label, hint]) => (
                                         <label
                                             key={key}
                                             className='minitigerSettingsToggle'
@@ -721,6 +805,26 @@ const MinitigerSettingsPanel = ({
                                             </span>
                                         </label>
                                     ))}
+
+                                    {!isAdmin && (
+                                        <label className='minitigerSettingsToggle'>
+                                            <input
+                                                type='checkbox'
+                                                checked={settings.bannerFskVisible}
+                                                disabled={!settings.bannerEnabled}
+                                                onChange={event =>
+                                                    onUpdate({
+                                                        bannerFskVisible:
+                                                            event.currentTarget.checked
+                                                    })
+                                                }
+                                            />
+                                            <span>
+                                                <strong>FSK-Sticker im Banner anzeigen</strong>
+                                                <small>Persönliche kosmetische Option; der Banner selbst wird vom Administrator verwaltet.</small>
+                                            </span>
+                                        </label>
+                                    )}
                                 </section>
 
                                 <section className='minitigerSettingsCard'>
@@ -790,7 +894,7 @@ const MinitigerSettingsPanel = ({
                             </>
                         )}
 
-                        {activeTab === 'home' && (
+                        {isAdmin && activeTab === 'home' && (
                             <>
                                 <h3>Startseite</h3>
                                 <p className='minitigerSettingsIntro'>
@@ -1427,7 +1531,7 @@ const MinitigerSettingsPanel = ({
                             </>
                         )}
 
-                        {activeTab === 'libraries' && (
+                        {isAdmin && activeTab === 'libraries' && (
                             <>
                                 <h3>Bibliotheken</h3>
                                 <p className='minitigerSettingsIntro'>
@@ -1528,10 +1632,28 @@ const MinitigerSettingsPanel = ({
                                         </div>
                                     </label>
 
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={librarySettings.customNavigationEnabled}
+                                            onChange={event =>
+                                                onUpdateLibrarySettings({
+                                                    customNavigationEnabled:
+                                                        event.currentTarget.checked
+                                                })
+                                            }
+                                        />
+                                        <span>
+                                            <strong>Minitiger-Navigationsleiste verwenden</strong>
+                                            <small>Aus = originale Jellyfin A-Z-Navigation. An = Minitiger-Leiste mit Sortierung und Filter.</small>
+                                        </span>
+                                    </label>
+
                                     <label className='minitigerSettingsField'>
-                                        <span>A-Z-Navigation</span>
+                                        <span>Position der Minitiger-Navigation</span>
                                         <select
                                             value={librarySettings.azMode}
+                                            disabled={!librarySettings.customNavigationEnabled}
                                             onChange={event =>
                                                 onUpdateLibrarySettings({
                                                     azMode: parseAZMode(
@@ -1622,7 +1744,56 @@ const MinitigerSettingsPanel = ({
                             </>
                         )}
 
-                        {activeTab === 'details' && (
+                        {!isAdmin && activeTab === 'libraries' && (
+                            <>
+                                <h3>Bibliotheken</h3>
+                                <p className='minitigerSettingsIntro'>
+                                    Persönliche Einstellung für die Bibliotheks-Navigation.
+                                </p>
+
+                                <section className='minitigerSettingsCard'>
+                                    <h4>Navigation</h4>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={librarySettings.customNavigationEnabled}
+                                            onChange={event =>
+                                                onUpdateLibrarySettings({
+                                                    customNavigationEnabled:
+                                                        event.currentTarget.checked
+                                                })
+                                            }
+                                        />
+                                        <span>
+                                            <strong>Minitiger-Navigationsleiste verwenden</strong>
+                                            <small>Aus = originale Jellyfin A-Z-Navigation. An = Minitiger-Navigation.</small>
+                                        </span>
+                                    </label>
+
+                                    <label className='minitigerSettingsField'>
+                                        <span>Position der Minitiger-Navigation</span>
+                                        <select
+                                            value={librarySettings.azMode}
+                                            disabled={!librarySettings.customNavigationEnabled}
+                                            onChange={event =>
+                                                onUpdateLibrarySettings({
+                                                    azMode: parseAZMode(
+                                                        event.currentTarget.value
+                                                    )
+                                                })
+                                            }
+                                        >
+                                            <option value='auto'>Oben → rechts beim Scrollen</option>
+                                            <option value='top'>Immer oben</option>
+                                            <option value='side'>Immer rechts</option>
+                                        </select>
+                                    </label>
+                                </section>
+                            </>
+                        )}
+
+                        {isAdmin && activeTab === 'details' && (
                             <>
                                 <h3>Detailpages</h3>
                                 <p className='minitigerSettingsIntro'>
@@ -1943,7 +2114,7 @@ const MinitigerSettingsPanel = ({
                             </>
                         )}
 
-                        {activeTab === 'backup' && (
+                        {isAdmin && activeTab === 'backup' && (
                             <>
                                 <h3>Backup & Import</h3>
                                 <p className='minitigerSettingsIntro'>

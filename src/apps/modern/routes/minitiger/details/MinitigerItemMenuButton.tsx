@@ -9,13 +9,15 @@ interface Props {
     item: Pick<ItemDto, 'Id' | 'Name' | 'Type'>;
     title?: string;
     placement?: 'card' | 'action';
+    allowDelete?: boolean;
 }
 
 const MinitigerItemMenuButton = ({
     apiClient,
     item,
     title = 'Mehr',
-    placement = 'card'
+    placement = 'card',
+    allowDelete = true
 }: Props) => {
     const queryClient = useQueryClient();
 
@@ -76,15 +78,21 @@ const MinitigerItemMenuButton = ({
                     type === 'season'
                     || type === 'musicalbum',
                 playlist: playable,
+                deleteItem: allowDelete,
                 playAllFromHere:
                     type === 'season'
                     || type === 'musicalbum'
             });
 
             if (result?.updated || result?.deleted) {
-                await queryClient.invalidateQueries({
-                    queryKey: [ 'Items' ]
-                });
+                await Promise.all([
+                    queryClient.invalidateQueries({
+                        queryKey: [ 'Items' ]
+                    }),
+                    queryClient.invalidateQueries({
+                        queryKey: [ 'Minitiger' ]
+                    })
+                ]);
             }
         } catch (error) {
             console.error(

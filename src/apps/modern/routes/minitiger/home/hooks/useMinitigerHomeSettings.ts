@@ -25,6 +25,31 @@ const STORAGE_PREFIX = 'Minitiger.NativeHomeSettings.v1';
 const SERVER_PREF_KEY = 'homeSettings';
 const SYNC_EVENT = 'minitiger:home-settings-changed';
 
+const PERSONAL_HOME_SETTING_KEYS: Array<keyof MinitigerHomeSettings> = [
+    'accentColor',
+    'primaryHoverColor',
+    'secondaryColor',
+    'secondaryHoverColor',
+    'libraryBarColor',
+    'libraryBarTextColor',
+    'bannerMetaColor',
+    'glowColor',
+    'arrowColor',
+    'genreTagColor',
+    'glowStrength',
+    'glowSize',
+    'bannerFskVisible',
+    'showAudioFlags',
+    'showFskBadges',
+    'showPlayedIndicators',
+    'playedIndicatorSize',
+    'playedIndicatorFontSize',
+    'playedIndicatorShape',
+    'hoverEnabled',
+    'glowEnabled',
+    'previewEnabled'
+];
+
 const cloneDefaults = (): MinitigerHomeSettings => ({
     ...DEFAULT_HOME_SETTINGS,
     sectionOrder: [
@@ -152,7 +177,8 @@ const useMinitigerHomeSettings = () => {
                 void broadcastMinitigerServerPreference(
                     apiClient,
                     SERVER_PREF_KEY,
-                    localValue
+                    localValue,
+                    PERSONAL_HOME_SETTING_KEYS
                 );
             }
         });
@@ -195,7 +221,8 @@ const useMinitigerHomeSettings = () => {
                 void broadcastMinitigerServerPreference(
                     apiClient,
                     SERVER_PREF_KEY,
-                    pending
+                    pending,
+                    PERSONAL_HOME_SETTING_KEYS
                 );
             } else {
                 void writeMinitigerServerPreference(
