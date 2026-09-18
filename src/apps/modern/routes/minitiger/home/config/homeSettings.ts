@@ -68,6 +68,11 @@ export interface MinitigerHomeSettings {
     genreTagColor: string;
     glowStrength: number;
     glowSize: number;
+    toolbarBrandLogoEnabled: boolean;
+    toolbarBrandLogoUrl: string;
+    toolbarBrandLogoSize: number;
+    toolbarBrandTextEnabled: boolean;
+    toolbarBrandText: string;
     customHomeRowsEnabled: boolean;
     bannerEnabled: boolean;
     bannerHeightOffset: number;
@@ -139,6 +144,160 @@ export const ACCENT_PRESETS = [
     '#d4e157'
 ];
 
+export const COLOR_THEME_KEYS = [
+    'accentColor',
+    'primaryHoverColor',
+    'secondaryColor',
+    'secondaryHoverColor',
+    'libraryBarColor',
+    'libraryBarTextColor',
+    'bannerMetaColor',
+    'glowColor',
+    'arrowColor',
+    'genreTagColor'
+] as const;
+
+export type MinitigerColorThemeKey =
+    typeof COLOR_THEME_KEYS[number];
+
+export type MinitigerColorTheme =
+    Pick<
+        MinitigerHomeSettings,
+        MinitigerColorThemeKey
+    >;
+
+export interface MinitigerColorThemePreset {
+    id: string;
+    name: string;
+    description: string;
+    colors: MinitigerColorTheme;
+}
+
+export const COLOR_THEME_PRESETS:
+    MinitigerColorThemePreset[] = [
+        {
+            id: 'minitiger',
+            name: 'Minitiger',
+            description: 'Das goldene Minitiger-Standarddesign.',
+            colors: {
+                accentColor: '#ffbf00',
+                primaryHoverColor: '#ffe152',
+                secondaryColor: '#34373e',
+                secondaryHoverColor: '#50545e',
+                libraryBarColor: '#ffbf00',
+                libraryBarTextColor: '#000000',
+                bannerMetaColor: '#ffbf00',
+                glowColor: '#ffbf00',
+                arrowColor: '#ffbf00',
+                genreTagColor: '#ffbf00'
+            }
+        },
+        {
+            id: 'taiga',
+            name: 'Taiga',
+            description: 'Warme Bernstein-, Kupfer- und Rottöne.',
+            colors: {
+                accentColor: '#e89b45',
+                primaryHoverColor: '#f4c17a',
+                secondaryColor: '#4b3030',
+                secondaryHoverColor: '#684343',
+                libraryBarColor: '#c9683c',
+                libraryBarTextColor: '#fff7ed',
+                bannerMetaColor: '#f0ad5f',
+                glowColor: '#e77845',
+                arrowColor: '#f0a555',
+                genreTagColor: '#b9573f'
+            }
+        },
+        {
+            id: 'midnight',
+            name: 'Midnight',
+            description: 'Dunkles Violett für eine ruhige Nachtoptik.',
+            colors: {
+                accentColor: '#8b5cf6',
+                primaryHoverColor: '#a78bfa',
+                secondaryColor: '#1f2937',
+                secondaryHoverColor: '#374151',
+                libraryBarColor: '#312e81',
+                libraryBarTextColor: '#f5f3ff',
+                bannerMetaColor: '#c4b5fd',
+                glowColor: '#7c3aed',
+                arrowColor: '#a78bfa',
+                genreTagColor: '#4c1d95'
+            }
+        },
+        {
+            id: 'ocean',
+            name: 'Ocean',
+            description: 'Kühle Cyan- und Meeresblautöne.',
+            colors: {
+                accentColor: '#22d3ee',
+                primaryHoverColor: '#67e8f9',
+                secondaryColor: '#164e63',
+                secondaryHoverColor: '#155e75',
+                libraryBarColor: '#0e7490',
+                libraryBarTextColor: '#ecfeff',
+                bannerMetaColor: '#67e8f9',
+                glowColor: '#06b6d4',
+                arrowColor: '#22d3ee',
+                genreTagColor: '#0891b2'
+            }
+        },
+        {
+            id: 'sakura',
+            name: 'Sakura',
+            description: 'Pink, Rosé und dunkle Beerentöne.',
+            colors: {
+                accentColor: '#ff6fae',
+                primaryHoverColor: '#ff9ac7',
+                secondaryColor: '#4a2f3d',
+                secondaryHoverColor: '#674254',
+                libraryBarColor: '#d94f8a',
+                libraryBarTextColor: '#fff7fb',
+                bannerMetaColor: '#ff8fbd',
+                glowColor: '#ff5fa2',
+                arrowColor: '#ff7fb5',
+                genreTagColor: '#c4457a'
+            }
+        },
+        {
+            id: 'emerald',
+            name: 'Emerald',
+            description: 'Sattes Grün mit dunklen Waldtönen.',
+            colors: {
+                accentColor: '#34d399',
+                primaryHoverColor: '#6ee7b7',
+                secondaryColor: '#1f3d35',
+                secondaryHoverColor: '#2c564a',
+                libraryBarColor: '#059669',
+                libraryBarTextColor: '#ecfdf5',
+                bannerMetaColor: '#6ee7b7',
+                glowColor: '#10b981',
+                arrowColor: '#34d399',
+                genreTagColor: '#047857'
+            }
+        },
+        {
+            id: 'jelly-violet',
+            name: 'Jelly Violett',
+            description: 'Eine violette Optik, angelehnt an Jellyfin.',
+            colors: {
+                accentColor: '#aa5cc3',
+                primaryHoverColor: '#c985dc',
+                secondaryColor: '#2e2635',
+                secondaryHoverColor: '#493b54',
+                libraryBarColor: '#5b3f6e',
+                libraryBarTextColor: '#ffffff',
+                bannerMetaColor: '#c985dc',
+                glowColor: '#aa5cc3',
+                arrowColor: '#b96fd1',
+                genreTagColor: '#7d4c91'
+            }
+        }
+    ];
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_8_0_TEST_COLOR_TEMPLATES */
+
 export const DEFAULT_HOME_SETTINGS: MinitigerHomeSettings = {
     accentColor: '#ffbf00',
     primaryHoverColor: '#ffe152',
@@ -152,6 +311,11 @@ export const DEFAULT_HOME_SETTINGS: MinitigerHomeSettings = {
     genreTagColor: '#ffbf00',
     glowStrength: 100,
     glowSize: 20,
+    toolbarBrandLogoEnabled: false,
+    toolbarBrandLogoUrl: '',
+    toolbarBrandLogoSize: 44,
+    toolbarBrandTextEnabled: false,
+    toolbarBrandText: 'Minitiger',
     customHomeRowsEnabled: true,
     bannerEnabled: true,
     bannerHeightOffset: 0,
@@ -415,6 +579,24 @@ export const normalizeHomeSettings = (
             0,
             40
         ),
+        toolbarBrandLogoEnabled:
+            source.toolbarBrandLogoEnabled === true,
+        toolbarBrandLogoUrl:
+            typeof source.toolbarBrandLogoUrl === 'string'
+                ? source.toolbarBrandLogoUrl.trim().slice(0, 240000)
+                : DEFAULT_HOME_SETTINGS.toolbarBrandLogoUrl,
+        toolbarBrandLogoSize: clampNumber(
+            source.toolbarBrandLogoSize,
+            DEFAULT_HOME_SETTINGS.toolbarBrandLogoSize,
+            24,
+            72
+        ),
+        toolbarBrandTextEnabled:
+            source.toolbarBrandTextEnabled === true,
+        toolbarBrandText:
+            typeof source.toolbarBrandText === 'string'
+                ? source.toolbarBrandText.slice(0, 40)
+                : DEFAULT_HOME_SETTINGS.toolbarBrandText,
         customHomeRowsEnabled: source.customHomeRowsEnabled !== false,
         bannerEnabled: source.bannerEnabled !== false,
         bannerHeightOffset: clampNumber(

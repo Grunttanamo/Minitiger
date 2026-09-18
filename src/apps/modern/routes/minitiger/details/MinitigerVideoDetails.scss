@@ -2291,3 +2291,71 @@ a.minitigerDetailsParentTitle:focus-visible {
     }
 }
 
+/* =========================================================
+   PHASE 18.12.6c TEST - SERIES SWITCHER ALIGNMENT RECOVERY
+   ========================================================= */
+.minitigerVideoDetailsPage .minitigerSeriesContentsSection {
+    position: relative;
+}
+
+.minitigerVideoDetailsPage
+.minitigerSeriesContentsSection
+.minitigerRail {
+    position: static !important;
+}
+
+.minitigerVideoDetailsPage
+.minitigerSeriesContentsSection
+.minitigerDetailsSectionHead {
+    position: relative;
+    z-index: 24;
+    min-height: 2.2rem;
+    align-items: center;
+    padding-right: 14.4rem;
+}
+
+.minitigerVideoDetailsPage
+.minitigerSeriesContentsSection
+.minitigerEpisodeSeasonSwitcher {
+    position: absolute;
+    z-index: 27;
+    top: 0;
+    right: 5.45rem;
+    width: auto;
+    min-width: 8.2rem;
+    height: 2.2rem;
+    box-sizing: border-box;
+    margin: 0 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
+.minitigerVideoDetailsPage
+.minitigerSeriesContentsSection
+.minitigerRailControls {
+    top: 0 !important;
+    right: 0 !important;
+    height: 2.2rem;
+    display: flex;
+    align-items: center;
+    z-index: 26 !important;
+}
+
+@media (max-width: 680px) {
+    .minitigerVideoDetailsPage
+    .minitigerSeriesContentsSection
+    .minitigerDetailsSectionHead {
+        padding-right: 11.8rem;
+    }
+
+    .minitigerVideoDetailsPage
+    .minitigerSeriesContentsSection
+    .minitigerEpisodeSeasonSwitcher {
+        right: 4.7rem;
+        min-width: 6.8rem;
+        max-width: min(45vw, 190px);
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_12_6C_TEST_SERIES_SWITCHER_ALIGNMENT_RECOVERY */

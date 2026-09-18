@@ -24,3 +24,283 @@
         width: fit-content;
     }
 }
+/* =========================================================
+   PHASE 18.9.0 TEST - MINITIGER CUSTOM LOGIN
+   ========================================================= */
+
+.minitigerLoginBackdrop,
+.minitigerLoginShade,
+.minitigerLoginLogo {
+    display: none;
+}
+
+#loginPage.minitigerLoginEnabled {
+    --mt-login-accent: #ffbf00;
+    --mt-login-dim: 0.48;
+    --mt-login-blur: 3px;
+    --mt-login-logo-size: 260px;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    isolation: isolate;
+    background: #090a0d;
+}
+
+#loginPage.minitigerLoginEnabled .minitigerLoginBackdrop,
+#loginPage.minitigerLoginEnabled .minitigerLoginShade {
+    position: fixed;
+    inset: 0;
+    display: block;
+    pointer-events: none;
+}
+
+#loginPage.minitigerLoginEnabled .minitigerLoginBackdrop {
+    z-index: -3;
+    background-position: center;
+    background-size: cover;
+    filter: blur(var(--mt-login-blur));
+    transform: scale(1.035);
+}
+
+#loginPage.minitigerLoginEnabled .minitigerLoginShade {
+    z-index: -2;
+    background:
+        radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.06), transparent 42%),
+        rgba(0, 0, 0, var(--mt-login-dim));
+}
+
+#loginPage.minitigerLoginEnabled .minitigerLoginLogo:not(.hide) {
+    position: fixed;
+    z-index: 2;
+    top: max(3.5vh, 1.4rem);
+    left: 50%;
+    display: block;
+    width: min(var(--mt-login-logo-size), 72vw);
+    max-height: 18vh;
+    object-fit: contain;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.48));
+    pointer-events: none;
+}
+
+#loginPage.minitigerLoginEnabled > .padded-left {
+    position: relative;
+    z-index: 1;
+    width: min(480px, calc(100vw - 2rem));
+    margin: clamp(7rem, 19vh, 12rem) auto 2.5rem;
+    padding: 1.25rem 1.35rem 1.15rem !important;
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 16px;
+    background: rgba(18, 19, 23, 0.82);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
+    backdrop-filter: blur(15px);
+}
+
+#loginPage.minitigerLoginEnabled h1,
+#loginPage.minitigerLoginEnabled .sectionTitle {
+    margin-top: 0.15rem !important;
+    color: #fff;
+    font-size: 1.45rem;
+    font-weight: 800;
+}
+
+#loginPage.minitigerLoginEnabled .button-submit {
+    background: var(--mt-login-accent) !important;
+    color: #111 !important;
+    font-weight: 800;
+}
+
+#loginPage.minitigerLoginEnabled .readOnlyContent {
+    margin-bottom: 0 !important;
+}
+
+#loginPage.minitigerLoginEnabled #divUsers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+    gap: 0.8rem;
+    align-items: start;
+    margin: 0.8rem 0 0.4rem;
+}
+
+#loginPage.minitigerLoginEnabled #divUsers .card {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+#loginPage.minitigerLoginEnabled #divUsers .cardBox {
+    padding: 0;
+}
+
+#loginPage.minitigerLoginEnabled #divUsers .cardImageContainer,
+#loginPage.minitigerLoginEnabled #divUsers .cardImage {
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+#loginPage.minitigerLoginEnabled #divUsers .card:hover .cardImageContainer,
+#loginPage.minitigerLoginEnabled #divUsers .card:hover .cardImage {
+    box-shadow:
+        0 0 0 2px var(--mt-login-accent),
+        0 0 22px color-mix(in srgb, var(--mt-login-accent) 48%, transparent);
+}
+
+#loginPage.minitigerLoginEnabled .minitigerRememberedForget {
+    width: 100%;
+    margin-top: 0.28rem;
+    padding: 0.2rem 0.25rem;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.68rem;
+    line-height: 1.25;
+    cursor: pointer;
+}
+
+#loginPage.minitigerLoginEnabled .minitigerRememberedForget:hover {
+    color: var(--mt-login-accent);
+}
+
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic {
+    justify-content: flex-end;
+}
+
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic > .padded-left {
+    width: min(500px, calc(100vw - 2rem));
+    margin-left: auto;
+    margin-right: clamp(2rem, 8vw, 9rem);
+}
+
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic .minitigerLoginLogo:not(.hide) {
+    top: 50%;
+    left: clamp(2rem, 8vw, 9rem);
+    width: min(var(--mt-login-logo-size), 42vw);
+    max-height: 30vh;
+    transform: translateY(-50%);
+}
+
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-minimal > .padded-left {
+    border-color: transparent;
+    background: rgba(8, 9, 12, 0.34);
+    box-shadow: none;
+    backdrop-filter: blur(10px);
+}
+
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-minimal .raised.cancel,
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-minimal .btnSelectServer {
+    background: rgba(255, 255, 255, 0.055);
+}
+
+@media (max-width: 760px) {
+    #loginPage.minitigerLoginEnabled {
+        display: block;
+        padding-top: 1rem;
+    }
+
+    #loginPage.minitigerLoginEnabled .minitigerLoginLogo:not(.hide),
+    #loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic .minitigerLoginLogo:not(.hide) {
+        position: relative;
+        top: auto;
+        left: auto;
+        width: min(var(--mt-login-logo-size), 76vw);
+        max-height: 110px;
+        margin: 1.2rem auto 0;
+        transform: none;
+    }
+
+    #loginPage.minitigerLoginEnabled > .padded-left,
+    #loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic > .padded-left {
+        width: min(94vw, 480px);
+        margin: 1.2rem auto 2rem;
+        padding: 1rem !important;
+    }
+}
+/* =========================================================
+   PHASE 18.10.0 TEST - LOGIN POLISH
+   ========================================================= */
+
+#loginPage.minitigerLoginEnabled {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    box-sizing: border-box;
+    flex-direction: column;
+    gap: clamp(0.55rem, 1.4vh, 1rem);
+    overflow: hidden !important;
+}
+
+#loginPage.minitigerLoginEnabled .minitigerLoginLogo:not(.hide) {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(var(--mt-login-logo-size), 72vw);
+    max-height: min(14vh, 132px);
+    margin: 0 auto;
+    transform: none;
+}
+
+#loginPage.minitigerLoginEnabled > .padded-left {
+    margin: 0 auto !important;
+}
+
+#loginPage.minitigerLoginEnabled #divUsers .cardImageContainer,
+#loginPage.minitigerLoginEnabled #divUsers .cardImage,
+#loginPage.minitigerLoginEnabled #divUsers .cardContent {
+    border-radius: 9px !important;
+}
+
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic {
+    align-items: flex-end;
+    justify-content: center;
+    padding-right: clamp(2rem, 8vw, 9rem);
+}
+
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic > .padded-left {
+    margin: 0 !important;
+}
+
+#loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic .minitigerLoginLogo:not(.hide) {
+    position: relative;
+    top: auto;
+    left: auto;
+    align-self: flex-end;
+    width: min(var(--mt-login-logo-size), 500px, 42vw);
+    max-height: min(14vh, 132px);
+    margin: 0;
+    transform: none;
+}
+
+@media (max-width: 760px) {
+    #loginPage.minitigerLoginEnabled,
+    #loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.7rem;
+        overflow: hidden !important;
+    }
+
+    #loginPage.minitigerLoginEnabled .minitigerLoginLogo:not(.hide),
+    #loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic .minitigerLoginLogo:not(.hide) {
+        position: relative;
+        top: auto;
+        left: auto;
+        align-self: center;
+        width: min(var(--mt-login-logo-size), 76vw);
+        max-height: 88px;
+        margin: 0 auto;
+        transform: none;
+    }
+
+    #loginPage.minitigerLoginEnabled > .padded-left,
+    #loginPage.minitigerLoginEnabled.minitigerLoginLayout-cinematic > .padded-left {
+        width: min(94vw, 480px);
+        margin: 0 auto !important;
+        padding: 0.85rem !important;
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_10_0_TEST_TRANSLATOR_LOGIN_POLISH */

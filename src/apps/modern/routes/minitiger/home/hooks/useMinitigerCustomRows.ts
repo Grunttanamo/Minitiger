@@ -121,7 +121,12 @@ const useMinitigerCustomRows = () => {
                     apiClient,
                     SERVER_PREF_KEY,
                     localValue
-                );
+                ).catch(error => {
+                    console.warn(
+                        '[Minitiger Custom Rows] Initiale Server-Synchronisierung ist fehlgeschlagen.',
+                        error
+                    );
+                });
             }
         });
 
@@ -159,20 +164,26 @@ const useMinitigerCustomRows = () => {
                 return;
             }
 
-            if (isAdmin) {
-                void broadcastMinitigerServerPreference(
-                    apiClient,
-                    SERVER_PREF_KEY,
-                    value
+            const writePromise =
+                isAdmin
+                    ? broadcastMinitigerServerPreference(
+                        apiClient,
+                        SERVER_PREF_KEY,
+                        value
+                    )
+                    : writeMinitigerServerPreference(
+                        apiClient,
+                        userId,
+                        SERVER_PREF_KEY,
+                        value
+                    );
+
+            void writePromise.catch(error => {
+                console.warn(
+                    '[Minitiger Custom Rows] Server-Speichern fehlgeschlagen.',
+                    error
                 );
-            } else {
-                void writeMinitigerServerPreference(
-                    apiClient,
-                    userId,
-                    SERVER_PREF_KEY,
-                    value
-                );
-            }
+            });
         }, 450);
     }, [
         apiClient,
@@ -259,3 +270,4 @@ const useMinitigerCustomRows = () => {
 };
 
 export default useMinitigerCustomRows;
+// MINITIGER_PATCH_MARKER: PHASE_18_13_0_TEST_STABILITY_TRANSLATOR_BACKGROUND

@@ -92,8 +92,7 @@ const UserSettingsPage: FC = () => {
                                 </div>
                             </div>
                         </LinkButton>
-
-                        {isQuickConnectEnabled && (
+{isQuickConnectEnabled && (
                             <LinkButton
                                 href={`#/quickconnect?userId=${userId}`}
                                 className='lnkQuickConnectPreferences listItem-border'
@@ -384,4 +383,6 @@ const UserSettingsPage: FC = () => {
     );
 };
 
+// MINITIGER_PATCH_MARKER: PHASE_18_12_0_TEST_USER_MENU_PROFILE_INTEGRATION
+// MINITIGER_PATCH_MARKER: PHASE_18_12_2_TEST_USER_RECOVERY_IDB_STABILITY
 export default UserSettingsPage;

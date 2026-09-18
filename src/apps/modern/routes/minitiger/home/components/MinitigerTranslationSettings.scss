@@ -1,0 +1,268 @@
+.minitigerTranslationWarning {
+    margin: 0.45rem 0 0.8rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid rgba(247, 201, 64, 0.34);
+    border-radius: 7px;
+    background: rgba(247, 201, 64, 0.07);
+    line-height: 1.4;
+}
+
+.minitigerTranslationKeyRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.minitigerTranslationKeyRow > input,
+.minitigerTranslationRunGrid input,
+.minitigerTranslationResult textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.minitigerTranslationLibraries {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.5rem;
+    margin: 0.65rem 0 0.9rem;
+}
+
+.minitigerTranslationLibrary {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    padding: 0.58rem 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.minitigerTranslationLibrary > span {
+    min-width: 0;
+}
+
+.minitigerTranslationLibrary strong,
+.minitigerTranslationLibrary small {
+    display: block;
+}
+
+.minitigerTranslationLibrary strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.minitigerTranslationLibrary small {
+    margin-top: 0.08rem;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.minitigerTranslationOptions,
+.minitigerTranslationRunGrid,
+.minitigerTranslationCompare {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+}
+
+.minitigerTranslationOptions {
+    margin: 0.8rem 0;
+}
+
+.minitigerTranslationOptions > div,
+.minitigerTranslationRunGrid > label {
+    padding: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.018);
+}
+
+.minitigerTranslationMiniCheck {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.5rem 0.65rem 0 0;
+}
+
+.minitigerTranslationRunGrid {
+    margin-top: 0.75rem;
+}
+
+.minitigerTranslationRunGrid label > span {
+    display: block;
+    margin-bottom: 0.35rem;
+    font-weight: 700;
+}
+
+.minitigerTranslationButtons,
+.minitigerTranslationRowActions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.minitigerTranslationInlineStatus {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.82rem;
+}
+
+.minitigerTranslationStatus {
+    margin-top: 0.65rem;
+    padding: 0.6rem 0.7rem;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.025);
+    color: rgba(255, 255, 255, 0.68);
+    line-height: 1.4;
+}
+
+.minitigerTranslationResults {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 0.8rem;
+}
+
+.minitigerTranslationResult {
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.018);
+}
+
+.minitigerTranslationResultTop {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.65rem;
+}
+
+.minitigerTranslationResultIdentity {
+    min-width: 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+}
+
+.minitigerTranslationResultTitle {
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.minitigerTranslationMeta {
+    margin-top: 0.18rem;
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.76rem;
+}
+
+.minitigerTranslationChip {
+    flex: 0 0 auto;
+    padding: 0.17rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+.minitigerTranslationChip.is-ready {
+    background: rgba(68, 180, 96, 0.16);
+    color: #8fe0a3;
+}
+
+.minitigerTranslationChip.is-applied {
+    background: rgba(247, 201, 64, 0.16);
+    color: #f7d869;
+}
+
+.minitigerTranslationChip.is-error {
+    background: rgba(220, 75, 75, 0.16);
+    color: #ef9a9a;
+}
+
+.minitigerTranslationChip.is-translating {
+    background: rgba(73, 156, 255, 0.14);
+    color: #9bc9ff;
+}
+
+.minitigerTranslationField {
+    margin-top: 0.7rem;
+}
+
+.minitigerTranslationFieldLabel {
+    margin-bottom: 0.32rem;
+    font-weight: 800;
+}
+
+.minitigerTranslationCompare > div {
+    min-width: 0;
+}
+
+.minitigerTranslationCompare > div > strong {
+    display: block;
+    margin-bottom: 0.3rem;
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.minitigerTranslationOriginal,
+.minitigerTranslationResult textarea {
+    min-height: 3.5rem;
+    padding: 0.55rem;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.035);
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.minitigerTranslationOriginal {
+    max-height: 12rem;
+    overflow: auto;
+}
+
+.minitigerTranslationResult textarea {
+    resize: vertical;
+    font: inherit;
+}
+
+.minitigerTranslationError {
+    margin: 0.55rem 0 0;
+    color: #ef9a9a;
+    font-size: 0.8rem;
+}
+
+.minitigerTranslationEmpty {
+    padding: 1rem;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+}
+
+.minitigerTranslationPager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 0.8rem;
+    color: rgba(255, 255, 255, 0.62);
+}
+
+@media (max-width: 780px) {
+    .minitigerTranslationOptions,
+    .minitigerTranslationRunGrid,
+    .minitigerTranslationCompare {
+        grid-template-columns: 1fr;
+    }
+
+    .minitigerTranslationResultTop {
+        flex-direction: column;
+    }
+}

@@ -5040,3 +5040,486 @@ iframe.minitigerInlineTrailer {
 .minitigerLibrarySection + .minitigerVirtualHomeSection {
     margin-top: var(--mt-library-virtual-gap, 64px) !important;
 }
+
+/* =========================================================
+   PHASE 18.8.0 TEST - COLOR TEMPLATES
+   ========================================================= */
+
+.minitigerColorThemeSection {
+    overflow: hidden;
+}
+
+.minitigerColorThemeHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.9rem;
+}
+
+.minitigerColorThemeHeader h4 {
+    margin-bottom: 0.25rem;
+}
+
+.minitigerColorThemeHeader .minitigerSettingsHint {
+    margin: 0;
+}
+
+.minitigerColorThemeStatus {
+    flex: 0 0 auto;
+    padding: 0.35rem 0.65rem;
+    border: 1px solid color-mix(
+        in srgb,
+        var(--mt-accent) 48%,
+        rgba(255, 255, 255, 0.18)
+    );
+    border-radius: 999px;
+    background: color-mix(
+        in srgb,
+        var(--mt-accent) 15%,
+        #151617
+    );
+    color: var(--mt-accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.minitigerColorThemeGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+}
+
+.minitigerColorThemePreset {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.45rem;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 7px;
+    background: #121314;
+    color: #eee;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition:
+        transform 140ms ease,
+        border-color 140ms ease,
+        background 140ms ease,
+        box-shadow 140ms ease;
+}
+
+.minitigerColorThemePreset:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.28);
+    background: #191a1c;
+}
+
+.minitigerColorThemePreset.isSelected {
+    border-color: var(--mt-accent);
+    background: color-mix(
+        in srgb,
+        var(--mt-accent) 10%,
+        #121314
+    );
+    box-shadow: inset 0 0 0 1px color-mix(
+        in srgb,
+        var(--mt-accent) 36%,
+        transparent
+    );
+}
+
+.minitigerColorThemePreset strong {
+    font-size: 0.92rem;
+}
+
+.minitigerColorThemePreset small {
+    color: #929292;
+    line-height: 1.35;
+}
+
+.minitigerColorThemeSwatches {
+    height: 2rem;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 5px;
+}
+
+.minitigerColorThemeSwatches i {
+    display: block;
+    min-width: 0;
+}
+
+.minitigerColorThemeCustomHint {
+    margin-bottom: 0;
+}
+
+@media (max-width: 980px) {
+    .minitigerColorThemeGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .minitigerColorThemeHeader {
+        flex-direction: column;
+    }
+
+    .minitigerColorThemeGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_8_0_TEST_COLOR_TEMPLATES */
+
+/* =========================================================
+   PHASE 18.8.1 TEST - COMPACT SETTINGS UI
+   ========================================================= */
+
+.minitigerAdminSettings {
+    width: min(1180px, calc(100vw - 2rem));
+    height: min(860px, calc(100vh - 2rem));
+}
+
+.minitigerAdminSettingsHeader {
+    padding: 0.8rem 1rem;
+}
+
+.minitigerAdminSettingsHeader h2 {
+    font-size: 1.35rem;
+}
+
+.minitigerAdminSettingsHeader span {
+    margin-top: 0.1rem;
+    font-size: 0.73rem;
+}
+
+.minitigerAdminSettingsBody {
+    grid-template-columns: 172px minmax(0, 1fr);
+}
+
+.minitigerAdminSettingsNav {
+    gap: 0.8rem;
+    padding: 0.75rem 0.55rem;
+}
+
+.minitigerSettingsNavGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.22rem;
+}
+
+.minitigerSettingsNavGroup + .minitigerSettingsNavGroup {
+    padding-top: 0.65rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.minitigerSettingsNavGroupLabel {
+    padding: 0 0.5rem 0.25rem;
+    color: #6f7278;
+    font-size: 0.66rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.minitigerAdminSettingsNav button {
+    min-height: 2.2rem;
+    display: grid;
+    grid-template-columns: 1.35rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.38rem;
+    padding: 0.38rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.84rem;
+}
+
+.minitigerSettingsNavIcon {
+    width: 1.35rem;
+    height: 1.35rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.055);
+    color: #a5a7aa;
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+.minitigerSettingsNavText {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.minitigerAdminSettingsNav button:hover .minitigerSettingsNavIcon,
+.minitigerAdminSettingsNav button.isActive .minitigerSettingsNavIcon {
+    background: color-mix(
+        in srgb,
+        var(--mt-accent) 18%,
+        #202124
+    );
+    color: var(--mt-accent);
+}
+
+.minitigerSettingsNavFooter {
+    margin-top: auto;
+    padding: 0.65rem 0.5rem 0.1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    color: #62656b;
+    line-height: 1.35;
+}
+
+.minitigerSettingsNavFooter small {
+    font-size: 0.65rem;
+}
+
+.minitigerAdminSettingsContent {
+    padding: 0.9rem 1rem 1.35rem;
+}
+
+.minitigerAdminSettingsContent > h3 {
+    font-size: 1.18rem;
+}
+
+.minitigerSettingsIntro {
+    margin: 0.2rem 0 0.7rem;
+    font-size: 0.82rem;
+    line-height: 1.35;
+}
+
+.minitigerSettingsCard {
+    margin-bottom: 0.68rem;
+    padding: 0.75rem 0.85rem;
+}
+
+.minitigerSettingsCard h4 {
+    margin-bottom: 0.55rem;
+    font-size: 0.92rem;
+}
+
+.minitigerSettingsToggle {
+    gap: 0.5rem;
+    padding: 0.28rem 0;
+}
+
+.minitigerSettingsToggle small,
+.minitigerSettingsHint {
+    font-size: 0.75rem;
+    line-height: 1.32;
+}
+
+.minitigerSettingsField,
+.minitigerRangeField {
+    gap: 0.26rem;
+    margin: 0.48rem 0;
+}
+
+.minitigerSettingsField > span,
+.minitigerRangeField > span {
+    font-size: 0.82rem;
+}
+
+.minitigerSettingsField select,
+.minitigerSettingsField input[type='text'],
+.minitigerVirtualRowSettings input[type='text'] {
+    min-height: 2.2rem;
+    padding: 0.34rem 0.55rem;
+    font-size: 0.82rem;
+}
+
+.minitigerRangeField > div {
+    grid-template-columns: minmax(0, 1fr) 62px;
+    gap: 0.55rem;
+}
+
+.minitigerRangeField output {
+    padding: 0.38rem 0.45rem;
+    font-size: 0.8rem;
+}
+
+.minitigerColorGrid {
+    gap: 0.55rem;
+}
+
+.minitigerColorSetting {
+    gap: 0.3rem;
+    padding: 0.58rem;
+}
+
+.minitigerColorSetting > span {
+    font-size: 0.8rem;
+}
+
+.minitigerColorSetting input[type='color'] {
+    width: 54px;
+    height: 36px;
+}
+
+.minitigerColorSetting > div {
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 0.5rem;
+}
+
+.minitigerColorSetting input[type='text'] {
+    padding: 0.36rem 0.48rem;
+    font-size: 0.8rem;
+}
+
+.minitigerColorThemeGrid {
+    gap: 0.5rem;
+}
+
+.minitigerColorThemePreset {
+    gap: 0.34rem;
+    padding: 0.58rem;
+}
+
+.minitigerColorThemeSwatches {
+    height: 1.6rem;
+}
+
+.minitigerColorThemePreset strong {
+    font-size: 0.84rem;
+}
+
+.minitigerColorThemePreset small {
+    font-size: 0.7rem;
+}
+
+.minitigerBackupButtons {
+    gap: 0.45rem;
+}
+
+.minitigerVirtualOrderButtons button,
+.minitigerBackupButtons button,
+.minitigerBackupButtons label {
+    min-height: 2.15rem;
+    padding: 0.36rem 0.6rem;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 800px) {
+    .minitigerAdminSettings {
+        width: calc(100vw - 0.75rem);
+        height: calc(100vh - 0.75rem);
+    }
+
+    .minitigerAdminSettingsNav {
+        gap: 0.45rem;
+        padding: 0.5rem;
+    }
+
+    .minitigerSettingsNavGroup {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .minitigerSettingsNavGroup + .minitigerSettingsNavGroup {
+        padding-top: 0;
+        padding-left: 0.5rem;
+        border-top: 0;
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .minitigerSettingsNavGroupLabel,
+    .minitigerSettingsNavFooter {
+        display: none;
+    }
+
+    .minitigerAdminSettingsNav button {
+        width: auto;
+        min-width: max-content;
+        grid-template-columns: 1.2rem auto;
+        padding: 0.32rem 0.45rem;
+    }
+
+    .minitigerSettingsNavIcon {
+        width: 1.2rem;
+        height: 1.2rem;
+    }
+
+    .minitigerAdminSettingsContent {
+        padding: 0.75rem 0.7rem 1rem;
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_8_1_TEST_COMPACT_SETTINGS_UI */
+
+
+
+/* =========================================================
+   PHASE 18.12.3 TEST - HOME HITBOX / HERO INTERACTION FIX
+   ========================================================= */
+
+/* Wenn Banner-Inhalte stark nach unten verschoben werden, dürfen die später
+   gerenderten Home-Reihen die Buttons/Pfeile nicht transparent überdecken. */
+.minitigerHome .minitigerHero {
+    z-index: 10 !important;
+}
+
+.minitigerHome .minitigerHeroContent,
+.minitigerHome .minitigerHeroNavigation {
+    pointer-events: auto !important;
+}
+
+/* Glow-Reihen besitzen absichtlich große transparente Scroll-Paddings und
+   negative Margins. Diese leeren Flächen dürfen die vorherige Reihe nicht
+   als unsichtbare Hitbox überlagern. Nur echte Inhalte werden Pointer-Ziele. */
+.minitigerHome .minitigerLibrarySection,
+.minitigerHome .minitigerMediaSection,
+.minitigerHome .minitigerVirtualHomeSection,
+.minitigerHome .minitigerLibraryGrid,
+.minitigerHome .minitigerMediaRow,
+.minitigerHome .minitigerVirtualHomeRow,
+.minitigerHome .minitigerMediaSection .minitigerSectionHeader,
+.minitigerHome .minitigerVirtualHomeSection .minitigerSectionHeader {
+    pointer-events: none !important;
+}
+
+.minitigerHome .minitigerLibraryCard,
+.minitigerHome .minitigerMediaCard,
+.minitigerHome .minitigerVirtualHomeCard,
+.minitigerHome .minitigerRowArrows,
+.minitigerHome .minitigerRowArrows button {
+    pointer-events: auto !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_12_3_TEST_HOME_USER_POLISH */
+
+
+/* =========================================================
+   PHASE 18.12.4 TEST - SPLIT HERO STACKING
+   ========================================================= */
+
+/* 18.12.3 hob den kompletten Hero auf z-index 10. Dadurch waren die
+   verschobenen Buttons zwar klickbar, aber Bannerbild/Fade lagen ebenfalls
+   über den Media-Bibliotheken. Der Hero erzeugt nun keinen isolierten
+   Stacking Context mehr. */
+.minitigerHome .minitigerHero {
+    z-index: auto !important;
+    isolation: auto !important;
+}
+
+/* Artwork/Fade bleibt unter dem Home-Content (Home-Content = z-index 6). */
+.minitigerHome .minitigerHeroMediaLayer {
+    z-index: 1 !important;
+}
+
+/* Nur echte Banner-Bedienelemente dürfen über den darunterliegenden
+   Bibliotheken liegen, wenn der Nutzer sie stark nach unten verschiebt. */
+.minitigerHome .minitigerHeroContent,
+.minitigerHome .minitigerHeroNavigation,
+.minitigerHome .minitigerHeroFskFloating {
+    z-index: 20 !important;
+    pointer-events: auto !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_12_4_TEST_BANNER_AVATAR_GLOBAL */

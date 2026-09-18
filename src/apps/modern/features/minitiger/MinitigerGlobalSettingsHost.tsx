@@ -13,26 +13,20 @@ import { useUserViews } from 'hooks/api/useUserViews';
 import { useApi } from 'hooks/useApi';
 import type { ItemDto } from 'types/base/models/item-dto';
 
-const MinitigerGlobalSettingsHost = () => {
-    const location = useLocation();
-    const [ open, setOpen ] = useState(false);
+interface OpenSettingsHostProps {
+    home: ReturnType<typeof useMinitigerHomeSettings>;
+    onClose: () => void;
+}
 
-    const {
-        user
-    } = useApi();
+const OpenSettingsHost = ({
+    home,
+    onClose
+}: OpenSettingsHostProps) => {
+    const { user } = useApi();
 
     const isAdmin = Boolean(
         user?.Policy?.IsAdministrator
     );
-
-    const {
-        settings,
-        updateSettings,
-        toggleSection,
-        moveHomeRow,
-        reorderHomeRows,
-        resetSettings
-    } = useMinitigerHomeSettings();
 
     const {
         settings: librarySettings,
@@ -72,7 +66,74 @@ const MinitigerGlobalSettingsHost = () => {
         userId: user?.Id
     });
 
-    useMinitigerThemeVariables(settings);
+    return (
+        <MinitigerSettingsPanel
+            settings={home.settings}
+            librarySettings={librarySettings}
+            detailSettings={detailSettings}
+            customConfig={customConfig}
+            libraries={
+                (userViewsData?.Items ?? []) as ItemDto[]
+            }
+            onUpdate={home.updateSettings}
+            onUpdateLibrarySettings={
+                updateLibrarySettings
+            }
+            onUpdateDetailSettings={
+                updateDetailSettings
+            }
+            onUpdateCustomRow={updateCustomRow}
+            onReplaceCustomConfig={replaceCustomConfig}
+            onToggleSection={home.toggleSection}
+            onMoveHomeRow={home.moveHomeRow}
+            onReorderHomeRows={home.reorderHomeRows}
+            onReset={home.resetSettings}
+            onResetLibrarySettings={
+                resetLibrarySettings
+            }
+            onResetDetailSettings={
+                resetDetailSettings
+            }
+            isAdmin={isAdmin}
+            virtualConfig={virtualConfig}
+            onAddVirtualLibrary={addVirtualLibrary}
+            onUpdateVirtualLibrary={
+                updateVirtualLibrary
+            }
+            onRemoveVirtualLibrary={
+                removeVirtualLibrary
+            }
+            onMoveVirtualLibrary={moveVirtualLibrary}
+            onReplaceVirtualConfig={
+                replaceVirtualConfig
+            }
+            onUpdateVirtualRowTitle={
+                updateVirtualRowTitle
+            }
+            onSetVirtualRowTitleVisible={
+                setVirtualRowTitleVisible
+            }
+            onToggleVirtualRow={toggleVirtualRow}
+            onSetVirtualHomeCardWidth={
+                setVirtualHomeCardWidth
+            }
+            onResetCustomRows={resetCustomRows}
+            onClose={onClose}
+        />
+    );
+};
+
+const MinitigerGlobalSettingsHost = () => {
+    const location = useLocation();
+    const [ open, setOpen ] = useState(false);
+
+    /*
+     * Keep only the lightweight Home/theme state alive globally so native
+     * Minitiger cards retain their CSS variables. Expensive library/custom/
+     * virtual hooks are mounted only while this overlay is actually open.
+     */
+    const home = useMinitigerHomeSettings();
+    useMinitigerThemeVariables(home.settings);
 
     useEffect(() => {
         const onOpen = () => {
@@ -106,60 +167,13 @@ const MinitigerGlobalSettingsHost = () => {
     }
 
     return (
-        <MinitigerSettingsPanel
-            settings={settings}
-            librarySettings={librarySettings}
-            detailSettings={detailSettings}
-            customConfig={customConfig}
-            libraries={
-                (userViewsData?.Items ?? []) as ItemDto[]
-            }
-            onUpdate={updateSettings}
-            onUpdateLibrarySettings={
-                updateLibrarySettings
-            }
-            onUpdateDetailSettings={
-                updateDetailSettings
-            }
-            onUpdateCustomRow={updateCustomRow}
-            onReplaceCustomConfig={replaceCustomConfig}
-            onToggleSection={toggleSection}
-            onMoveHomeRow={moveHomeRow}
-            onReorderHomeRows={reorderHomeRows}
-            onReset={resetSettings}
-            onResetLibrarySettings={
-                resetLibrarySettings
-            }
-            onResetDetailSettings={
-                resetDetailSettings
-            }
-            isAdmin={isAdmin}
-            virtualConfig={virtualConfig}
-            onAddVirtualLibrary={addVirtualLibrary}
-            onUpdateVirtualLibrary={
-                updateVirtualLibrary
-            }
-            onRemoveVirtualLibrary={
-                removeVirtualLibrary
-            }
-            onMoveVirtualLibrary={moveVirtualLibrary}
-            onReplaceVirtualConfig={
-                replaceVirtualConfig
-            }
-            onUpdateVirtualRowTitle={
-                updateVirtualRowTitle
-            }
-            onSetVirtualRowTitleVisible={
-                setVirtualRowTitleVisible
-            }
-            onToggleVirtualRow={toggleVirtualRow}
-            onSetVirtualHomeCardWidth={
-                setVirtualHomeCardWidth
-            }
-            onResetCustomRows={resetCustomRows}
+        <OpenSettingsHost
+            home={home}
             onClose={() => setOpen(false)}
         />
     );
 };
 
 export default MinitigerGlobalSettingsHost;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_13_0_TEST_STABILITY_TRANSLATOR_BACKGROUND

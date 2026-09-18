@@ -29,6 +29,230 @@ domPurify.setConfig({
 });
 
 const enableFocusTransform = !browser.slow && !browser.edge;
+// MINITIGER_PATCH_MARKER: PHASE_18_9_0_TEST_CUSTOM_LOGIN
+// MINITIGER_PATCH_MARKER: PHASE_18_11_0_TEST_CUSTOM_USER_AVATARS
+const MINITIGER_LOGIN_CONFIG_PATTERN = /<!--\s*MINITIGER_LOGIN_CONFIG:([A-Za-z0-9+/=]+)\s*-->/;
+const MINITIGER_LOGIN_USERS_VERSION = 1;
+
+const DEFAULT_MINITIGER_LOGIN_CONFIG = {
+    enabled: false,
+    layout: 'classic',
+    backgroundImage: '',
+    backgroundDim: 48,
+    backgroundBlur: 3,
+    logoImage: '',
+    logoSize: 260,
+    accentColor: '#ffbf00'
+};
+
+const clampMinitigerLoginNumber = (value, fallback, min, max) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+        return fallback;
+    }
+    return Math.min(max, Math.max(min, Math.round(parsed)));
+};
+
+const normalizeMinitigerLoginConfig = value => {
+    if (!value || typeof value !== 'object') {
+        return { ...DEFAULT_MINITIGER_LOGIN_CONFIG };
+    }
+
+    const layout = value.layout === 'cinematic' || value.layout === 'minimal'
+        ? value.layout
+        : 'classic';
+
+    return {
+        enabled: value.enabled === true,
+        layout,
+        backgroundImage: typeof value.backgroundImage === 'string'
+            ? value.backgroundImage
+            : '',
+        backgroundDim: clampMinitigerLoginNumber(
+            value.backgroundDim,
+            DEFAULT_MINITIGER_LOGIN_CONFIG.backgroundDim,
+            0,
+            90
+        ),
+        backgroundBlur: clampMinitigerLoginNumber(
+            value.backgroundBlur,
+            DEFAULT_MINITIGER_LOGIN_CONFIG.backgroundBlur,
+            0,
+            20
+        ),
+        logoImage: typeof value.logoImage === 'string'
+            ? value.logoImage
+            : '',
+        logoSize: clampMinitigerLoginNumber(
+            value.logoSize,
+            DEFAULT_MINITIGER_LOGIN_CONFIG.logoSize,
+            100,
+            520
+        ),
+        accentColor: typeof value.accentColor === 'string'
+            && /^#[0-9a-f]{6}$/i.test(value.accentColor)
+            ? value.accentColor
+            : DEFAULT_MINITIGER_LOGIN_CONFIG.accentColor
+    };
+};
+
+const getMinitigerLoginConfig = disclaimer => {
+    const match = MINITIGER_LOGIN_CONFIG_PATTERN.exec(disclaimer || '');
+    if (!match) {
+        return { ...DEFAULT_MINITIGER_LOGIN_CONFIG };
+    }
+
+    try {
+        const binary = atob(match[1]);
+        const bytes = Uint8Array.from(
+            binary,
+            character => character.charCodeAt(0)
+        );
+        return normalizeMinitigerLoginConfig(
+            JSON.parse(new TextDecoder().decode(bytes))
+        );
+    } catch (error) {
+        console.warn('[Minitiger Login] Konfiguration konnte nicht gelesen werden.', error);
+        return { ...DEFAULT_MINITIGER_LOGIN_CONFIG };
+    }
+};
+
+const applyMinitigerLoginBranding = (view, options) => {
+    const config = getMinitigerLoginConfig(options?.LoginDisclaimer || '');
+    const layouts = [ 'classic', 'cinematic', 'minimal' ];
+
+    view.classList.toggle('minitigerLoginEnabled', config.enabled);
+    for (const layout of layouts) {
+        view.classList.toggle(
+            `minitigerLoginLayout-${layout}`,
+            config.enabled && config.layout === layout
+        );
+    }
+
+    view.style.setProperty(
+        '--mt-login-dim',
+        String(config.backgroundDim / 100)
+    );
+    view.style.setProperty(
+        '--mt-login-blur',
+        `${config.backgroundBlur}px`
+    );
+    view.style.setProperty(
+        '--mt-login-logo-size',
+        `${config.logoSize}px`
+    );
+    view.style.setProperty(
+        '--mt-login-accent',
+        config.accentColor
+    );
+
+    const backdrop = view.querySelector('.minitigerLoginBackdrop');
+    if (backdrop) {
+        backdrop.style.backgroundImage =
+            config.enabled && config.backgroundImage
+                ? `url(${JSON.stringify(config.backgroundImage)})`
+                : '';
+    }
+
+    const logo = view.querySelector('.minitigerLoginLogo');
+    if (logo) {
+        if (config.enabled && config.logoImage) {
+            logo.src = config.logoImage;
+            logo.classList.remove('hide');
+        } else {
+            logo.removeAttribute('src');
+            logo.classList.add('hide');
+        }
+    }
+};
+
+const getMinitigerLoginUsersKey = apiClient => {
+    let serverId = 'server';
+    let deviceId = 'device';
+
+    try {
+        serverId = apiClient.serverId?.() || serverId;
+    } catch (error) {
+        console.debug('[Minitiger Login] serverId nicht verfügbar', error);
+    }
+
+    try {
+        deviceId = apiClient.deviceId?.() || deviceId;
+    } catch (error) {
+        console.debug('[Minitiger Login] deviceId nicht verfügbar', error);
+    }
+
+    return `minitiger.login.users.v${MINITIGER_LOGIN_USERS_VERSION}:${serverId}:${deviceId}`;
+};
+
+const getRememberedMinitigerLoginUsers = apiClient => {
+    try {
+        const parsed = JSON.parse(
+            localStorage.getItem(getMinitigerLoginUsersKey(apiClient)) || '[]'
+        );
+
+        if (!Array.isArray(parsed)) {
+            return [];
+        }
+
+        return parsed.filter(user =>
+            user
+            && typeof user.Id === 'string'
+            && typeof user.Name === 'string'
+        ).slice(0, 12);
+    } catch (error) {
+        console.warn('[Minitiger Login] Lokale Benutzerliste konnte nicht gelesen werden.', error);
+        return [];
+    }
+};
+
+const rememberMinitigerLoginUser = (apiClient, user) => {
+    if (!user?.Id || !user?.Name) {
+        return;
+    }
+
+    try {
+        const remembered =
+            getRememberedMinitigerLoginUsers(apiClient);
+        const previous = remembered.find(
+            entry => entry.Id === user.Id
+        );
+        const existing = remembered.filter(
+            entry => entry.Id !== user.Id
+        );
+        const next = [
+            {
+                Id: user.Id,
+                Name: user.Name,
+                HasPassword: user.HasPassword !== false,
+                PrimaryImageTag: user.PrimaryImageTag || null,
+                MinitigerAvatar:
+                    previous?.MinitigerAvatar || null
+            },
+            ...existing
+        ].slice(0, 12);
+
+        localStorage.setItem(
+            getMinitigerLoginUsersKey(apiClient),
+            JSON.stringify(next)
+        );
+    } catch (error) {
+        console.warn('[Minitiger Login] Benutzer konnte nicht lokal gemerkt werden.', error);
+    }
+};
+
+const forgetMinitigerLoginUser = (apiClient, userId) => {
+    try {
+        const next = getRememberedMinitigerLoginUsers(apiClient)
+            .filter(user => user.Id !== userId);
+        localStorage.setItem(
+            getMinitigerLoginUsersKey(apiClient),
+            JSON.stringify(next)
+        );
+    } catch (error) {
+        console.warn('[Minitiger Login] Benutzer konnte nicht entfernt werden.', error);
+    }
+};
 
 function authenticateUserByName(page, apiClient, url, username, password) {
     loading.show();
@@ -36,7 +260,7 @@ function authenticateUserByName(page, apiClient, url, username, password) {
         const user = result.User;
         loading.hide();
 
-        onLoginSuccessful(user.Id, result.AccessToken, apiClient, url);
+        onLoginSuccessful(user, result.AccessToken, apiClient, url);
     }, function (response) {
         page.querySelector('#txtManualPassword').value = '';
         loading.hide();
@@ -87,7 +311,7 @@ function authenticateQuickConnect(apiClient, targetUrl) {
                 }
 
                 const result = await apiClient.quickConnect(data.Secret);
-                onLoginSuccessful(result.User.Id, result.AccessToken, apiClient, targetUrl);
+                onLoginSuccessful(result.User, result.AccessToken, apiClient, targetUrl);
             }, function (e) {
                 clearInterval(interval);
 
@@ -118,8 +342,9 @@ function authenticateQuickConnect(apiClient, targetUrl) {
     });
 }
 
-function onLoginSuccessful(id, accessToken, apiClient, url) {
-    Dashboard.onServerChanged(id, accessToken, apiClient);
+function onLoginSuccessful(user, accessToken, apiClient, url) {
+    rememberMinitigerLoginUser(apiClient, user);
+    Dashboard.onServerChanged(user.Id, accessToken, apiClient);
     Dashboard.navigate(url || 'home');
 }
 
@@ -165,7 +390,13 @@ function loadUserList(context, apiClient, users) {
         html += `<div class="cardContent" data-haspw="${user.HasPassword}" data-username="${user.Name}" data-userid="${user.Id}">`;
         let imgUrl;
 
-        if (user.PrimaryImageTag) {
+        if (
+            typeof user.MinitigerAvatar === 'string'
+            && user.MinitigerAvatar.startsWith('data:image/')
+        ) {
+            imgUrl = user.MinitigerAvatar;
+            html += '<div class="cardImageContainer coveredImage minitigerCustomLoginAvatar" style="background-image:url(\'' + imgUrl + "');\"></div>";
+        } else if (user.PrimaryImageTag) {
             imgUrl = apiClient.getUserImageUrl(user.Id, {
                 width: 300,
                 tag: user.PrimaryImageTag,
@@ -183,6 +414,7 @@ function loadUserList(context, apiClient, users) {
         html += '</div>';
         html += '<div class="cardFooter visualCardBox-cardFooter">';
         html += '<div class="cardText singleCardText cardTextCentered">' + user.Name + '</div>';
+        html += '<span class="minitigerRememberedForget" data-userid="' + user.Id + '" role="button" tabindex="0">Von diesem Gerät vergessen</span>';
         html += '</div>';
         html += '</div>';
         html += '</button>';
@@ -224,7 +456,53 @@ export default function (view, params) {
         });
     }
 
+    function showRememberedUsers() {
+        const apiClient = getApiClient();
+        const users = getRememberedMinitigerLoginUsers(apiClient);
+
+        if (users.length) {
+            showVisualForm();
+            loadUserList(view, apiClient, users);
+            return;
+        }
+
+        view.querySelector('#divUsers').innerHTML = '';
+        view.querySelector('#txtManualName').value = '';
+        showManualForm(view, false, false);
+    }
+
+    function showOriginalPublicUsers() {
+        const apiClient = getApiClient();
+        return apiClient.getPublicUsers().then(function (users) {
+            if (users.length) {
+                showVisualForm();
+                loadUserList(view, apiClient, users);
+            } else {
+                view.querySelector('#txtManualName').value = '';
+                showManualForm(view, false, false);
+            }
+        }).catch(function (error) {
+            console.debug('[Minitiger Login] Originale Public-User-Liste konnte nicht geladen werden.', error);
+            view.querySelector('#txtManualName').value = '';
+            showManualForm(view, false, false);
+        });
+    }
+
     view.querySelector('#divUsers').addEventListener('click', function (e) {
+        const target = e.target instanceof Element ? e.target : null;
+        const forgetButton = target?.closest('.minitigerRememberedForget');
+
+        if (forgetButton) {
+            e.preventDefault();
+            e.stopPropagation();
+            forgetMinitigerLoginUser(
+                getApiClient(),
+                forgetButton.getAttribute('data-userid')
+            );
+            showRememberedUsers();
+            return;
+        }
+
         const card = dom.parentWithClass(e.target, 'card');
         const cardContent = card ? card.querySelector('.cardContent') : null;
 
@@ -288,18 +566,18 @@ export default function (view, params) {
                 console.debug('Failed to get QuickConnect status');
             });
 
-        apiClient.getPublicUsers().then(function (users) {
-            if (users.length) {
-                showVisualForm();
-                loadUserList(view, apiClient, users);
-            } else {
-                view.querySelector('#txtManualName').value = '';
-                showManualForm(view, false, false);
-            }
-        }).catch().then(function () {
-            loading.hide();
-        });
+        // Nutzerliste wird nach dem Laden der globalen Login-Konfiguration gewählt.
         apiClient.getJSON(apiClient.getUrl('Branding/Configuration')).then(function (options) {
+            const loginConfig = getMinitigerLoginConfig(options.LoginDisclaimer || '');
+            applyMinitigerLoginBranding(view, options);
+
+            if (loginConfig.enabled) {
+                showRememberedUsers();
+                loading.hide();
+            } else {
+                showOriginalPublicUsers().finally(() => loading.hide());
+            }
+
             const loginDisclaimer = view.querySelector('.loginDisclaimer');
 
             // eslint-disable-next-line sonarjs/disabled-auto-escaping
@@ -316,6 +594,10 @@ export default function (view, params) {
                     elem.tabIndex = -1;
                 }
             }
+        }).catch(function (error) {
+            console.debug('[Minitiger Login] Branding-Konfiguration konnte nicht geladen werden.', error);
+            applyMinitigerLoginBranding(view, {});
+            showOriginalPublicUsers().finally(() => loading.hide());
         });
     });
     view.addEventListener('viewhide', function () {

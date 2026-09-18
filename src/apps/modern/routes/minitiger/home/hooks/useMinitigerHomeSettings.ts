@@ -20,6 +20,10 @@ import {
     readMinitigerServerPreference,
     writeMinitigerServerPreference
 } from '../serverPreferences';
+import {
+    readMinitigerToolbarBranding,
+    writeMinitigerToolbarBranding
+} from '../toolbarBranding';
 
 const STORAGE_PREFIX = 'Minitiger.NativeHomeSettings.v1';
 const SERVER_PREF_KEY = 'homeSettings';
@@ -38,6 +42,8 @@ const PERSONAL_HOME_SETTING_KEYS: Array<keyof MinitigerHomeSettings> = [
     'genreTagColor',
     'glowStrength',
     'glowSize',
+    'toolbarBrandTextEnabled',
+    'toolbarBrandText',
     'bannerFskVisible',
     'showAudioFlags',
     'showFskBadges',
@@ -49,6 +55,30 @@ const PERSONAL_HOME_SETTING_KEYS: Array<keyof MinitigerHomeSettings> = [
     'glowEnabled',
     'previewEnabled'
 ];
+
+const TOOLBAR_BRANDING_SETTING_KEYS: Array<keyof MinitigerHomeSettings> = [
+    'toolbarBrandLogoEnabled',
+    'toolbarBrandLogoUrl',
+    'toolbarBrandLogoSize'
+];
+
+const isNonBroadcastHomePatch = (
+    patch: Partial<MinitigerHomeSettings>
+) => {
+    const keys =
+        Object.keys(
+            patch
+        ) as Array<keyof MinitigerHomeSettings>;
+
+    if (!keys.length) {
+        return true;
+    }
+
+    return keys.every(key =>
+        PERSONAL_HOME_SETTING_KEYS.includes(key)
+        || TOOLBAR_BRANDING_SETTING_KEYS.includes(key)
+    );
+};
 
 const cloneDefaults = (): MinitigerHomeSettings => ({
     ...DEFAULT_HOME_SETTINGS,
@@ -105,6 +135,8 @@ const useMinitigerHomeSettings = () => {
 
     const serverSaveTimer = useRef<number | null>(null);
     const pendingServerValue = useRef<MinitigerHomeSettings | null>(null);
+    const pendingServerBroadcast = useRef(false);
+    const toolbarBrandingResolved = useRef(false);
 
     useEffect(() => {
         if (activeStorageKey.current === storageKey) {
@@ -154,17 +186,32 @@ const useMinitigerHomeSettings = () => {
             }
 
             if (serverValue) {
-                const normalized = normalizeHomeSettings(serverValue);
-                setSettingsState(normalized);
+                setSettingsState(current => {
+                    /*
+                     * Toolbar branding is server-global and must never be
+                     * overwritten by an older per-user Home preference.
+                     */
+                    const normalized = normalizeHomeSettings({
+                        ...serverValue,
+                        toolbarBrandLogoEnabled:
+                            current.toolbarBrandLogoEnabled,
+                        toolbarBrandLogoUrl:
+                            current.toolbarBrandLogoUrl,
+                        toolbarBrandLogoSize:
+                            current.toolbarBrandLogoSize
+                    });
 
-                try {
-                    window.localStorage.setItem(
-                        activeStorageKey.current,
-                        JSON.stringify(normalized)
-                    );
-                } catch {
-                    // Server value remains authoritative for this load.
-                }
+                    try {
+                        window.localStorage.setItem(
+                            activeStorageKey.current,
+                            JSON.stringify(normalized)
+                        );
+                    } catch {
+                        // Server value remains authoritative for this load.
+                    }
+
+                    return normalized;
+                });
 
                 return;
             }
@@ -179,7 +226,12 @@ const useMinitigerHomeSettings = () => {
                     SERVER_PREF_KEY,
                     localValue,
                     PERSONAL_HOME_SETTING_KEYS
-                );
+                ).catch(error => {
+                    console.warn(
+                        '[Minitiger Settings] Initiale Server-Synchronisierung ist fehlgeschlagen.',
+                        error
+                    );
+                });
             }
         });
 
@@ -192,8 +244,146 @@ const useMinitigerHomeSettings = () => {
         user?.Id
     ]);
 
+
+    useEffect(() => {
+        toolbarBrandingResolved.current = false;
+    }, [
+        apiClient,
+        user?.Id
+    ]);
+
+    useEffect(() => {
+        if (!apiClient || toolbarBrandingResolved.current) {
+            return;
+        }
+
+        let cancelled = false;
+
+        const applyGlobalBranding = (
+            globalBranding: {
+                enabled: boolean;
+                image: string;
+                size: number;
+            }
+        ) => {
+            if (cancelled) {
+                return;
+            }
+
+            toolbarBrandingResolved.current = true;
+
+            setSettingsState(current => {
+                const next = normalizeHomeSettings({
+                    ...current,
+                    toolbarBrandLogoEnabled:
+                        globalBranding.enabled,
+                    toolbarBrandLogoUrl:
+                        globalBranding.image,
+                    toolbarBrandLogoSize:
+                        globalBranding.size
+                });
+
+                try {
+                    window.localStorage.setItem(
+                        activeStorageKey.current,
+                        JSON.stringify(next)
+                    );
+                } catch {
+                    // In-memory settings are enough for this session.
+                }
+
+                return next;
+            });
+        };
+
+        const load = async () => {
+            const globalBranding =
+                await readMinitigerToolbarBranding(
+                    apiClient
+                );
+
+            if (cancelled) {
+                return;
+            }
+
+            if (globalBranding) {
+                applyGlobalBranding(globalBranding);
+                return;
+            }
+
+            if (!isAdmin) {
+                toolbarBrandingResolved.current = true;
+                return;
+            }
+
+            /*
+             * One-time migration path for older 18.8/18.12 builds.
+             * Read the legacy value directly instead of waiting for a
+             * state dependency loop to fire again.
+             */
+            const userId = user?.Id;
+            const legacy =
+                userId
+                    ? await readMinitigerServerPreference<MinitigerHomeSettings>(
+                        apiClient,
+                        userId,
+                        SERVER_PREF_KEY
+                    )
+                    : null;
+
+            if (cancelled) {
+                return;
+            }
+
+            if (
+                legacy
+                && (
+                    legacy.toolbarBrandLogoUrl
+                    || legacy.toolbarBrandLogoEnabled
+                )
+            ) {
+                const migrated = {
+                    enabled:
+                        legacy.toolbarBrandLogoEnabled,
+                    image:
+                        legacy.toolbarBrandLogoUrl,
+                    size:
+                        legacy.toolbarBrandLogoSize
+                };
+
+                await writeMinitigerToolbarBranding(
+                    apiClient,
+                    migrated
+                );
+
+                applyGlobalBranding(migrated);
+                return;
+            }
+
+            toolbarBrandingResolved.current = true;
+        };
+
+        void load().catch(error => {
+            toolbarBrandingResolved.current = false;
+            console.warn(
+                '[Minitiger Branding] Globales Toolbar-Branding konnte nicht geladen werden.',
+                error
+            );
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [
+        apiClient,
+        isAdmin,
+        user?.Id
+    ]);
+
+
     const saveToServer = useCallback((
-        value: MinitigerHomeSettings
+        value: MinitigerHomeSettings,
+        broadcastForAdmin = true
     ) => {
         const userId = user?.Id;
 
@@ -202,6 +392,9 @@ const useMinitigerHomeSettings = () => {
         }
 
         pendingServerValue.current = value;
+        pendingServerBroadcast.current =
+            pendingServerBroadcast.current
+            || broadcastForAdmin;
 
         if (serverSaveTimer.current != null) {
             window.clearTimeout(serverSaveTimer.current);
@@ -211,27 +404,37 @@ const useMinitigerHomeSettings = () => {
             serverSaveTimer.current = null;
 
             const pending = pendingServerValue.current;
+            const shouldBroadcast =
+                pendingServerBroadcast.current;
+
             pendingServerValue.current = null;
+            pendingServerBroadcast.current = false;
 
             if (!pending) {
                 return;
             }
 
-            if (isAdmin) {
-                void broadcastMinitigerServerPreference(
-                    apiClient,
-                    SERVER_PREF_KEY,
-                    pending,
-                    PERSONAL_HOME_SETTING_KEYS
+            const writePromise =
+                isAdmin && shouldBroadcast
+                    ? broadcastMinitigerServerPreference(
+                        apiClient,
+                        SERVER_PREF_KEY,
+                        pending,
+                        PERSONAL_HOME_SETTING_KEYS
+                    )
+                    : writeMinitigerServerPreference(
+                        apiClient,
+                        userId,
+                        SERVER_PREF_KEY,
+                        pending
+                    );
+
+            void writePromise.catch(error => {
+                console.warn(
+                    '[Minitiger Settings] Server-Speichern fehlgeschlagen.',
+                    error
                 );
-            } else {
-                void writeMinitigerServerPreference(
-                    apiClient,
-                    userId,
-                    SERVER_PREF_KEY,
-                    pending
-                );
-            }
+            });
         }, 450);
     }, [
         apiClient,
@@ -247,7 +450,8 @@ const useMinitigerHomeSettings = () => {
 
     const saveLocal = useCallback((
         value: MinitigerHomeSettings,
-        warning: string
+        warning: string,
+        broadcastForAdmin = true
     ) => {
         try {
             window.localStorage.setItem(
@@ -265,7 +469,7 @@ const useMinitigerHomeSettings = () => {
             )
         );
 
-        saveToServer(value);
+        saveToServer(value, broadcastForAdmin);
     }, [saveToServer]);
 
     const persist = useCallback((
@@ -290,14 +494,61 @@ const useMinitigerHomeSettings = () => {
                 ...patch
             });
 
+            const broadcastForAdmin =
+                !isNonBroadcastHomePatch(patch);
+
             saveLocal(
                 next,
-                '[Minitiger Settings] Einstellungen konnten nicht gespeichert werden'
+                '[Minitiger Settings] Einstellungen konnten nicht gespeichert werden',
+                broadcastForAdmin
             );
+
+            const toolbarBrandingChanged =
+                Object.prototype.hasOwnProperty.call(
+                    patch,
+                    'toolbarBrandLogoEnabled'
+                )
+                || Object.prototype.hasOwnProperty.call(
+                    patch,
+                    'toolbarBrandLogoUrl'
+                )
+                || Object.prototype.hasOwnProperty.call(
+                    patch,
+                    'toolbarBrandLogoSize'
+                );
+
+            if (
+                toolbarBrandingChanged
+                && isAdmin
+                && apiClient
+            ) {
+                toolbarBrandingResolved.current = true;
+
+                void writeMinitigerToolbarBranding(
+                    apiClient,
+                    {
+                        enabled:
+                            next.toolbarBrandLogoEnabled,
+                        image:
+                            next.toolbarBrandLogoUrl,
+                        size:
+                            next.toolbarBrandLogoSize
+                    }
+                ).catch(error => {
+                    console.warn(
+                        '[Minitiger Branding] Globales Toolbar-Branding konnte nicht gespeichert werden.',
+                        error
+                    );
+                });
+            }
 
             return next;
         });
-    }, [saveLocal]);
+    }, [
+        apiClient,
+        isAdmin,
+        saveLocal
+    ]);
 
     const toggleSection = useCallback((
         sectionId: HomeSectionId
@@ -448,3 +699,8 @@ const useMinitigerHomeSettings = () => {
 };
 
 export default useMinitigerHomeSettings;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_12_3_TEST_HOME_USER_POLISH
+
+// MINITIGER_PATCH_MARKER: PHASE_18_12_4_TEST_BANNER_AVATAR_GLOBAL
+// MINITIGER_PATCH_MARKER: PHASE_18_13_0_TEST_STABILITY_TRANSLATOR_BACKGROUND

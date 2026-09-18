@@ -4,6 +4,7 @@ import { ItemFields } from '@jellyfin/sdk/lib/generated-client/models/item-field
 import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-by';
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order';
 import type { ApiClient } from 'jellyfin-apiclient';
+import { useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
@@ -93,6 +94,8 @@ const MinitigerHome = () => {
         user,
         __legacyApiClient__: apiClient
     } = useApi();
+
+    const queryClient = useQueryClient();
 
     const [ settingsOpen, setSettingsOpen ] = useState(false);
     const [ assignTarget, setAssignTarget ] = useState<ItemDto | null>(null);
@@ -400,7 +403,8 @@ const MinitigerHome = () => {
             && [
                 'episode',
                 'movie',
-                'video'
+                'video',
+                'musicvideo'
             ].includes(type);
     });
 
@@ -413,6 +417,26 @@ const MinitigerHome = () => {
     const activeVirtualLibrary = virtualConfig.libraries.find(
         library => library.id === virtualLibraryId
     );
+
+
+    useEffect(() => {
+        if (!user?.Id) {
+            return;
+        }
+
+        void Promise.all([
+            queryClient.invalidateQueries({
+                queryKey: [ 'User', user.Id, 'ResumeItems' ]
+            }),
+            queryClient.invalidateQueries({
+                queryKey: [ 'User', user.Id, 'NextUp' ]
+            })
+        ]);
+    }, [
+        queryClient,
+        user?.Id,
+        virtualLibraryId
+    ]);
 
     const isVirtuallyAssigned = (itemId?: string | null) => (
         Boolean(itemId)
@@ -887,4 +911,5 @@ const MinitigerHome = () => {
     );
 };
 
+// MINITIGER_PATCH_MARKER: PHASE_18_12_3_TEST_HOME_USER_POLISH
 export default MinitigerHome;

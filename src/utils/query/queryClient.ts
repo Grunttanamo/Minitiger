@@ -63,7 +63,50 @@ queryClient = new QueryClient({
 /** Create an IndexedDB persister for react-query-persist-client. Uses idb-keyval for simplicity. */
 const createIDBPersister = (idbValidKey: IDBValidKey = 'query-cache') => ({
     persistClient: async (client: PersistedClient) => {
-        await set(idbValidKey, client);
+        try {
+            await set(idbValidKey, client);
+        } catch (error) {
+            const isDataCloneError =
+                error instanceof DOMException
+                && error.name === 'DataCloneError';
+
+            if (!isDataCloneError) {
+                throw error;
+            }
+
+            const isCloneable = (value: unknown) => {
+                try {
+                    window.structuredClone(value);
+                    return true;
+                } catch {
+                    return false;
+                }
+            };
+
+            const queries = client.clientState.queries.filter(isCloneable);
+            const mutations = client.clientState.mutations.filter(isCloneable);
+
+            const safeClient: PersistedClient = {
+                ...client,
+                clientState: {
+                    ...client.clientState,
+                    queries,
+                    mutations
+                }
+            };
+
+            console.warn(
+                '[QueryCache] Nicht-klonbare Cache-Einträge wurden nicht in IndexedDB persistiert.',
+                {
+                    skippedQueries:
+                        client.clientState.queries.length - queries.length,
+                    skippedMutations:
+                        client.clientState.mutations.length - mutations.length
+                }
+            );
+
+            await set(idbValidKey, safeClient);
+        }
     },
     restoreClient: () => {
         return get<PersistedClient>(idbValidKey);
@@ -74,3 +117,5 @@ const createIDBPersister = (idbValidKey: IDBValidKey = 'query-cache') => ({
 } satisfies Persister);
 
 export const persister = createIDBPersister('jellyfin-query-cache');
+
+// MINITIGER_PATCH_MARKER: PHASE_18_12_2_TEST_USER_RECOVERY_IDB_STABILITY

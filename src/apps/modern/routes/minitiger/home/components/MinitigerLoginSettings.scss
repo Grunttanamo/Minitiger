@@ -1,0 +1,147 @@
+.minitigerLoginAccentRow {
+    display: grid;
+    gap: 0.45rem;
+    margin-top: 0.8rem;
+}
+
+.minitigerLoginAccentRow > span,
+.minitigerLoginUpload > span {
+    color: #d7d7d7;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.minitigerLoginAccentRow > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.42rem;
+}
+
+.minitigerLoginAccentRow button,
+.minitigerLoginAccentRow input[type='color'] {
+    width: 1.85rem;
+    height: 1.85rem;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.minitigerLoginAccentRow button.isSelected {
+    border-color: #fff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
+}
+
+.minitigerLoginUpload {
+    display: grid;
+    gap: 0.48rem;
+    margin-bottom: 0.6rem;
+}
+
+.minitigerLoginUpload input[type='file'] {
+    width: 100%;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #cfcfcf;
+}
+
+.minitigerLoginRemoveMedia {
+    margin: 0 0 0.75rem;
+}
+
+.minitigerLoginSettingsMessage {
+    margin-top: 0.7rem;
+}
+
+.minitigerLoginPreview {
+    --mt-login-preview-accent: #ffbf00;
+    --mt-login-preview-dim: 0.48;
+    --mt-login-preview-blur: 3px;
+    position: relative;
+    min-height: 300px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    background: #101114;
+}
+
+.minitigerLoginPreviewBackground,
+.minitigerLoginPreviewShade {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.minitigerLoginPreviewBackground {
+    object-fit: cover;
+    filter: blur(var(--mt-login-preview-blur));
+    transform: scale(1.04);
+}
+
+.minitigerLoginPreviewShade {
+    background: rgba(0, 0, 0, var(--mt-login-preview-dim));
+}
+
+.minitigerLoginPreviewContent {
+    position: relative;
+    z-index: 1;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.minitigerLoginPreview.is-cinematic .minitigerLoginPreviewContent {
+    align-items: flex-end;
+    padding-right: 8%;
+}
+
+.minitigerLoginPreview.is-minimal .minitigerLoginPreviewCard {
+    background: rgba(12, 13, 16, 0.38);
+    box-shadow: none;
+}
+
+.minitigerLoginPreviewLogo {
+    max-width: 72%;
+    max-height: 90px;
+    object-fit: contain;
+}
+
+.minitigerLoginPreviewContent > strong {
+    color: var(--mt-login-preview-accent);
+    font-size: 1.7rem;
+}
+
+.minitigerLoginPreviewCard {
+    width: min(250px, 72%);
+    display: grid;
+    gap: 0.5rem;
+    padding: 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    background: rgba(18, 19, 23, 0.82);
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.32);
+}
+
+.minitigerLoginPreviewCard i {
+    height: 0.55rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.11);
+}
+
+.minitigerLoginPreviewCard button {
+    margin-top: 0.2rem;
+    border: 0;
+    border-radius: 6px;
+    padding: 0.45rem;
+    background: var(--mt-login-preview-accent);
+    color: #111;
+    font-weight: 800;
+}

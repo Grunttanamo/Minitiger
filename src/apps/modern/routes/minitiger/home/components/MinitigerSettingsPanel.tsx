@@ -21,6 +21,8 @@ import {
 } from '../config/virtualLibraries';
 import {
     ACCENT_PRESETS,
+    COLOR_THEME_KEYS,
+    COLOR_THEME_PRESETS,
     getContrastTextColor,
     type BannerItemLimit,
     type BannerRotationSeconds,
@@ -33,6 +35,9 @@ import {
 } from '../config/homeSettings';
 import type { MinitigerVirtualMediaKind } from '../virtualServerSync';
 import MinitigerHomeBuilderSettings from './MinitigerHomeBuilderSettings';
+import MinitigerLoginSettings from './MinitigerLoginSettings';
+import MinitigerTranslationSettings from './MinitigerTranslationSettings';
+import MinitigerAvatarGallerySettings from './MinitigerAvatarGallerySettings';
 
 interface MinitigerSettingsPanelProps {
     settings: MinitigerHomeSettings;
@@ -140,6 +145,9 @@ type SettingsTab =
     | 'libraries'
     | 'details'
     | 'colors'
+    | 'login'
+    | 'translation'
+    | 'avatars'
     | 'backup';
 
 const ROTATION_OPTIONS: Array<{
@@ -202,6 +210,130 @@ const parseAZMode = (value: string): MinitigerAZMode => {
 
     return 'auto';
 };
+
+const TOOLBAR_BRAND_LOGO_MAX_INPUT_BYTES = 8 * 1024 * 1024;
+const TOOLBAR_BRAND_LOGO_MAX_WIDTH = 640;
+const TOOLBAR_BRAND_LOGO_MAX_HEIGHT = 256;
+const TOOLBAR_BRAND_LOGO_MAX_DATA_URL_LENGTH = 220000;
+const TOOLBAR_BRAND_LOGO_TYPES = new Set([
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'image/webp'
+]);
+
+const createToolbarBrandLogoSource = (
+    file: File
+): Promise<string> => new Promise((resolve, reject) => {
+    if (!TOOLBAR_BRAND_LOGO_TYPES.has(file.type)) {
+        reject(new Error(
+            'Bitte PNG, JPG oder WebP verwenden.'
+        ));
+        return;
+    }
+
+    if (file.size > TOOLBAR_BRAND_LOGO_MAX_INPUT_BYTES) {
+        reject(new Error(
+            'Das Bild darf maximal 8 MB groß sein.'
+        ));
+        return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+
+    const cleanup = () => {
+        URL.revokeObjectURL(objectUrl);
+    };
+
+    image.onerror = () => {
+        cleanup();
+        reject(new Error(
+            'Das Bild konnte nicht gelesen werden.'
+        ));
+    };
+
+    image.onload = () => {
+        const width = image.naturalWidth;
+        const height = image.naturalHeight;
+
+        if (!width || !height) {
+            cleanup();
+            reject(new Error(
+                'Das Bild hat keine gültigen Abmessungen.'
+            ));
+            return;
+        }
+
+        const scale = Math.min(
+            1,
+            TOOLBAR_BRAND_LOGO_MAX_WIDTH / width,
+            TOOLBAR_BRAND_LOGO_MAX_HEIGHT / height
+        );
+        const targetWidth = Math.max(
+            1,
+            Math.round(width * scale)
+        );
+        const targetHeight = Math.max(
+            1,
+            Math.round(height * scale)
+        );
+
+        const canvas = document.createElement('canvas');
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+
+        const context = canvas.getContext('2d');
+
+        if (!context) {
+            cleanup();
+            reject(new Error(
+                'Das Bild konnte nicht verarbeitet werden.'
+            ));
+            return;
+        }
+
+        context.imageSmoothingEnabled = true;
+        context.imageSmoothingQuality = 'high';
+        context.drawImage(
+            image,
+            0,
+            0,
+            targetWidth,
+            targetHeight
+        );
+
+        let source = '';
+
+        for (const quality of [ 0.92, 0.84, 0.76, 0.68 ]) {
+            source = canvas.toDataURL('image/webp', quality);
+
+            if (
+                source.length
+                <= TOOLBAR_BRAND_LOGO_MAX_DATA_URL_LENGTH
+            ) {
+                break;
+            }
+        }
+
+        cleanup();
+
+        if (
+            !source
+            || source.length
+                > TOOLBAR_BRAND_LOGO_MAX_DATA_URL_LENGTH
+        ) {
+            reject(new Error(
+                'Das Logo ist nach der Optimierung noch zu groß. Bitte ein kleineres Bild verwenden.'
+            ));
+            return;
+        }
+
+        resolve(source);
+    };
+
+    image.src = objectUrl;
+});
 
 const ColorField = ({
     label,
@@ -436,6 +568,14 @@ const MinitigerSettingsPanel = ({
     const [ activeTab, setActiveTab ] = useState<SettingsTab>('general');
     const [ importMessage, setImportMessage ] = useState('');
     const [ virtualMediaMessage, setVirtualMediaMessage ] = useState('');
+    const activeColorTheme =
+        COLOR_THEME_PRESETS.find(preset =>
+            COLOR_THEME_KEYS.every(key =>
+                settings[key].toLowerCase()
+                === preset.colors[key].toLowerCase()
+            )
+        );
+
 
     const onUpdate = (
         patch: Partial<MinitigerHomeSettings>
@@ -676,14 +816,23 @@ const MinitigerSettingsPanel = ({
 
     const tabButton = (
         id: SettingsTab,
-        label: string
+        label: string,
+        icon: string
     ) => (
         <button
             type='button'
             className={activeTab === id ? 'isActive' : ''}
             onClick={() => setActiveTab(id)}
         >
-            {label}
+            <span
+                className='minitigerSettingsNavIcon'
+                aria-hidden='true'
+            >
+                {icon}
+            </span>
+            <span className='minitigerSettingsNavText'>
+                {label}
+            </span>
         </button>
     );
 
@@ -718,13 +867,42 @@ const MinitigerSettingsPanel = ({
                 </header>
 
                 <div className='minitigerAdminSettingsBody'>
-                    <nav className='minitigerAdminSettingsNav'>
-                        {tabButton('general', 'General')}
-                        {isAdmin && tabButton('home', 'Startseite')}
-                        {tabButton('libraries', 'Bibliotheken')}
-                        {isAdmin && tabButton('details', 'Detailpages')}
-                        {tabButton('colors', 'Farben')}
-                        {isAdmin && tabButton('backup', 'Backup & Import')}
+                    <nav
+                        className='minitigerAdminSettingsNav'
+                        aria-label='Minitiger Einstellungen'
+                    >
+                        <div className='minitigerSettingsNavGroup'>
+                            <span className='minitigerSettingsNavGroupLabel'>
+                                Persönlich
+                            </span>
+
+                            {tabButton('general', 'Allgemein', '⚙')}
+                            {tabButton('colors', 'Farben', '◉')}
+                            {tabButton('libraries', 'Bibliotheken', '▦')}
+                        </div>
+
+                        {isAdmin && (
+                            <div className='minitigerSettingsNavGroup isAdmin'>
+                                <span className='minitigerSettingsNavGroupLabel'>
+                                    Administrator
+                                </span>
+
+                                {tabButton('home', 'Startseite', '⌂')}
+                                {tabButton('login', 'Login', '↪')}
+                                {tabButton('avatars', 'Avatar-Galerie', '☺')}
+                                {tabButton('details', 'Detailpages', '▤')}
+                                {tabButton('translation', 'Auto-Übersetzung', '文')}
+                                {tabButton('backup', 'Backup & Import', '↕')}
+                            </div>
+                        )}
+
+                        <div className='minitigerSettingsNavFooter'>
+                            <small>
+                                {isAdmin
+                                    ? 'Persönliche und globale Einstellungen'
+                                    : 'Deine persönlichen Einstellungen'}
+                            </small>
+                        </div>
                     </nav>
 
                     <main className='minitigerAdminSettingsContent'>
@@ -736,6 +914,163 @@ const MinitigerSettingsPanel = ({
                                         ? 'Globale Standard-Einstellungen für die komplette Minitiger-Oberfläche.'
                                         : 'Persönliche kosmetische Einstellungen für deinen Minitiger-Account.'}
                                 </p>
+
+                                {isAdmin && (
+                                <section
+                                    className='minitigerSettingsCard'
+                                    style={{ display: isAdmin ? undefined : 'none' }}
+                                >
+                                    <h4>Branding oben links</h4>
+                                    <p className='minitigerSettingsHint'>
+                                        Dein persönliches Logo ersetzt oben links das normale Jellyfin-Logo samt Servernamen. Der Klick führt weiterhin wie bisher zur Startseite.
+                                    </p>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={settings.toolbarBrandLogoEnabled}
+                                            onChange={event =>
+                                                onUpdate({
+                                                    toolbarBrandLogoEnabled:
+                                                        event.currentTarget.checked
+                                                })
+                                            }
+                                        />
+                                        <span>
+                                            <strong>Eigenes Logo anzeigen</strong>
+                                            <small>Aktiviert den optischen Ersatz für Jellyfin-Logo und Servernamen. Ohne hochgeladenes Bild bleibt vorsichtshalber das originale Server-Branding sichtbar.</small>
+                                        </span>
+                                    </label>
+
+                                    <label className='minitigerSettingsField'>
+                                        <span>Logo-Datei</span>
+                                        <input
+                                            type='file'
+                                            accept='image/png,image/jpeg,image/webp'
+                                            onChange={event => {
+                                                const input = event.currentTarget;
+                                                const file = input.files?.[0];
+
+                                                input.setCustomValidity('');
+                                                input.value = '';
+
+                                                if (!file) {
+                                                    return;
+                                                }
+
+                                                void createToolbarBrandLogoSource(file)
+                                                    .then(source => {
+                                                        onUpdate({
+                                                            toolbarBrandLogoUrl: source,
+                                                            toolbarBrandLogoEnabled: true
+                                                        });
+                                                    })
+                                                    .catch(error => {
+                                                        const message = error instanceof Error
+                                                            ? error.message
+                                                            : 'Das Logo konnte nicht verarbeitet werden.';
+
+                                                        console.warn(
+                                                            '[Minitiger Branding] Logo-Upload fehlgeschlagen',
+                                                            error
+                                                        );
+                                                        input.setCustomValidity(message);
+                                                        input.reportValidity();
+                                                        window.setTimeout(() => {
+                                                            input.setCustomValidity('');
+                                                        }, 0);
+                                                    });
+                                            }}
+                                        />
+                                        <small>PNG, JPG oder WebP · maximal 8 MB. Das Bild wird im Browser automatisch verkleinert und als kompaktes WebP gespeichert.</small>
+                                    </label>
+
+                                    {settings.toolbarBrandLogoUrl.trim() && (
+                                        <button
+                                            type='button'
+                                            onClick={() => onUpdate({
+                                                toolbarBrandLogoUrl: '',
+                                                toolbarBrandLogoEnabled: false
+                                            })}
+                                            style={{
+                                                alignSelf: 'flex-start',
+                                                margin: '0 0 0.35rem',
+                                                padding: '0.45rem 0.7rem',
+                                                border: '1px solid rgba(255,255,255,0.16)',
+                                                borderRadius: '6px',
+                                                background: 'rgba(255,255,255,0.06)',
+                                                color: 'inherit',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            Logo entfernen
+                                        </button>
+                                    )}
+
+                                    <label className='minitigerRangeField'>
+                                        <span>Logo-Größe</span>
+                                        <div>
+                                            <input
+                                                type='range'
+                                                min='24'
+                                                max='72'
+                                                step='1'
+                                                value={settings.toolbarBrandLogoSize}
+                                                disabled={!settings.toolbarBrandLogoUrl.trim()}
+                                                onChange={event =>
+                                                    onUpdate({
+                                                        toolbarBrandLogoSize:
+                                                            Number(event.currentTarget.value)
+                                                    })
+                                                }
+                                            />
+                                            <output>{settings.toolbarBrandLogoSize}px</output>
+                                        </div>
+                                    </label>
+
+                                    {settings.toolbarBrandLogoEnabled && (
+                                        <div
+                                            aria-label='Branding Vorschau'
+                                            style={{
+                                                minHeight: '3rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '0.55rem',
+                                                marginTop: '0.65rem',
+                                                padding: '0.5rem 0.65rem',
+                                                border: '1px solid rgba(255,255,255,0.08)',
+                                                borderRadius: '7px',
+                                                background: 'rgba(255,255,255,0.025)',
+                                                overflow: 'hidden'
+                                            }}
+                                        >
+                                            {settings.toolbarBrandLogoEnabled
+                                                && settings.toolbarBrandLogoUrl.trim() && (
+                                                <img
+                                                    key={settings.toolbarBrandLogoUrl}
+                                                    src={settings.toolbarBrandLogoUrl}
+                                                    alt=''
+                                                    style={{
+                                                        width: 'auto',
+                                                        height: `${settings.toolbarBrandLogoSize}px`,
+                                                        maxWidth: '14rem',
+                                                        objectFit: 'contain',
+                                                        flex: '0 1 auto'
+                                                    }}
+                                                    onError={event => {
+                                                        event.currentTarget.style.display = 'none';
+                                                    }}
+                                                />
+                                            )}
+
+                                            {settings.toolbarBrandLogoEnabled
+                                                && !settings.toolbarBrandLogoUrl.trim() && (
+                                                <small>Bitte zuerst ein Logo hochladen.</small>
+                                            )}
+                                        </div>
+                                    )}
+                                </section>
+                                )}
 
                                 <section className='minitigerSettingsCard'>
                                     <h4>Standard Einstellungen</h4>
@@ -1966,6 +2301,79 @@ const MinitigerSettingsPanel = ({
                                     Native Farbsteuerung für Hauptaktionen, Nebenaktionen, Bibliotheksleiste, Banner und Glow.
                                 </p>
 
+                                <section className='minitigerSettingsCard minitigerColorThemeSection'>
+                                    <div className='minitigerColorThemeHeader'>
+                                        <div>
+                                            <h4>Farbtemplates</h4>
+                                            <p className='minitigerSettingsHint'>
+                                                Ein Klick übernimmt das komplette Farbschema. Einzelne Farben kannst du danach weiterhin jederzeit verändern.
+                                            </p>
+                                        </div>
+
+                                        <span className='minitigerColorThemeStatus'>
+                                            {activeColorTheme
+                                                ? activeColorTheme.name
+                                                : 'Custom'}
+                                        </span>
+                                    </div>
+
+                                    <div className='minitigerColorThemeGrid'>
+                                        {COLOR_THEME_PRESETS.map(preset => {
+                                            const selected =
+                                                activeColorTheme?.id
+                                                === preset.id;
+
+                                            const previewColors = [
+                                                preset.colors.accentColor,
+                                                preset.colors.primaryHoverColor,
+                                                preset.colors.secondaryColor,
+                                                preset.colors.libraryBarColor,
+                                                preset.colors.glowColor
+                                            ];
+
+                                            return (
+                                                <button
+                                                    key={preset.id}
+                                                    type='button'
+                                                    className={`minitigerColorThemePreset${selected ? ' isSelected' : ''}`}
+                                                    aria-pressed={selected}
+                                                    onClick={() =>
+                                                        onUpdate({
+                                                            ...preset.colors
+                                                        })
+                                                    }
+                                                >
+                                                    <span className='minitigerColorThemeSwatches'>
+                                                        {previewColors.map((
+                                                            color,
+                                                            index
+                                                        ) => (
+                                                            <i
+                                                                key={`${color}-${index}`}
+                                                                style={{
+                                                                    backgroundColor:
+                                                                        color
+                                                                }}
+                                                            />
+                                                        ))}
+                                                    </span>
+
+                                                    <strong>
+                                                        {preset.name}
+                                                    </strong>
+                                                    <small>
+                                                        {preset.description}
+                                                    </small>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
+                                    <p className='minitigerSettingsHint minitigerColorThemeCustomHint'>
+                                        Sobald du eine Farbe manuell veränderst, wird der Status automatisch zu „Custom“. Dein eigenes Schema bleibt dabei ganz normal gespeichert.
+                                    </p>
+                                </section>
+
                                 <section className='minitigerSettingsCard'>
                                     <h4>Haupt- und Nebenfarben</h4>
                                     <div className='minitigerColorGrid'>
@@ -2114,6 +2522,18 @@ const MinitigerSettingsPanel = ({
                             </>
                         )}
 
+                        {isAdmin && activeTab === 'login' && (
+                            <MinitigerLoginSettings />
+                        )}
+
+                        {isAdmin && activeTab === 'avatars' && (
+                            <MinitigerAvatarGallerySettings />
+                        )}
+
+                        {isAdmin && activeTab === 'translation' && (
+                            <MinitigerTranslationSettings />
+                        )}
+
                         {isAdmin && activeTab === 'backup' && (
                             <>
                                 <h3>Backup & Import</h3>
@@ -2192,6 +2612,17 @@ const MinitigerSettingsPanel = ({
     );
 };
 
+/* MINITIGER_PATCH_MARKER: PHASE_18_8_1_TEST_COMPACT_SETTINGS_UI */
+/* MINITIGER_PATCH_MARKER: PHASE_18_8_2_TEST_CUSTOM_HEADER_BRANDING */
+/* MINITIGER_PATCH_MARKER: PHASE_18_8_3_TEST_HEADER_BRANDING_V2 */
+/* MINITIGER_PATCH_MARKER: PHASE_18_8_4B_TEST_LOGO_ONLY_SAFE */
+/* MINITIGER_PATCH_MARKER: PHASE_18_9_0_TEST_CUSTOM_LOGIN */
+/* MINITIGER_PATCH_MARKER: PHASE_18_10_0_TEST_TRANSLATOR_LOGIN_POLISH */
+/* MINITIGER_PATCH_MARKER: PHASE_18_11_0_TEST_CUSTOM_USER_AVATARS */
+/* MINITIGER_PATCH_MARKER: PHASE_18_12_0_TEST_USER_MENU_PROFILE_INTEGRATION */
+/* MINITIGER_PATCH_MARKER: PHASE_18_12_2_TEST_USER_RECOVERY_IDB_STABILITY */
+/* MINITIGER_PATCH_MARKER: PHASE_18_12_3_TEST_HOME_USER_POLISH */
+/* MINITIGER_PATCH_MARKER: PHASE_18_12_4_TEST_BANNER_AVATAR_GLOBAL */
 export default MinitigerSettingsPanel;
 
 // MINITIGER_PATCH_MARKER: PHASE_18_3_1_2_FORCE_APPLY

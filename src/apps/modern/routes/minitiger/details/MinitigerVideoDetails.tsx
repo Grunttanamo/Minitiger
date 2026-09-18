@@ -898,7 +898,7 @@ const MinitigerVideoDetails = () => {
 
                 {isSeries && (
                     <>
-                        <section className='minitigerDetailsSection'>
+                        <section className='minitigerDetailsSection minitigerSeriesContentsSection'>
                             <div className='minitigerDetailsSectionHead'>
                                 <div>
                                     <h2>Inhalte</h2>
@@ -1297,4 +1297,5 @@ const MinitigerVideoDetails = () => {
     );
 };
 
+// MINITIGER_PATCH_MARKER: PHASE_18_12_6C_TEST_SERIES_SWITCHER_ALIGNMENT_RECOVERY
 export default MinitigerVideoDetails;
