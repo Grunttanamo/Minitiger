@@ -970,3 +970,74 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+
+/* =========================================================
+   PHASE 18.15.1 TEST - PREVIEW BUTTON / GLOBAL HOVER PARITY
+   ========================================================= */
+/* Large preview Play action: dark/translucent at rest, accent only while the
+   Play button itself is hovered/focused. */
+.minitigerLargePreviewButtons .isPrimary {
+    background: rgba(0, 0, 0, 0.72) !important;
+    color: #fff !important;
+}
+
+.minitigerLargePreviewButtons .isPrimary:hover,
+.minitigerLargePreviewButtons .isPrimary:focus-visible {
+    background: var(--mt-preview-accent) !important;
+    color: var(--mt-preview-accent-text) !important;
+}
+
+/* Episode Play inside the large Series preview follows the same recipe. */
+.minitigerSeriesEpisodePlay {
+    background: rgba(0, 0, 0, 0.72) !important;
+    color: #fff !important;
+    transition:
+        opacity 140ms ease,
+        transform 140ms ease,
+        background 140ms ease,
+        color 140ms ease !important;
+}
+
+.minitigerSeriesEpisodePlay:hover,
+.minitigerSeriesEpisodePlay:focus-visible {
+    background: var(--mt-preview-accent) !important;
+    color: var(--mt-preview-accent-text) !important;
+    outline: none;
+}
+
+/* Personal NORMAL Hover switch: keep Preview controls usable, but disable
+   card lift/scale/brightness effects inside the large preview. */
+:root[data-minitiger-hover-enabled='false']
+.minitigerLargePreview .minitigerSeriesEpisodeCard:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerLargePreview .minitigerSeriesEpisodeCard:focus-within {
+    transform: none !important;
+    filter: none !important;
+    background: #292929 !important;
+}
+
+:root[data-minitiger-hover-enabled='false']
+.minitigerLargePreview .minitigerMangaVolumeCard:hover .minitigerMangaVolumeImage,
+:root[data-minitiger-hover-enabled='false']
+.minitigerLargePreview .minitigerMangaVolumeCard:focus-visible .minitigerMangaVolumeImage {
+    transform: none !important;
+    filter: none !important;
+}
+
+/* Personal Glow switch: remove only coloured card aura, without disabling
+   useful direct button-hover feedback. */
+:root[data-minitiger-glow-enabled='false']
+.minitigerLargePreview .minitigerSeriesEpisodeCard:hover,
+:root[data-minitiger-glow-enabled='false']
+.minitigerLargePreview .minitigerSeriesEpisodeCard:focus-within {
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.045) !important;
+}
+
+:root[data-minitiger-glow-enabled='false']
+.minitigerLargePreview .minitigerMangaVolumeCard:hover .minitigerMangaVolumeImage,
+:root[data-minitiger-glow-enabled='false']
+.minitigerLargePreview .minitigerMangaVolumeCard:focus-visible .minitigerMangaVolumeImage {
+    box-shadow: none !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_15_1_PREVIEW_MINIMAL_DETAILS */

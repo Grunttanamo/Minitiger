@@ -92,6 +92,21 @@ const useMinitigerDetailSettings = () => {
     }, [storageKey]);
 
     useEffect(() => {
+        const root = document.documentElement;
+
+        root.dataset.minitigerDetailLayout =
+            settings.layoutMode;
+        root.dataset.minitigerShowStudios =
+            settings.showStudios ? 'true' : 'false';
+        root.dataset.minitigerShowGenres =
+            settings.showGenres ? 'true' : 'false';
+    }, [
+        settings.layoutMode,
+        settings.showGenres,
+        settings.showStudios
+    ]);
+
+    useEffect(() => {
         const onSync = (event: Event) => {
             const custom =
                 event as CustomEvent<MinitigerDetailSettings>;

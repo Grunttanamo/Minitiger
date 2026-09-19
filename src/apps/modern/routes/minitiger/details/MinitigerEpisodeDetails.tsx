@@ -448,6 +448,28 @@ const MinitigerEpisodeDetails = ({
         });
     };
 
+
+    const playSiblingEpisode = (
+        event: React.MouseEvent<HTMLButtonElement>,
+        episode: ItemDto
+    ) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        playbackManager.play({
+            items: [ episode ],
+            startPositionTicks:
+                episode.UserData
+                    ?.PlaybackPositionTicks
+                ?? 0
+        }).catch(error => {
+            console.error(
+                '[Minitiger Episode] Folgen-Schnellstart fehlgeschlagen',
+                error
+            );
+        });
+    };
+
     const togglePlayed =
         async () => {
             if (
@@ -853,6 +875,21 @@ const MinitigerEpisodeDetails = ({
                                                 ) : (
                                                     <span />
                                                 )}
+
+                                                <button
+                                                    type='button'
+                                                    className='minitigerDetailsEpisodePlay'
+                                                    title='Abspielen'
+                                                    aria-label={`${episode.Name ?? 'Episode'} abspielen`}
+                                                    onClick={event =>
+                                                        playSiblingEpisode(
+                                                            event,
+                                                            episode
+                                                        )
+                                                    }
+                                                >
+                                                    ▶
+                                                </button>
 
                                                 <MinitigerDetailAudioFlags
                                                     item={audioFlagItem}

@@ -5523,3 +5523,88 @@ iframe.minitigerInlineTrailer {
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_12_4_TEST_BANNER_AVATAR_GLOBAL */
+
+/* =========================================================
+   PHASE 18.15.0 TEST - GLOBAL HOVER / STABLE GLOW LAYOUT
+   ========================================================= */
+/* Glow visibility must never change row geometry. Reuse the exact same fixed
+   breathing room while Glow is OFF; only the aura itself disappears. */
+.minitigerHome[data-glow-enabled='false'] .minitigerVirtualHomeRow {
+    padding-top: calc(var(--mt-glow-layout-reserve, 72px) + 0.65rem) !important;
+    padding-bottom: calc(var(--mt-glow-layout-reserve, 72px) + 0.85rem) !important;
+    margin-top: calc(-1 * var(--mt-glow-layout-reserve, 72px)) !important;
+    margin-bottom: calc(-1 * var(--mt-glow-layout-reserve, 72px)) !important;
+}
+
+.minitigerHome[data-glow-enabled='false'] .minitigerMediaRow {
+    padding-top: calc(30px + var(--mt-glow-layout-reserve, 72px)) !important;
+    padding-bottom: calc(31px + var(--mt-glow-layout-reserve, 72px)) !important;
+    margin-top: calc(-30px - var(--mt-glow-layout-reserve, 72px)) !important;
+    margin-bottom: calc(-30px - var(--mt-glow-layout-reserve, 72px)) !important;
+}
+
+.minitigerHome[data-glow-enabled='false'] .minitigerLibraryGrid {
+    padding-top: calc(1.2rem + var(--mt-glow-layout-reserve, 72px)) !important;
+    padding-bottom: calc(1.1rem + var(--mt-glow-layout-reserve, 72px)) !important;
+    margin-top: calc(-1 * var(--mt-glow-layout-reserve, 72px)) !important;
+    margin-bottom: calc(-1 * var(--mt-glow-layout-reserve, 72px)) !important;
+}
+
+.minitigerHome[data-side-row-titles='true'][data-glow-enabled='false']
+.minitigerMediaRow,
+.minitigerHome[data-side-row-titles='true'][data-glow-enabled='false']
+.minitigerVirtualHomeRow {
+    box-sizing: border-box !important;
+    padding-left: calc(0.25rem + var(--mt-glow-layout-reserve, 72px)) !important;
+    padding-right: calc(0.25rem + var(--mt-glow-layout-reserve, 72px)) !important;
+    margin-left: calc(-1 * var(--mt-glow-layout-reserve, 72px)) !important;
+    margin-right: calc(-1 * var(--mt-glow-layout-reserve, 72px)) !important;
+    width: calc(100% + var(--mt-glow-layout-reserve, 72px) + var(--mt-glow-layout-reserve, 72px)) !important;
+}
+
+/* Aura OFF means aura OFF for original + virtual Home cards. */
+.minitigerHome[data-glow-enabled='false'] .minitigerMediaCard::before,
+.minitigerHome[data-glow-enabled='false'] .minitigerLibraryCard::before,
+.minitigerHome[data-glow-enabled='false'] .minitigerVirtualHomeCard::before {
+    opacity: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Normal hover controls card movement only. Quick-play/action controls remain
+   available on hover, but cards no longer lift/scale/brighten. */
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerMediaCard:hover .minitigerMediaCardBody,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerMediaCard:focus-within .minitigerMediaCardBody,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerMediaCard:hover .minitigerMediaCardLink,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerMediaCard:focus-within .minitigerMediaCardLink,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerLibraryCard:hover .minitigerLibraryCardBody,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerLibraryCard:focus-visible .minitigerLibraryCardBody,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerVirtualHomeCard:hover .minitigerVirtualHomeImage,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerVirtualHomeCard:focus-visible .minitigerVirtualHomeImage {
+    transform: none !important;
+    filter: none !important;
+}
+
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerMediaCard:hover::before,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerMediaCard:focus-within::before,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerLibraryCard:hover::before,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerLibraryCard:focus-visible::before,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerVirtualHomeCard:hover::before,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome .minitigerVirtualHomeCard:focus-visible::before {
+    transform: none !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_15_0_HOME_HOVER_LAYOUT */

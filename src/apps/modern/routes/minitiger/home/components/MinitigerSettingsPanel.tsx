@@ -879,6 +879,7 @@ const MinitigerSettingsPanel = ({
                             {tabButton('general', 'Allgemein', '⚙')}
                             {tabButton('colors', 'Farben', '◉')}
                             {tabButton('libraries', 'Bibliotheken', '▦')}
+                            {tabButton('details', 'Detailpages', '▤')}
                         </div>
 
                         {isAdmin && (
@@ -890,7 +891,6 @@ const MinitigerSettingsPanel = ({
                                 {tabButton('home', 'Startseite', '⌂')}
                                 {tabButton('login', 'Login', '↪')}
                                 {tabButton('avatars', 'Avatar-Galerie', '☺')}
-                                {tabButton('details', 'Detailpages', '▤')}
                                 {tabButton('translation', 'Auto-Übersetzung', '文')}
                                 {tabButton('backup', 'Backup & Import', '↕')}
                             </div>
@@ -2128,12 +2128,78 @@ const MinitigerSettingsPanel = ({
                             </>
                         )}
 
-                        {isAdmin && activeTab === 'details' && (
+                        {activeTab === 'details' && (
                             <>
                                 <h3>Detailpages</h3>
                                 <p className='minitigerSettingsIntro'>
-                                    Native Größen für Serien-, Film-, Staffel- und Folgen-Detailpages. Änderungen wirken sofort per HMR/React.
+                                    Persönliche Darstellung für alle Minitiger-Detailpages. Diese Einstellungen gelten nur für deinen Benutzer.
                                 </p>
+
+                                <section className='minitigerSettingsCard'>
+                                    <h4>Layout</h4>
+                                    <p className='minitigerSettingsHint'>
+                                        Kompakt entspricht dem aktuellen Minitiger-Layout. Breit (Classic) nutzt den Bildschirm ähnlich wie die ältere Minitiger-Design-Detailpage deutlich stärker aus.
+                                    </p>
+
+                                    <label className='minitigerSettingsField'>
+                                        <span>Layoutbreite</span>
+                                        <select
+                                            value={detailSettings.layoutMode}
+                                            onChange={event =>
+                                                onUpdateDetailSettings({
+                                                    layoutMode:
+                                                        event.currentTarget.value === 'wide'
+                                                            ? 'wide'
+                                                            : 'compact'
+                                                })
+                                            }
+                                        >
+                                            <option value='compact'>Kompakt</option>
+                                            <option value='wide'>Breit (Classic)</option>
+                                        </select>
+                                    </label>
+                                </section>
+
+                                <section className='minitigerSettingsCard'>
+                                    <h4>Metadaten</h4>
+                                    <p className='minitigerSettingsHint'>
+                                        Für ein besonders minimalistisches Detailpage-Layout kannst du Studios und Genres unabhängig voneinander ausblenden.
+                                    </p>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={detailSettings.showStudios}
+                                            onChange={event =>
+                                                onUpdateDetailSettings({
+                                                    showStudios:
+                                                        event.currentTarget.checked
+                                                })
+                                            }
+                                        />
+                                        <span>
+                                            <strong>Studios anzeigen</strong>
+                                            <small>Blendet den Studio-Bereich auf unterstützten Minitiger-Detailpages ein oder aus.</small>
+                                        </span>
+                                    </label>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={detailSettings.showGenres}
+                                            onChange={event =>
+                                                onUpdateDetailSettings({
+                                                    showGenres:
+                                                        event.currentTarget.checked
+                                                })
+                                            }
+                                        />
+                                        <span>
+                                            <strong>Genres anzeigen</strong>
+                                            <small>Blendet Genre-Tags auf unterstützten Minitiger-Detailpages ein oder aus.</small>
+                                        </span>
+                                    </label>
+                                </section>
 
                                 <section className='minitigerSettingsCard'>
                                     <h4>Größen</h4>

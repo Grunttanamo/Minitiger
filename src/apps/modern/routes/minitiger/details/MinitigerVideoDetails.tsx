@@ -404,6 +404,28 @@ const MinitigerVideoDetails = () => {
         });
     };
 
+
+    const playRailEpisode = (
+        event: React.MouseEvent<HTMLButtonElement>,
+        episode: ItemDto
+    ) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        playbackManager.play({
+            items: [ episode ],
+            startPositionTicks:
+                episode.UserData
+                    ?.PlaybackPositionTicks
+                ?? 0
+        }).catch(error => {
+            console.error(
+                '[Minitiger Details] Folgen-Schnellstart fehlgeschlagen',
+                error
+            );
+        });
+    };
+
     const toggleFavorite = async () => {
         if (
             !item?.Id
@@ -868,9 +890,9 @@ const MinitigerVideoDetails = () => {
                         {(studios.length > 0
                             || genres.length > 0)
                             && (
-                                <div className='minitigerDetailsExtraMeta'>
+                                <div className='minitigerDetailsExtraMeta minitigerDetailsStudioGenreMeta'>
                                     {studios.length > 0 && (
-                                        <div>
+                                        <div className='minitigerDetailsStudiosRow'>
                                             <strong>Studios</strong>
                                             <span>
                                                 {studios.join(' · ')}
@@ -879,7 +901,7 @@ const MinitigerVideoDetails = () => {
                                     )}
 
                                     {genres.length > 0 && (
-                                        <div>
+                                        <div className='minitigerDetailsGenresRow'>
                                             <strong>Genres</strong>
                                             <span className='minitigerDetailsGenreChips'>
                                                 {genres.map(genre => (
@@ -990,6 +1012,21 @@ const MinitigerVideoDetails = () => {
                                                         ) : (
                                                             <span />
                                                         )}
+
+                                                        <button
+                                                            type='button'
+                                                            className='minitigerDetailsEpisodePlay'
+                                                            title='Abspielen'
+                                                            aria-label={`${episode.Name ?? 'Episode'} abspielen`}
+                                                            onClick={event =>
+                                                                playRailEpisode(
+                                                                    event,
+                                                                    episode
+                                                                )
+                                                            }
+                                                        >
+                                                            ▶
+                                                        </button>
 
                                                         <MinitigerDetailAudioFlags
                                                             item={audioFlagItem}

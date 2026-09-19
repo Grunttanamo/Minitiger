@@ -29,7 +29,9 @@ const useMinitigerThemeVariables = (
             '--mt-genre-tag-text':
                 getContrastTextColor(settings.genreTagColor),
             '--mt-glow-opacity':
-                String(settings.glowStrength / 100),
+                settings.glowEnabled
+                    ? String(settings.glowStrength / 100)
+                    : '0',
             '--mt-glow-size': `${settings.glowSize}px`,
             '--mt-played-indicator-size':
                 `${settings.playedIndicatorSize}px`,
@@ -60,6 +62,14 @@ const useMinitigerThemeVariables = (
             'data-minitiger-played-shape',
             settings.playedIndicatorShape
         );
+        root.setAttribute(
+            'data-minitiger-hover-enabled',
+            settings.hoverEnabled ? 'true' : 'false'
+        );
+        root.setAttribute(
+            'data-minitiger-glow-enabled',
+            settings.glowEnabled ? 'true' : 'false'
+        );
 
         Object.entries(variables).forEach(
             ([ name, value ]) => {
@@ -71,9 +81,11 @@ const useMinitigerThemeVariables = (
         settings.arrowColor,
         settings.bannerMetaColor,
         settings.glowColor,
+        settings.glowEnabled,
         settings.glowSize,
         settings.glowStrength,
         settings.genreTagColor,
+        settings.hoverEnabled,
         settings.libraryBarColor,
         settings.libraryBarTextColor,
         settings.playedIndicatorFontSize,
@@ -86,3 +98,5 @@ const useMinitigerThemeVariables = (
 };
 
 export default useMinitigerThemeVariables;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_15_0_GLOBAL_HOVER_DETAIL_QUICKPLAY

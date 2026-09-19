@@ -324,3 +324,23 @@
     gap: 0.13rem !important;
 }
 /* MINITIGER_PATCH_MARKER: PHASE_18_3_3_LANDSCAPE_AUDIO_FLAG_DIRECTION */
+
+/* =========================================================
+   PHASE 18.15.0 TEST - GLOBAL NATIVE LIBRARY HOVER
+   ========================================================= */
+:root[data-minitiger-hover-enabled='false']
+.minitigerNativeLibraryCard:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerNativeLibraryCard:focus-within {
+    transform: none !important;
+    filter: none !important;
+}
+
+:root[data-minitiger-glow-enabled='false']
+.minitigerNativeLibraryCard:hover .cardScalable,
+:root[data-minitiger-glow-enabled='false']
+.minitigerNativeLibraryCard:focus-within .cardScalable {
+    box-shadow: none !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_15_0_NATIVE_HOVER_GLOBAL */

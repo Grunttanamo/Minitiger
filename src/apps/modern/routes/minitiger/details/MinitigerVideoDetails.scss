@@ -2359,3 +2359,233 @@ a.minitigerDetailsParentTitle:focus-visible {
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_12_6C_TEST_SERIES_SWITCHER_ALIGNMENT_RECOVERY */
+/* =========================================================
+   PHASE 18.14.0 TEST - DETAILPAGE WIDTH MODE
+   ========================================================= */
+/*
+ * Personal detailpage layout mode.
+ * "compact" keeps the current Minitiger 1640px container.
+ * "wide" intentionally mirrors the older Minitiger feeling:
+ * much smaller outer gutters and nearly full-width hero/rails.
+ */
+:root[data-minitiger-detail-layout='wide']
+.minitigerVideoDetailsPage
+.minitigerDetailsSurface {
+    padding-left: clamp(2rem, 2.5vw, 3rem);
+    padding-right: clamp(2rem, 2.5vw, 3rem);
+}
+
+:root[data-minitiger-detail-layout='wide']
+.minitigerVideoDetailsPage
+.minitigerDetailsHero,
+:root[data-minitiger-detail-layout='wide']
+.minitigerVideoDetailsPage
+.minitigerDetailsSection,
+:root[data-minitiger-detail-layout='wide']
+.minitigerVideoDetailsPage
+.minitigerDetailsAdminHint {
+    width: 100%;
+    max-width: none;
+}
+
+:root[data-minitiger-detail-layout='wide']
+.minitigerVideoDetailsPage
+.minitigerDetailsInfo h1 {
+    max-width: none;
+}
+
+:root[data-minitiger-detail-layout='wide']
+.minitigerVideoDetailsPage
+.minitigerDetailsOverview,
+:root[data-minitiger-detail-layout='wide']
+.minitigerVideoDetailsPage
+.minitigerExpandableOverview {
+    max-width: min(1450px, 100%);
+}
+
+:root[data-minitiger-detail-layout='wide']
+.minitigerVideoDetailsPage
+.minitigerDetailsExtraMeta {
+    max-width: min(1120px, 100%);
+}
+
+@media (max-width: 900px) {
+    :root[data-minitiger-detail-layout='wide']
+    .minitigerVideoDetailsPage
+    .minitigerDetailsSurface {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_14_0_DETAILPAGE_WIDTH_MODE */
+
+/* =========================================================
+   PHASE 18.15.0 TEST - GLOBAL DETAIL HOVER + QUICK PLAY
+   ========================================================= */
+/* All Minitiger detail card families obey the personal global Hover switch. */
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsEpisodeCard:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsEpisodeCard:focus-visible,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsSeasonCard:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsSeasonCard:focus-visible,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsCastCard:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsCastCard:focus-visible,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerMangaVolumeCard:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerMangaVolumeCard:focus-visible,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerMusicAlbumCard:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerMusicAlbumCard:focus-visible,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerMusicVideoCard:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerMusicVideoCard:focus-visible {
+    transform: none !important;
+    filter: none !important;
+}
+
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerPersonCreditCard:hover > div,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerPersonCreditCard:focus-visible > div {
+    transform: none !important;
+}
+
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerSeasonEpisodeItem:hover,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerSeasonEpisodeItem:focus-within,
+:root[data-minitiger-hover-enabled='false']
+.minitigerVideoDetailsPage .minitigerSeasonEpisodeItem:focus-visible {
+    transform: none !important;
+    filter: none !important;
+    background: rgba(28, 30, 34, 0.88) !important;
+}
+
+/* Glow is independent from Hover and can be disabled everywhere. */
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsEpisodeCard:hover,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsEpisodeCard:focus-visible,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsSeasonCard:hover,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsSeasonCard:focus-visible,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsCastCard:hover,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerDetailsCastCard:focus-visible,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerMangaVolumeCard:hover,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerMangaVolumeCard:focus-visible,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerMusicAlbumCard:hover,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerMusicAlbumCard:focus-visible,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerMusicVideoCard:hover,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerMusicVideoCard:focus-visible,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerSeasonEpisodeItem:hover,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerSeasonEpisodeItem:focus-within,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerPersonCreditCard:hover > div,
+:root[data-minitiger-glow-enabled='false']
+.minitigerVideoDetailsPage .minitigerPersonCreditCard:focus-visible > div {
+    box-shadow: none !important;
+}
+
+/* Series + episode sibling rails: same quick-play affordance as Home. */
+.minitigerDetailsEpisodeCard > div {
+    position: relative;
+}
+
+.minitigerDetailsEpisodePlay {
+    position: absolute;
+    z-index: 8;
+    left: 50%;
+    top: 50%;
+    width: 3.15rem;
+    height: 3.15rem;
+    display: grid;
+    place-items: center;
+    padding: 0 0 0 0.12rem;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.72);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%) scale(0.86);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.35);
+    transition:
+        opacity 160ms ease,
+        transform 180ms ease,
+        background 150ms ease,
+        color 150ms ease;
+}
+
+.minitigerDetailsEpisodeCard:hover .minitigerDetailsEpisodePlay,
+.minitigerDetailsEpisodeCard:focus-within .minitigerDetailsEpisodePlay,
+.minitigerDetailsEpisodePlay:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.minitigerDetailsEpisodePlay:hover,
+.minitigerDetailsEpisodePlay:focus-visible {
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    outline: none;
+}
+
+/* Season detail page: dark/translucent at rest, accent only on button hover. */
+.minitigerSeasonEpisodePlay {
+    background: rgba(0, 0, 0, 0.72);
+    color: #fff;
+}
+
+.minitigerSeasonEpisodePlay:hover,
+.minitigerSeasonEpisodePlay:focus-visible {
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    outline: none;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_15_0_GLOBAL_HOVER_DETAIL_QUICKPLAY */
+
+/* =========================================================
+   PHASE 18.15.1 TEST - PERSONAL MINIMAL DETAIL METADATA
+   ========================================================= */
+:root[data-minitiger-show-studios='false']
+.minitigerVideoDetailsPage .minitigerDetailsStudiosRow {
+    display: none !important;
+}
+
+:root[data-minitiger-show-genres='false']
+.minitigerVideoDetailsPage .minitigerDetailsGenresRow,
+:root[data-minitiger-show-genres='false']
+.minitigerVideoDetailsPage .minitigerMusicGenres {
+    display: none !important;
+}
+
+:root[data-minitiger-show-studios='false'][data-minitiger-show-genres='false']
+.minitigerVideoDetailsPage .minitigerDetailsStudioGenreMeta {
+    display: none !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_15_1_DETAIL_MINIMAL_METADATA */

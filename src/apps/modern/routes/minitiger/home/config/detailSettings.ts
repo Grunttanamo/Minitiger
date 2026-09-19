@@ -6,7 +6,14 @@ export type MinitigerCastShape =
     | 'star'
     | 'landscape';
 
+export type MinitigerDetailLayout =
+    | 'compact'
+    | 'wide';
+
 export interface MinitigerDetailSettings {
+    layoutMode: MinitigerDetailLayout;
+    showStudios: boolean;
+    showGenres: boolean;
     posterWidth: number;
     seasonPosterWidth: number;
     contentWidth: number;
@@ -17,6 +24,9 @@ export interface MinitigerDetailSettings {
 }
 
 export const DEFAULT_DETAIL_SETTINGS: MinitigerDetailSettings = {
+    layoutMode: 'compact',
+    showStudios: true,
+    showGenres: true,
     posterWidth: 460,
     seasonPosterWidth: 260,
     contentWidth: 380,
@@ -45,6 +55,16 @@ const clamp = (
             Math.round(numeric)
         )
     );
+};
+
+const parseDetailLayout = (
+    value: unknown
+): MinitigerDetailLayout => {
+    if (value === 'wide') {
+        return 'wide';
+    }
+
+    return 'compact';
 };
 
 const parseCastShape = (
@@ -79,6 +99,12 @@ export const normalizeDetailSettings = (
         value as Partial<MinitigerDetailSettings>;
 
     return {
+        layoutMode:
+            parseDetailLayout(
+                source.layoutMode
+            ),
+        showStudios: source.showStudios !== false,
+        showGenres: source.showGenres !== false,
         posterWidth: clamp(
             source.posterWidth,
             DEFAULT_DETAIL_SETTINGS.posterWidth,
