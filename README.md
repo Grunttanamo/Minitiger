@@ -5,7 +5,7 @@
 <h1 align="center">🐯 Minitiger Web</h1>
 
 <p align="center">
-  <strong>A cute custom Jellyfin 12.1 web experience — delivered as a safe sidecar.</strong><br>
+  <strong>A cute custom Jellyfin 12.1 web experience — available as a safe Docker sidecar or a native Debian / Raspberry Pi frontend.</strong><br>
   Keep your existing Jellyfin server, database, users, libraries, watch state and settings untouched.
 </p>
 
@@ -19,7 +19,9 @@
 <p align="center">
   <a href="https://github.com/Grunttanamo/Minitiger/pkgs/container/minitiger-web"><strong>📦 Docker Package</strong></a>
   ·
-  <a href="SIDECAR_SETUP.md"><strong>🧊 Sidecar Setup</strong></a>
+  <a href="SIDECAR_SETUP.md"><strong>🧊 Docker / Sidecar</strong></a>
+  ·
+  <a href="DEBIAN_RASPBERRY_PI_SETUP.md"><strong>🍓 Debian / Raspberry Pi</strong></a>
   ·
   <a href="PLUGIN_SETUP.md"><strong>🔌 Companion Plugin</strong></a>
   ·
@@ -32,7 +34,12 @@
 
 **Minitiger Web** is a heavily customized Jellyfin Web frontend targeting **Jellyfin 12.1**. It keeps the familiar Jellyfin backend while adding the Minitiger home, custom detail pages, virtual libraries, manga/comic improvements, trailer integrations, audio-language flags and a lot of UI polish.
 
-The recommended installation is the **Minitiger Sidecar**. It runs next to your existing Jellyfin installation instead of replacing it.
+There are currently two installation styles:
+
+- **Docker / Sidecar (recommended for most users):** runs next to your existing Jellyfin installation on a separate port.
+- **Debian / Raspberry Pi native:** serves Minitiger directly from your existing Jellyfin instance on the normal Jellyfin port.
+
+The Docker sidecar is the most isolated option:
 
 ```text
 Your normal Jellyfin                 Minitiger Web Sidecar
@@ -48,7 +55,9 @@ http://SERVER:8096                   http://SERVER:8098
 
 Deleting the Minitiger container does **not** delete or migrate your Jellyfin data.
 
-## 🚀 Quick start
+The native Debian / Raspberry Pi setup keeps the same Jellyfin backend but points Jellyfin's web directory at a separately built Minitiger frontend. The packaged Jellyfin web files remain untouched for rollback.
+
+## 🚀 Docker quick start
 
 ```bash
 docker run -d \
@@ -62,15 +71,11 @@ docker run -d \
 
 ### Jellyfin Desktop Client
 
-Connect to:
-
 ```text
 http://SERVER-IP:8098
 ```
 
 ### Browser
-
-The currently confirmed browser URL is:
 
 ```text
 http://SERVER-IP:8098/web/index.html
@@ -78,9 +83,23 @@ http://SERVER-IP:8098/web/index.html
 
 The external port `8098` is only an example. Pick any free port on your system.
 
+## 🍓 Debian / Raspberry Pi native install
+
+A native installation is available for users who want Minitiger directly on their normal Jellyfin address, for example:
+
+```text
+http://SERVER-IP:8096
+```
+
+The currently tested native environment is **Raspberry Pi 5 + Debian 13 (trixie) arm64 + Jellyfin 12.1**.
+
+The native guide includes build requirements, cloning, Jellyfin web-directory configuration, production deployment, updates, companion-plugin setup, rollback to the previous Minitiger build and a full rollback to the stock Jellyfin frontend.
+
+See **[DEBIAN_RASPBERRY_PI_SETUP.md](DEBIAN_RASPBERRY_PI_SETUP.md)**.
+
 ## 🔌 Optional companion plugin
 
-For server-synced Minitiger virtual libraries, install **Minitiger Virtual Sync** as a normal Jellyfin plugin. The sidecar remains separate; the plugin only provides the server-side storage/API used by Minitiger virtual-library sync.
+For server-synced Minitiger features, install **Minitiger Virtual Sync** as a normal Jellyfin plugin.
 
 Add this repository in **Jellyfin Dashboard → Plugins → Repositories**:
 
@@ -112,7 +131,8 @@ Do **not** mount your Jellyfin `/config`, `/cache`, appdata or media folders int
 - Manga / comic improvements
 - Trailer and playback integrations
 - Audio-language flags and media information polish
-- Separate disposable sidecar container
+- Docker sidecar installation
+- Native Debian / Raspberry Pi installation
 - Multi-architecture Docker image for **amd64** and **arm64**
 
 ## 🔖 Docker tags
@@ -131,6 +151,8 @@ Confirmed in the current test setup:
 
 - Jellyfin 12.1 server connection
 - Jellyfin Desktop Client via sidecar
+- Native Jellyfin Desktop Client connection on Debian / Raspberry Pi
+- Raspberry Pi 5 / Debian 13 (trixie) / arm64 native deployment
 - Login
 - Home
 - Libraries
