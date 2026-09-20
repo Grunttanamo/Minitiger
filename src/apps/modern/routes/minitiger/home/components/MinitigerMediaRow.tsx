@@ -1,5 +1,5 @@
 import type { ApiClient } from 'jellyfin-apiclient';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, {
     useCallback,
     useEffect,
@@ -50,6 +50,9 @@ interface MinitigerMediaRowProps {
     onVirtualAssign?: (item: ItemDto) => void;
     emptyText?: string;
     previewContext?: string;
+    subtitleOverride?: (
+        item: ItemDto
+    ) => string | null | undefined;
 }
 
 const isQuickPlayable = (item: ItemDto) => {
@@ -97,7 +100,8 @@ const MinitigerMediaRow = ({
     isVirtuallyAssigned,
     onVirtualAssign,
     emptyText,
-    previewContext
+    previewContext,
+    subtitleOverride
 }: MinitigerMediaRowProps) => {
     const rowRef = useRef<HTMLDivElement>(null);
     const [ canScroll, setCanScroll ] = useState(false);
@@ -111,17 +115,91 @@ const MinitigerMediaRow = ({
             loadAudioFlags
         );
 
+    const currentUserId =
+        apiClient?.getCurrentUserId() ?? '';
+    const seriesIds = useMemo(
+        () => Array.from(new Set(
+            items
+                .filter(item =>
+                    (
+                        item.Type === 'Episode'
+                        || item.Type === 'Season'
+                    )
+                    && Boolean(item.SeriesId)
+                )
+                .map(item => String(item.SeriesId))
+        )),
+        [items]
+    );
+    const seriesTitleQuery = useQuery({
+        queryKey: [
+            'Minitiger',
+            'SeriesMainTitles',
+            currentUserId,
+            seriesIds.join(',')
+        ],
+        queryFn: async () => {
+            if (!apiClient || !currentUserId) {
+                return new Map<string, string>();
+            }
+
+            const series = await Promise.all(
+                seriesIds.map(async seriesId => {
+                    try {
+                        return await apiClient.getItem(
+                            currentUserId,
+                            seriesId
+                        ) as ItemDto;
+                    } catch {
+                        return null;
+                    }
+                })
+            );
+
+            return new Map(
+                series
+                    .filter(
+                        (item): item is ItemDto =>
+                            Boolean(item?.Id && item.Name)
+                    )
+                    .map(item => [
+                        String(item.Id),
+                        String(item.Name)
+                    ])
+            );
+        },
+        enabled: Boolean(
+            apiClient
+            && currentUserId
+            && seriesIds.length
+        )
+    });
+    const seriesMainTitles =
+        seriesTitleQuery.data;
+
     const displayItems = useMemo(
         () => items.map(item => {
+            const resolvedSeriesName =
+                item.SeriesId
+                    ? seriesMainTitles?.get(
+                        String(item.SeriesId)
+                    )
+                    : undefined;
+            const displayItem = resolvedSeriesName
+                ? {
+                    ...item,
+                    SeriesName: resolvedSeriesName
+                }
+                : item;
             if (!item.Id) {
-                return item;
+                return displayItem;
             }
 
             const detailed =
                 streamDetails?.get(item.Id);
 
             if (!detailed) {
-                return item;
+                return displayItem;
             }
 
             const mediaStreams =
@@ -142,16 +220,22 @@ const MinitigerMediaRow = ({
             }
 
             return {
-                ...item,
+                ...displayItem,
                 OfficialRating:
                     detailed.OfficialRating
-                    ?? item.OfficialRating,
+                    ?? displayItem.OfficialRating,
                 MediaStreams: mediaStreams,
                 MediaSources: mediaSources
             };
         }),
-        [items, streamDetails]
+        [
+            items,
+            seriesMainTitles,
+            streamDetails
+        ]
     );
+
+    // MINITIGER_PATCH_MARKER: PHASE_18_18_0_MAIN_TITLE_RESOLUTION
 
     const updateScrollAvailability = useCallback(() => {
         const row = rowRef.current;
@@ -493,6 +577,10 @@ const MinitigerMediaRow = ({
                         const itemRoute =
                             getItemRoute(item);
 
+                        const cardSubtitle =
+                            subtitleOverride?.(item)
+                            ?? getCardSubtitle(item);
+
                         const titleRoute =
                             item.Type === 'Episode'
                             && item.SeriesId
@@ -767,13 +855,11 @@ const MinitigerMediaRow = ({
                                                 event.stopPropagation();
                                             }}
                                             title={
-                                                getCardSubtitle(
-                                                    item
-                                                )
+                                                cardSubtitle
                                             }
                                         >
                                             <span>
-                                                {getCardSubtitle(item)}
+                                                {cardSubtitle}
                                             </span>
                                         </Link>
                                     </div>
@@ -788,3 +874,5 @@ const MinitigerMediaRow = ({
 };
 
 export default MinitigerMediaRow;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_5B_MEDIA_SUBTITLE_OVERRIDE

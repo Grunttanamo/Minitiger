@@ -162,6 +162,24 @@ const MinitigerGlobalSettingsHost = () => {
         };
     }, [location.pathname]);
 
+    useEffect(() => {
+        const onCloseSettings = () => {
+            setOpen(false);
+        };
+
+        window.addEventListener(
+            'minitiger:close-settings',
+            onCloseSettings
+        );
+
+        return () => {
+            window.removeEventListener(
+                'minitiger:close-settings',
+                onCloseSettings
+            );
+        };
+    }, []);
+
     if (!open) {
         return null;
     }
@@ -177,3 +195,5 @@ const MinitigerGlobalSettingsHost = () => {
 export default MinitigerGlobalSettingsHost;
 
 // MINITIGER_PATCH_MARKER: PHASE_18_13_0_TEST_STABILITY_TRANSLATOR_BACKGROUND
+
+// MINITIGER_PATCH_MARKER: PHASE_18_17_4_SETTINGS_CLOSE_ON_PROFILE_SWITCH

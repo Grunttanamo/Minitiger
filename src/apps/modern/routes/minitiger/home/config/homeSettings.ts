@@ -101,6 +101,7 @@ export interface MinitigerHomeSettings {
     hoverEnabled: boolean;
     glowEnabled: boolean;
     previewEnabled: boolean;
+    cardTextCentered: boolean;
 
     /**
      * Legacy Phase-1..11 ordering for the five original sections.
@@ -344,6 +345,7 @@ export const DEFAULT_HOME_SETTINGS: MinitigerHomeSettings = {
     hoverEnabled: true,
     glowEnabled: true,
     previewEnabled: true,
+    cardTextCentered: false,
     sectionOrder: [ ...HOME_SECTION_IDS ],
     homeRowOrder: [ ...DEFAULT_HOME_ROW_ORDER ],
     visibleSections: {
@@ -686,6 +688,8 @@ export const normalizeHomeSettings = (
         hoverEnabled: source.hoverEnabled !== false,
         glowEnabled: source.glowEnabled !== false,
         previewEnabled: source.previewEnabled !== false,
+        cardTextCentered:
+            source.cardTextCentered === true,
         sectionOrder: derivedLegacyOrder,
         homeRowOrder,
         visibleSections: HOME_SECTION_IDS.reduce(
@@ -733,3 +737,5 @@ export const getContrastTextColor = (hex: string) => {
 
     return luminance > 150 ? '#111111' : '#ffffff';
 };
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_3_CENTERED_CARD_TEXT_SETTING

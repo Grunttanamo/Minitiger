@@ -16,6 +16,7 @@ export interface MinitigerDetailSettings {
     showGenres: boolean;
     posterWidth: number;
     seasonPosterWidth: number;
+    seasonWrapEnabled: boolean;
     contentWidth: number;
     mangaPosterWidth: number;
     mangaVolumeWidth: number;
@@ -29,6 +30,7 @@ export const DEFAULT_DETAIL_SETTINGS: MinitigerDetailSettings = {
     showGenres: true,
     posterWidth: 460,
     seasonPosterWidth: 260,
+    seasonWrapEnabled: false,
     contentWidth: 380,
     mangaPosterWidth: 460,
     mangaVolumeWidth: 260,
@@ -117,6 +119,8 @@ export const normalizeDetailSettings = (
             120,
             360
         ),
+        seasonWrapEnabled:
+            source.seasonWrapEnabled === true,
         contentWidth: clamp(
             source.contentWidth,
             DEFAULT_DETAIL_SETTINGS.contentWidth,
@@ -147,3 +151,5 @@ export const normalizeDetailSettings = (
             )
     };
 };
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_1_SEASON_WRAP

@@ -5,7 +5,7 @@ import { ItemSortBy } from '@jellyfin/sdk/lib/generated-client/models/item-sort-
 import { SortOrder } from '@jellyfin/sdk/lib/generated-client/models/sort-order';
 import type { ApiClient } from 'jellyfin-apiclient';
 import { useQueryClient } from '@tanstack/react-query';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import { useNextUp } from 'apps/legacy/features/libraries/api/useNextUp';
@@ -20,6 +20,7 @@ import type { ItemDto } from 'types/base/models/item-dto';
 
 import MinitigerCustomRow from './components/MinitigerCustomRow';
 import MinitigerHero from './components/MinitigerHero';
+import MinitigerProfileGate from './components/MinitigerProfileGate';
 import MinitigerVanillaHomeSections from './components/MinitigerVanillaHomeSections';
 import MinitigerMediaRow from './components/MinitigerMediaRow';
 import MinitigerSettingsPanel from './components/MinitigerSettingsPanel';
@@ -39,9 +40,15 @@ import useMinitigerCustomRows from './hooks/useMinitigerCustomRows';
 import useMinitigerDetailSettings from './hooks/useMinitigerDetailSettings';
 import useMinitigerHomeSettings from './hooks/useMinitigerHomeSettings';
 import useMinitigerLibrarySettings from './hooks/useMinitigerLibrarySettings';
+import useMinitigerProfiles from './hooks/useMinitigerProfiles';
 import useMinitigerThemeVariables from './hooks/useMinitigerThemeVariables';
 import useMinitigerVirtualLibraries from './hooks/useMinitigerVirtualLibraries';
 import { getItemRoute } from './routingUtils';
+import {
+    captureMinitigerOwnerSession,
+    isMinitigerProfileIdentityCurrent,
+    switchMinitigerProfileIdentity
+} from './profileIdentity';
 import './MinitigerHome.scss';
 
 const getLibraryImageUrl = (
@@ -125,6 +132,24 @@ const MinitigerHome = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const onCloseSettings = () => {
+            setSettingsOpen(false);
+        };
+
+        window.addEventListener(
+            'minitiger:close-settings',
+            onCloseSettings
+        );
+
+        return () => {
+            window.removeEventListener(
+                'minitiger:close-settings',
+                onCloseSettings
+            );
+        };
+    }, []);
+
     const isAdmin = Boolean(user?.Policy?.IsAdministrator);
 
     const {
@@ -179,6 +204,23 @@ const MinitigerHome = () => {
     } = useMinitigerDetailSettings();
 
     useMinitigerThemeVariables(settings);
+
+    const profileState = useMinitigerProfiles();
+    const [
+        profileSwitchingId,
+        setProfileSwitchingId
+    ] = useState<string | null>(null);
+    const [
+        profileSwitchError,
+        setProfileSwitchError
+    ] = useState('');
+
+    useEffect(() => {
+        captureMinitigerOwnerSession(
+            apiClient,
+            user
+        );
+    }, [ apiClient, user ]);
 
     useEffect(() => {
         const root = document.querySelector<HTMLElement>(
@@ -430,6 +472,9 @@ const MinitigerHome = () => {
             }),
             queryClient.invalidateQueries({
                 queryKey: [ 'User', user.Id, 'NextUp' ]
+            }),
+            queryClient.invalidateQueries({
+                queryKey: [ 'Items' ]
             })
         ]);
     }, [
@@ -742,6 +787,81 @@ const MinitigerHome = () => {
         return null;
     };
 
+    const activateMinitigerProfile = useCallback(async (
+        profileId: string
+    ) => {
+        const profile = profileState.profiles.find(
+            candidate => candidate.id === profileId
+        );
+
+        if (!profile || !apiClient || !user?.Id) {
+            return;
+        }
+
+        setProfileSwitchError('');
+        setProfileSwitchingId(profile.id);
+        profileState.selectProfile(profile.id);
+
+        try {
+            await switchMinitigerProfileIdentity(
+                apiClient,
+                user,
+                profile
+            );
+        } catch (error) {
+            console.error(
+                '[Minitiger Profiles] Profilwechsel fehlgeschlagen',
+                error
+            );
+
+            profileState.requestSelection();
+            setProfileSwitchError(
+                error instanceof Error
+                    ? error.message
+                    : 'Der Profilwechsel ist fehlgeschlagen.'
+            );
+        } finally {
+            setProfileSwitchingId(null);
+        }
+    }, [
+        apiClient,
+        profileState.profiles,
+        profileState.requestSelection,
+        profileState.selectProfile,
+        user
+    ]);
+
+    const activeProfileNeedsIdentitySwitch = Boolean(
+        profileState.isReady
+        && profileState.activeProfile
+        && !isMinitigerProfileIdentityCurrent(
+            apiClient,
+            user,
+            profileState.activeProfile
+        )
+    );
+
+    useEffect(() => {
+        if (
+            !activeProfileNeedsIdentitySwitch
+            || profileState.requiresSelection
+            || profileSwitchingId
+            || !profileState.activeProfile
+        ) {
+            return;
+        }
+
+        void activateMinitigerProfile(
+            profileState.activeProfile.id
+        );
+    }, [
+        activateMinitigerProfile,
+        activeProfileNeedsIdentitySwitch,
+        profileState.activeProfile,
+        profileState.requiresSelection,
+        profileSwitchingId
+    ]);
+
     const homeStyle = {
         '--mt-accent': settings.accentColor,
         '--mt-accent-hover': settings.primaryHoverColor,
@@ -780,6 +900,35 @@ const MinitigerHome = () => {
         '--mt-virtual-page-gap':
             `${virtualConfig.pageGap}px`
     } as React.CSSProperties;
+
+    if (
+        profileState.requiresSelection
+        || activeProfileNeedsIdentitySwitch
+        || profileSwitchingId
+    ) {
+        return (
+            <Page
+                id='indexPage'
+                className='mainAnimatedPage homePage minitigerHome minitigerProfileSelectionPage'
+                isBackButtonEnabled={false}
+                style={homeStyle}
+            >
+                <MinitigerProfileGate
+                    profiles={profileState.profiles}
+                    onSelect={activateMinitigerProfile}
+                    busyProfileId={
+                        profileSwitchingId
+                        ?? (
+                            activeProfileNeedsIdentitySwitch
+                                ? profileState.activeProfile?.id
+                                : null
+                        )
+                    }
+                    error={profileSwitchError}
+                />
+            </Page>
+        );
+    }
 
     return (
         <Page
@@ -840,7 +989,7 @@ const MinitigerHome = () => {
                 ))}
 
                 <footer className='minitigerDevFooter'>
-                    🐯 Minitiger Native · Phase 18.7.0
+                    🐯 Minitiger Native · Phase 18.17.1 TEST
                 </footer>
                 </>)}
             </div>
@@ -912,4 +1061,9 @@ const MinitigerHome = () => {
 };
 
 // MINITIGER_PATCH_MARKER: PHASE_18_12_3_TEST_HOME_USER_POLISH
+// MINITIGER_PATCH_MARKER: PHASE_18_17_0_PROFILE_GATE
+// MINITIGER_PATCH_MARKER: PHASE_18_17_1_PROFILE_IDENTITY
+// MINITIGER_PATCH_MARKER: PHASE_18_17_2C_HOME_READY_GUARD
 export default MinitigerHome;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_17_4_HOME_SETTINGS_CLOSE_ON_PROFILE_SWITCH

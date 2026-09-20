@@ -36,6 +36,7 @@ import {
 import type { MinitigerVirtualMediaKind } from '../virtualServerSync';
 import MinitigerHomeBuilderSettings from './MinitigerHomeBuilderSettings';
 import MinitigerLoginSettings from './MinitigerLoginSettings';
+import MinitigerProfilesSettings from './MinitigerProfilesSettings';
 import MinitigerTranslationSettings from './MinitigerTranslationSettings';
 import MinitigerAvatarGallerySettings from './MinitigerAvatarGallerySettings';
 
@@ -144,6 +145,7 @@ type SettingsTab =
     | 'home'
     | 'libraries'
     | 'details'
+    | 'profiles'
     | 'colors'
     | 'login'
     | 'translation'
@@ -607,7 +609,8 @@ const MinitigerSettingsPanel = ({
             'playedIndicatorShape',
             'hoverEnabled',
             'glowEnabled',
-            'previewEnabled'
+            'previewEnabled',
+            'cardTextCentered'
         ]);
 
         const filtered = Object.fromEntries(
@@ -649,6 +652,8 @@ const MinitigerSettingsPanel = ({
             && activeTab !== 'general'
             && activeTab !== 'libraries'
             && activeTab !== 'colors'
+            && activeTab !== 'details'
+            && activeTab !== 'profiles'
         ) {
             setActiveTab('general');
         }
@@ -880,6 +885,7 @@ const MinitigerSettingsPanel = ({
                             {tabButton('colors', 'Farben', '◉')}
                             {tabButton('libraries', 'Bibliotheken', '▦')}
                             {tabButton('details', 'Detailpages', '▤')}
+                            {tabButton('profiles', 'Profile', '👥')}
                         </div>
 
                         {isAdmin && (
@@ -906,6 +912,10 @@ const MinitigerSettingsPanel = ({
                     </nav>
 
                     <main className='minitigerAdminSettingsContent'>
+                        {activeTab === 'profiles' && (
+                            <MinitigerProfilesSettings />
+                        )}
+
                         {activeTab === 'general' && (
                             <>
                                 <h3>General</h3>
@@ -1105,6 +1115,11 @@ const MinitigerSettingsPanel = ({
                                             'previewEnabled',
                                             'Mini-Vorschaukarten aktivieren',
                                             'Schaltet kleine und große Netflix-artige Vorschau global ein oder aus.'
+                                        ],
+                                        [
+                                            'cardTextCentered',
+                                            'Kartentexte zentrieren',
+                                            'Zentriert Titel und Untertitel unter Karten auf der Startseite und in Bibliotheken. Kurze Texte stehen mittig; lange Titel behalten die volle Kartenbreite und werden erst am Ende mit … gekürzt.'
                                         ],
                                         [
                                             'glowEnabled',
@@ -2158,6 +2173,31 @@ const MinitigerSettingsPanel = ({
                                             <option value='wide'>Breit (Classic)</option>
                                         </select>
                                     </label>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='checkbox'
+                                            checked={
+                                                detailSettings
+                                                    .seasonWrapEnabled
+                                            }
+                                            onChange={event =>
+                                                onUpdateDetailSettings({
+                                                    seasonWrapEnabled:
+                                                        event.currentTarget
+                                                            .checked
+                                                })
+                                            }
+                                        />
+                                        <span>
+                                            <strong>
+                                                Staffeln automatisch umbrechen
+                                            </strong>
+                                            <small>
+                                                An = Staffelposter füllen die verfügbare Breite und laufen danach automatisch in Reihe 2, 3 usw. weiter. Die seitlichen Staffel-Pfeile werden dabei ausgeblendet.
+                                            </small>
+                                        </span>
+                                    </label>
                                 </section>
 
                                 <section className='minitigerSettingsCard'>
@@ -2692,3 +2732,7 @@ const MinitigerSettingsPanel = ({
 export default MinitigerSettingsPanel;
 
 // MINITIGER_PATCH_MARKER: PHASE_18_3_1_2_FORCE_APPLY
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_1_SEASON_WRAP_SETTING_UI
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_3_CENTERED_CARD_TEXT_UI

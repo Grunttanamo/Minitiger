@@ -29,3 +29,10 @@ Minitiger_Gedaechtnis/
 # Python cache
 __pycache__/
 *.py[cod]
+
+# Minitiger local patch/test artifacts
+.minitiger_backups/
+phase18_*_files/
+DIAGNOSE_18_*.sh
+PHASE_18_*.scss.inc
+VERIFY_*.bad-check.bak

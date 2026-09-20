@@ -1197,3 +1197,43 @@
             both !important;
     }
 }
+
+/* =========================================================
+   PHASE 18.18.3b TEST - CUSTOM LIBRARY CENTERED CARD TEXT
+   ========================================================= */
+
+/*
+ * MinitigerLibrary.scss normally forces card text left.
+ * When the personal global centering option is enabled, override only
+ * this custom-library context.
+ *
+ * Short text:
+ *   shrink to natural width + center under the card.
+ *
+ * Long text:
+ *   grow up to 100% of card width + keep end ellipsis.
+ */
+:root[data-minitiger-card-text-centered='true']
+.minitigerLibraryPage .cardText {
+    width: fit-content !important;
+    max-width: 100% !important;
+    margin-inline: auto !important;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left !important;
+}
+
+:root[data-minitiger-card-text-centered='true']
+.minitigerLibraryPage .cardText > .textActionButton {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_18_3B_CUSTOM_LIBRARY_CENTERED_TEXT */

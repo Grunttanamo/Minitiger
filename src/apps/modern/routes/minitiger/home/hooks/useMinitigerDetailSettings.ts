@@ -153,12 +153,14 @@ const useMinitigerDetailSettings = () => {
             );
         }
 
-        window.dispatchEvent(
-            new CustomEvent<MinitigerDetailSettings>(
-                SYNC_EVENT,
-                { detail: normalized }
-            )
-        );
+        window.setTimeout(() => {
+            window.dispatchEvent(
+                new CustomEvent<MinitigerDetailSettings>(
+                    SYNC_EVENT,
+                    { detail: normalized }
+                )
+            );
+        }, 0);
     }, []);
 
     const updateSettings =
@@ -185,12 +187,14 @@ const useMinitigerDetailSettings = () => {
                     );
                 }
 
-                window.dispatchEvent(
-                    new CustomEvent<MinitigerDetailSettings>(
-                        SYNC_EVENT,
-                        { detail: next }
-                    )
-                );
+                window.setTimeout(() => {
+                    window.dispatchEvent(
+                        new CustomEvent<MinitigerDetailSettings>(
+                            SYNC_EVENT,
+                            { detail: next }
+                        )
+                    );
+                }, 0);
 
                 return next;
             });
@@ -212,3 +216,5 @@ const useMinitigerDetailSettings = () => {
 };
 
 export default useMinitigerDetailSettings;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_1_SAFE_DETAIL_SETTINGS_SYNC

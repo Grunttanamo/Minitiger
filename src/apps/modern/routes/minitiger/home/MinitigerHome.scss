@@ -5608,3 +5608,41 @@ iframe.minitigerInlineTrailer {
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_15_0_HOME_HOVER_LAYOUT */
+
+/* =========================================================
+   PHASE 18.18.3 TEST - OPTIONAL CENTERED CARD TEXT
+   ========================================================= */
+
+/*
+ * Short strings shrink to their natural width and are centered.
+ * Long strings may still use the full card width and ellipsize at the end.
+ */
+:root[data-minitiger-card-text-centered='true']
+.minitigerMediaInfo {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+:root[data-minitiger-card-text-centered='true']
+.minitigerMediaInfoLink {
+    width: 100%;
+    min-width: 0;
+}
+
+:root[data-minitiger-card-text-centered='true']
+.minitigerMediaInfo strong,
+:root[data-minitiger-card-text-centered='true']
+.minitigerMediaInfo span {
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_18_3_CENTERED_HOME_CARD_TEXT */

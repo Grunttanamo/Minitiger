@@ -9,11 +9,13 @@ import React, {
 interface Props extends PropsWithChildren {
     className?: string;
     ariaLabel?: string;
+    wrap?: boolean;
 }
 
 const MinitigerRail = ({
     className,
     ariaLabel,
+    wrap = false,
     children
 }: Props) => {
     const trackRef =
@@ -46,6 +48,17 @@ const MinitigerRail = ({
                 return;
             }
 
+            if (wrap) {
+                if (track.scrollLeft !== 0) {
+                    track.scrollLeft = 0;
+                }
+
+                setHasOverflow(false);
+                setCanScrollLeft(false);
+                setCanScrollRight(false);
+                return;
+            }
+
             const maxScroll =
                 Math.max(
                     0,
@@ -70,7 +83,7 @@ const MinitigerRail = ({
                 && track.scrollLeft
                     < maxScroll - 4
             );
-        }, []);
+        }, [wrap]);
 
     useEffect(() => {
         const track =
@@ -195,6 +208,9 @@ const MinitigerRail = ({
                 'minitigerRail',
                 hasOverflow
                     ? 'hasOverflow'
+                    : '',
+                wrap
+                    ? 'isWrapped'
                     : ''
             ]
                 .filter(Boolean)
@@ -204,6 +220,9 @@ const MinitigerRail = ({
                 ref={trackRef}
                 className={[
                     'minitigerRailTrack',
+                    wrap
+                        ? 'isWrapped'
+                        : '',
                     className
                 ].filter(Boolean).join(' ')}
                 aria-label={ariaLabel}
@@ -211,7 +230,7 @@ const MinitigerRail = ({
                 {children}
             </div>
 
-            {hasOverflow && (
+            {!wrap && hasOverflow && (
                 <div
                     className='minitigerRailControls'
                     aria-label={
@@ -250,3 +269,5 @@ const MinitigerRail = ({
 };
 
 export default MinitigerRail;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_1_WRAPPABLE_RAIL

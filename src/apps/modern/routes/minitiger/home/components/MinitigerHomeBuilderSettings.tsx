@@ -90,7 +90,9 @@ const parseCustomSort = (
 ): MinitigerCustomSortMode => (
     value === 'latestTitles'
         ? 'latestTitles'
-        : 'latestItems'
+        : value === 'latestSeasons'
+            ? 'latestSeasons'
+            : 'latestItems'
 );
 
 const LibrarySelect = ({
@@ -537,9 +539,11 @@ const MinitigerHomeBuilderSettings = ({
 
                                         <span className='minitigerHomeBuilderMeta'>
                                             Custom · {
-                                                row.display === 'landscape'
-                                                    ? 'Landscape'
-                                                    : 'Poster'
+                                                row.sortMode === 'latestSeasons'
+                                                    ? 'Staffelposter'
+                                                    : row.display === 'landscape'
+                                                        ? 'Landscape'
+                                                        : 'Poster'
                                             } · {row.count}
                                         </span>
 
@@ -661,13 +665,25 @@ const MinitigerHomeBuilderSettings = ({
                                                         einmalig
                                                         (z. B. Serien/Alben)
                                                     </option>
+                                                    <option value='latestSeasons'>
+                                                        Neueste Staffeln nach
+                                                        letzter neuer Folge
+                                                        (eine Karte je Staffel)
+                                                    </option>
                                                 </select>
                                             </label>
 
                                             <label className='minitigerSettingsField'>
                                                 <span>Anzeigeformat</span>
                                                 <select
-                                                    value={row.display}
+                                                    value={
+                                                        row.sortMode === 'latestSeasons'
+                                                            ? 'poster'
+                                                            : row.display
+                                                    }
+                                                    disabled={
+                                                        row.sortMode === 'latestSeasons'
+                                                    }
                                                     onChange={event =>
                                                         onUpdateCustomRow(
                                                             row.key,
@@ -996,3 +1012,5 @@ const MinitigerHomeBuilderSettings = ({
 };
 
 export default MinitigerHomeBuilderSettings;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_0_LATEST_SEASONS_BUILDER

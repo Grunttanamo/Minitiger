@@ -16,6 +16,7 @@ import LibraryToolbar from './features/libraries/components/LibraryToolbar';
 import { LibraryProvider } from './features/libraries/hooks/useLibrary';
 import { isLibraryPath } from './features/libraries/utils/path';
 import MinitigerGlobalSettingsHost from './features/minitiger/MinitigerGlobalSettingsHost';
+import MinitigerProfileSelectionHost from './features/minitiger/MinitigerProfileSelectionHost';
 
 import './AppOverrides.scss';
 
@@ -84,8 +85,11 @@ export const Component = () => {
                 </Box>
             </Box>
             <MinitigerGlobalSettingsHost />
+            <MinitigerProfileSelectionHost />
             <ThemeCss />
             <CustomCss />
         </LibraryProvider>
     );
 };
+
+// MINITIGER_PATCH_MARKER: PHASE_18_17_4_GLOBAL_PROFILE_SELECTION_MOUNT

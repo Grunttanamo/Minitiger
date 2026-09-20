@@ -2589,3 +2589,39 @@ a.minitigerDetailsParentTitle:focus-visible {
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_15_1_DETAIL_MINIMAL_METADATA */
+
+/* =========================================================
+   PHASE 18.18.1 TEST - RESPONSIVE SEASON WRAP
+   ========================================================= */
+
+/*
+ * Optional series-detail mode:
+ * keep the configured season poster width, but wrap cards at the
+ * available right edge instead of creating a horizontal rail.
+ */
+.minitigerRail.isWrapped {
+    overflow: visible;
+}
+
+.minitigerRail.isWrapped
+.minitigerRailTrack.minitigerDetailsSeasonRow {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    overflow-x: visible;
+    overflow-y: visible;
+    row-gap: 1.15rem;
+    scroll-behavior: auto;
+    overscroll-behavior-inline: auto;
+}
+
+.minitigerRail.isWrapped
+.minitigerDetailsSeasonCard {
+    flex-shrink: 0;
+}
+
+.minitigerRail.isWrapped
+.minitigerRailControls {
+    display: none !important;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_18_1_SEASON_WRAP_STYLE */

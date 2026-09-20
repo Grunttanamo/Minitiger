@@ -70,6 +70,12 @@ const useMinitigerThemeVariables = (
             'data-minitiger-glow-enabled',
             settings.glowEnabled ? 'true' : 'false'
         );
+        root.setAttribute(
+            'data-minitiger-card-text-centered',
+            settings.cardTextCentered
+                ? 'true'
+                : 'false'
+        );
 
         Object.entries(variables).forEach(
             ([ name, value ]) => {
@@ -80,6 +86,7 @@ const useMinitigerThemeVariables = (
         settings.accentColor,
         settings.arrowColor,
         settings.bannerMetaColor,
+        settings.cardTextCentered,
         settings.glowColor,
         settings.glowEnabled,
         settings.glowSize,
@@ -100,3 +107,5 @@ const useMinitigerThemeVariables = (
 export default useMinitigerThemeVariables;
 
 // MINITIGER_PATCH_MARKER: PHASE_18_15_0_GLOBAL_HOVER_DETAIL_QUICKPLAY
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_3_CENTERED_CARD_TEXT_THEME

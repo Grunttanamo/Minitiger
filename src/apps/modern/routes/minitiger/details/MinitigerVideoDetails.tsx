@@ -67,7 +67,7 @@ interface DetailMediaSource {
     Container?: string | null;
 }
 
-const noItemId = '__minitiger-no-item__';
+const noItemId = '00000000000000000000000000000000';
 
 const getPersonImageUrl = (
     apiClient: ReturnType<typeof useApi>['__legacyApiClient__'],
@@ -1089,6 +1089,10 @@ const MinitigerVideoDetails = () => {
                                 <MinitigerRail
                                     className='minitigerDetailsSeasonRow'
                                     ariaLabel='Staffeln'
+                                    wrap={
+                                        detailSettings
+                                            .seasonWrapEnabled
+                                    }
                                 >
                                     {seasons.map(season => {
                                         const detailedSeason =
@@ -1336,3 +1340,7 @@ const MinitigerVideoDetails = () => {
 
 // MINITIGER_PATCH_MARKER: PHASE_18_12_6C_TEST_SERIES_SWITCHER_ALIGNMENT_RECOVERY
 export default MinitigerVideoDetails;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_1_SERIES_SEASON_WRAP
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_1B_VALID_EMPTY_GUID

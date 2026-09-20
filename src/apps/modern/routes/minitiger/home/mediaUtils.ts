@@ -223,7 +223,13 @@ export const getEpisodeLabel = (item: ItemDto) => {
 };
 
 export const getCardTitle = (item: ItemDto) => {
-    if (item.Type === 'Episode' && item.SeriesName) {
+    if (
+        (
+            item.Type === 'Episode'
+            || item.Type === 'Season'
+        )
+        && item.SeriesName
+    ) {
         return item.SeriesName;
     }
 
@@ -236,6 +242,15 @@ export const getCardSubtitle = (item: ItemDto) => {
         const episodeName = item.Name ?? '';
 
         return [ episodeLabel, episodeName ]
+            .filter(Boolean)
+            .join(' · ');
+    }
+
+    if (item.Type === 'Season') {
+        return [
+            item.Name ?? 'Staffel',
+            item.ProductionYear
+        ]
             .filter(Boolean)
             .join(' · ');
     }
@@ -625,3 +640,5 @@ export const getBingeEndLabel = (
         minute: '2-digit'
     })} Uhr`;
 };
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_0_MAIN_TITLE_HELPERS

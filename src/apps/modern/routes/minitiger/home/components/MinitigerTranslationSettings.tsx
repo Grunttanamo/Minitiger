@@ -6,6 +6,7 @@ import React, {
 
 import { useApi } from 'hooks/useApi';
 
+import MinitigerTranslationBackgroundSettings from './MinitigerTranslationBackgroundSettings';
 import './MinitigerTranslationSettings.scss';
 
 type TranslationStatus =
@@ -1573,6 +1574,8 @@ const MinitigerTranslationSettings = () => {
                 nur ausgewählte Kandidaten werden an OpenAI gesendet.
             </p>
 
+            <MinitigerTranslationBackgroundSettings />
+
             <section className='minitigerSettingsCard'>
                 <h4>OpenAI API</h4>
 
@@ -2139,3 +2142,5 @@ const MinitigerTranslationSettings = () => {
 
 export default MinitigerTranslationSettings;
 /* MINITIGER_PATCH_MARKER: PHASE_18_13_0_TEST_STABILITY_TRANSLATOR_BACKGROUND */
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_0_BACKGROUND_TRANSLATION_PANEL

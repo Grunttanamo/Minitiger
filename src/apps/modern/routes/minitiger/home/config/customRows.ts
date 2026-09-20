@@ -1,5 +1,5 @@
 export type MinitigerCustomRowId = `custom${number}`;
-export type MinitigerCustomSortMode = 'latestItems' | 'latestTitles';
+export type MinitigerCustomSortMode = 'latestItems' | 'latestTitles' | 'latestSeasons';
 export type MinitigerCustomDisplay = 'poster' | 'landscape';
 
 export interface MinitigerCustomRow {
@@ -100,7 +100,9 @@ export const normalizeCustomRows = (
                 sortMode:
                     candidate.sortMode === 'latestTitles'
                         ? 'latestTitles'
-                        : 'latestItems',
+                        : candidate.sortMode === 'latestSeasons'
+                            ? 'latestSeasons'
+                            : 'latestItems',
                 display:
                     candidate.display === 'landscape'
                         ? 'landscape'
@@ -116,3 +118,5 @@ export const normalizeCustomRows = (
         })
     };
 };
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_0_LATEST_SEASONS_MODE

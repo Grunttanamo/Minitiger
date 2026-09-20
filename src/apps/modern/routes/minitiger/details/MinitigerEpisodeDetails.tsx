@@ -80,7 +80,7 @@ const getEpisodeStreamLabel = (
 );
 
 const noItemId =
-    '__minitiger-no-episode__';
+    '00000000000000000000000000000000';
 
 const MinitigerEpisodeDetails = ({
     itemId
@@ -943,3 +943,5 @@ const MinitigerEpisodeDetails = ({
 };
 
 export default MinitigerEpisodeDetails;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_1B_VALID_EMPTY_GUID

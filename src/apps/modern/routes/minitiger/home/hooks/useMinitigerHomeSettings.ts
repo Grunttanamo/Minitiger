@@ -462,12 +462,21 @@ const useMinitigerHomeSettings = () => {
             console.warn(warning, error);
         }
 
-        window.dispatchEvent(
-            new CustomEvent<MinitigerHomeSettings>(
-                SYNC_EVENT,
-                { detail: value }
-            )
-        );
+        /*
+         * React may execute functional state updaters while rendering the
+         * component that owns this hook. Dispatching synchronously here
+         * would make the second mounted settings hook update another
+         * component during that render. Defer only the cross-component
+         * notification to the next task.
+         */
+        window.setTimeout(() => {
+            window.dispatchEvent(
+                new CustomEvent<MinitigerHomeSettings>(
+                    SYNC_EVENT,
+                    { detail: value }
+                )
+            );
+        }, 0);
 
         saveToServer(value, broadcastForAdmin);
     }, [saveToServer]);
@@ -704,3 +713,5 @@ export default useMinitigerHomeSettings;
 
 // MINITIGER_PATCH_MARKER: PHASE_18_12_4_TEST_BANNER_AVATAR_GLOBAL
 // MINITIGER_PATCH_MARKER: PHASE_18_13_0_TEST_STABILITY_TRANSLATOR_BACKGROUND
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_1_SAFE_SETTINGS_SYNC

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import type { CardOptions } from 'types/cardOptions';
 import type { ItemDto } from 'types/base/models/item-dto';
@@ -49,11 +49,141 @@ const MinitigerNativeLibraryOverlay = ({
     item,
     cardOptions
 }: Props) => {
-    if (
-        !String(cardOptions.cardCssClass ?? '')
+    const overlayRef =
+        useRef<HTMLDivElement>(null);
+
+    const isNativeLibraryCard =
+        String(cardOptions.cardCssClass ?? '')
             .split(/\s+/)
-            .includes('minitigerNativeLibraryCard')
-    ) {
+            .includes('minitigerNativeLibraryCard');
+
+    useEffect(() => {
+        if (!isNativeLibraryCard) {
+            return;
+        }
+
+        const overlay = overlayRef.current;
+        const card =
+            overlay?.closest<HTMLElement>('.card')
+            ?? overlay?.closest<HTMLElement>(
+                '.minitigerNativeLibraryCard'
+            );
+
+        if (!card) {
+            return;
+        }
+
+        let animationFrame = 0;
+
+        const updateTextAlignment = () => {
+            animationFrame = 0;
+
+            const enabled =
+                document.documentElement.getAttribute(
+                    'data-minitiger-card-text-centered'
+                ) === 'true';
+
+            const lines =
+                card.querySelectorAll<HTMLElement>(
+                    '.cardText:not(.btnCardOptions)'
+                );
+
+            lines.forEach(line => {
+                line.classList.remove(
+                    'minitigerNativeCardTextAutoCenter'
+                );
+
+                if (!enabled) {
+                    return;
+                }
+
+                const measuredText =
+                    line.querySelector<HTMLElement>(
+                        '.textActionButton'
+                    )
+                    ?? line;
+
+                const overflowing =
+                    measuredText.scrollWidth
+                    > measuredText.clientWidth + 1;
+
+                if (!overflowing) {
+                    line.classList.add(
+                        'minitigerNativeCardTextAutoCenter'
+                    );
+                }
+            });
+        };
+
+        const scheduleUpdate = () => {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+
+            animationFrame =
+                requestAnimationFrame(
+                    updateTextAlignment
+                );
+        };
+
+        scheduleUpdate();
+
+        const rootObserver =
+            new MutationObserver(scheduleUpdate);
+
+        rootObserver.observe(
+            document.documentElement,
+            {
+                attributes: true,
+                attributeFilter: [
+                    'data-minitiger-card-text-centered'
+                ]
+            }
+        );
+
+        const cardObserver =
+            new MutationObserver(scheduleUpdate);
+
+        cardObserver.observe(
+            card,
+            {
+                childList: true,
+                subtree: true,
+                characterData: true
+            }
+        );
+
+        const resizeObserver =
+            new ResizeObserver(scheduleUpdate);
+
+        resizeObserver.observe(card);
+
+        return () => {
+            if (animationFrame) {
+                cancelAnimationFrame(
+                    animationFrame
+                );
+            }
+
+            rootObserver.disconnect();
+            cardObserver.disconnect();
+            resizeObserver.disconnect();
+
+            card.querySelectorAll<HTMLElement>(
+                '.minitigerNativeCardTextAutoCenter'
+            ).forEach(line => {
+                line.classList.remove(
+                    'minitigerNativeCardTextAutoCenter'
+                );
+            });
+        };
+    }, [
+        isNativeLibraryCard,
+        item.Id,
+        item.Name
+    ]);
+
+    if (!isNativeLibraryCard) {
         return null;
     }
 
@@ -115,7 +245,7 @@ const MinitigerNativeLibraryOverlay = ({
     );
 
     return (
-        <div className='minitigerNativeCardOverlay'>
+        <div ref={overlayRef} className='minitigerNativeCardOverlay'>
             {canVirtualAssign && (
                 <button
                     type='button'
@@ -183,3 +313,7 @@ const MinitigerNativeLibraryOverlay = ({
 };
 
 export default MinitigerNativeLibraryOverlay;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_3A_NATIVE_TEXT_MEASURE
+
+// MINITIGER_PATCH_MARKER: PHASE_18_18_3C_BOOK_TEXT_CENTER_FIX

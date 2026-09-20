@@ -8,6 +8,7 @@ import {
 
 import { useApi } from 'hooks/useApi';
 
+import { getMinitigerAccessToken } from '../apiAuth';
 import {
     DEFAULT_MINITIGER_AVATAR_GALLERY,
     type MinitigerAvatarGalleryConfig,
@@ -121,6 +122,35 @@ const getFileLabel = (file: File) => {
     return raw.slice(0, 60) || 'Avatar';
 };
 
+const readSharedAvatarGallery = async (
+    apiClient: NonNullable<ReturnType<typeof useApi>['__legacyApiClient__']>
+): Promise<MinitigerAvatarGalleryConfig | null> => {
+    try {
+        const token = getMinitigerAccessToken(apiClient);
+        const response = await fetch(
+            apiClient.getUrl(
+                'Minitiger/Profiles/AvatarGallery',
+                token ? { ApiKey: token } : {}
+            ),
+            { method: 'GET' }
+        );
+
+        if (!response.ok) {
+            return null;
+        }
+
+        return normalizeMinitigerAvatarGallery(
+            await response.json()
+        );
+    } catch (error) {
+        console.warn(
+            '[Minitiger Avatar] Gemeinsame Avatar-Galerie konnte nicht geladen werden.',
+            error
+        );
+        return null;
+    }
+};
+
 const useMinitigerAvatarGallery = () => {
     const {
         user,
@@ -198,10 +228,32 @@ const useMinitigerAvatarGallery = () => {
                     SERVER_PREF_KEY
                 );
 
-            if (serverValue) {
-                saveLocal(
-                    normalizeMinitigerAvatarGallery(serverValue)
-                );
+            const normalizedServerValue =
+                serverValue
+                    ? normalizeMinitigerAvatarGallery(serverValue)
+                    : null;
+
+            if (
+                normalizedServerValue
+                && normalizedServerValue.items.length > 0
+            ) {
+                saveLocal(normalizedServerValue);
+                return;
+            }
+
+            const sharedGallery =
+                await readSharedAvatarGallery(apiClient);
+
+            if (
+                sharedGallery
+                && sharedGallery.items.length > 0
+            ) {
+                saveLocal(sharedGallery);
+                return;
+            }
+
+            if (normalizedServerValue) {
+                saveLocal(normalizedServerValue);
             }
         } finally {
             setLoading(false);
@@ -341,3 +393,5 @@ const useMinitigerAvatarGallery = () => {
 
 export default useMinitigerAvatarGallery;
 // MINITIGER_PATCH_MARKER: PHASE_18_13_0_TEST_STABILITY_TRANSLATOR_BACKGROUND
+
+// MINITIGER_PATCH_MARKER: PHASE_18_17_4A_SHARED_AVATAR_GALLERY_FALLBACK
