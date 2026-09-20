@@ -8,6 +8,14 @@
     "category": "General",
     "versions": [
       {
+        "version": "1.2.2.0",
+        "changelog": "Adds Minitiger profile synchronization, shared avatar support, background translation services and API controls, plus stability and compatibility improvements for Minitiger Web 18.18.5c.",
+        "targetAbi": "12.0.0.0",
+        "sourceUrl": "https://github.com/Grunttanamo/Minitiger/releases/download/plugin-v1.2.2.0/Minitiger.VirtualSync_1.2.2.0.zip",
+        "checksum": "defdc70f69a10af2c7dea40b83156a3f",
+        "timestamp": "2026-09-20T16:55:59Z"
+      },
+      {
         "version": "1.0.3.0",
         "changelog": "Initial public Minitiger plugin repository release for Jellyfin 12.1.",
         "targetAbi": "12.0.0.0",
