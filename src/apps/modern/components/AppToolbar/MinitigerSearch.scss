@@ -1,0 +1,240 @@
+.minitigerSearchRoot {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    z-index: 1300;
+}
+
+.minitigerSearchExpanded {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: min(32rem, calc(100vw - 2rem));
+    transform: translateY(-50%);
+}
+
+.minitigerSearchInputShell {
+    display: flex;
+    align-items: center;
+    min-height: 2.65rem;
+    padding: 0.15rem 0.25rem 0.15rem 0.7rem;
+    border: 1px solid color-mix(in srgb, var(--minitiger-accent, #f0a039) 72%, white 8%);
+    border-radius: 0.72rem;
+    background: rgb(18 18 18 / 96%);
+    box-shadow:
+        0 10px 30px rgb(0 0 0 / 32%),
+        0 0 18px color-mix(in srgb, var(--minitiger-accent, #f0a039) 12%, transparent);
+    backdrop-filter: blur(14px);
+}
+
+.minitigerSearchInputIcon {
+    flex: 0 0 auto;
+    margin-right: 0.5rem;
+    opacity: 0.72;
+}
+
+.minitigerSearchInputShell input {
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 0.4rem 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #fff;
+    font: inherit;
+}
+
+.minitigerSearchInputShell input::placeholder {
+    color: rgb(255 255 255 / 48%);
+}
+
+.minitigerSearchInputShell input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.minitigerSearchClear {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 1.8rem;
+    height: 1.8rem;
+    margin-right: 0.1rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: rgb(255 255 255 / 66%);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.minitigerSearchClear:hover,
+.minitigerSearchClear:focus-visible {
+    background: rgb(255 255 255 / 8%);
+    color: #fff;
+}
+
+.minitigerSearchDropdown {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    right: 0;
+    width: min(38rem, calc(100vw - 2rem));
+    max-height: min(72vh, 46rem);
+    overflow: auto;
+    border: 1px solid rgb(255 255 255 / 9%);
+    border-radius: 0.85rem;
+    background: rgb(15 15 15 / 97%);
+    box-shadow:
+        0 22px 55px rgb(0 0 0 / 48%),
+        0 0 24px color-mix(in srgb, var(--minitiger-accent, #f0a039) 10%, transparent);
+    backdrop-filter: blur(18px);
+    overscroll-behavior: contain;
+}
+
+.minitigerSearchState {
+    padding: 1.1rem 1rem;
+    color: rgb(255 255 255 / 62%);
+    text-align: center;
+}
+
+.minitigerSearchState.isError {
+    color: #ff9f9f;
+}
+
+.minitigerSearchResults {
+    padding: 0.55rem;
+}
+
+.minitigerSearchGroup + .minitigerSearchGroup {
+    margin-top: 0.45rem;
+    padding-top: 0.45rem;
+    border-top: 1px solid rgb(255 255 255 / 7%);
+}
+
+.minitigerSearchGroupTitle {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.4rem 0.45rem 0.48rem;
+    color: color-mix(in srgb, var(--minitiger-accent, #f0a039) 88%, white 12%);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.minitigerSearchGroupTitle small {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.45rem;
+    height: 1.45rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 7%);
+    color: rgb(255 255 255 / 62%);
+    font-size: 0.7rem;
+    letter-spacing: 0;
+}
+
+.minitigerSearchGroupItems {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.minitigerSearchResult {
+    display: grid;
+    grid-template-columns: 3.1rem minmax(0, 1fr);
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    min-height: 4.15rem;
+    padding: 0.42rem;
+    border: 0;
+    border-radius: 0.62rem;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.minitigerSearchResult:hover,
+.minitigerSearchResult:focus-visible {
+    outline: 0;
+    background: color-mix(in srgb, var(--minitiger-accent, #f0a039) 12%, rgb(255 255 255 / 4%));
+}
+
+.minitigerSearchResultImage {
+    display: grid;
+    place-items: center;
+    width: 3.1rem;
+    height: 3.35rem;
+    overflow: hidden;
+    border-radius: 0.42rem;
+    background: rgb(255 255 255 / 6%);
+    color: rgb(255 255 255 / 48%);
+}
+
+.minitigerSearchResultImage img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.minitigerSearchResultText {
+    min-width: 0;
+    display: grid;
+    gap: 0.2rem;
+}
+
+.minitigerSearchResultText strong,
+.minitigerSearchResultText small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.minitigerSearchResultText strong {
+    color: #fff;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+.minitigerSearchResultText small {
+    color: rgb(255 255 255 / 52%);
+    font-size: 0.76rem;
+}
+
+@media (max-width: 50rem) {
+    .minitigerSearchExpanded {
+        width: min(27rem, calc(100vw - 1rem));
+    }
+
+    .minitigerSearchDropdown {
+        width: min(32rem, calc(100vw - 1rem));
+    }
+}
+
+@media (max-width: 36rem) {
+    .minitigerSearchExpanded {
+        position: fixed;
+        top: 0.4rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        width: auto;
+        transform: none;
+    }
+
+    .minitigerSearchDropdown {
+        position: fixed;
+        top: 3.55rem;
+        right: 0.5rem;
+        left: 0.5rem;
+        width: auto;
+        max-height: calc(100vh - 4.2rem);
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_22_0_MINITIGER_SEARCH_STYLE */

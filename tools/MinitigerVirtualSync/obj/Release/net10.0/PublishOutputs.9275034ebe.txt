@@ -1,3 +1,0 @@
-/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/out/Jellyfin.Plugin.MinitigerVirtualSync.dll
-/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/out/Jellyfin.Plugin.MinitigerVirtualSync.deps.json
-/home/grunttanamo/minitiger-web/tools/MinitigerVirtualSync/out/Jellyfin.Plugin.MinitigerVirtualSync.pdb

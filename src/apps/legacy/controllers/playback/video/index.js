@@ -137,6 +137,8 @@ export default function (view) {
             btnUserRating.setItem(null);
         }
 
+        updateMinitigerEpisodePreviewButton(currentItem);
+
         // Update trickplay data
         trickplayResolution = null;
 
@@ -201,6 +203,7 @@ export default function (view) {
             view.querySelector('.btnAudio').classList.add('hide');
             view.querySelector('.osdTitle').innerHTML = '';
             view.querySelector('.osdMediaInfo').innerHTML = '';
+            updateMinitigerEpisodePreviewButton(null);
             return;
         }
 
@@ -1651,6 +1654,142 @@ export default function (view) {
     const transitionEndEventName = dom.whichTransitionEvent();
     const headerElement = document.querySelector('.skinHeader');
     const osdBottomElement = view.querySelector('.videoOsdBottom-maincontrols');
+    const mtEpisodeButton = view.querySelector('.btnMinitigerEpisodePreview');
+    const mtEpisodePanel = view.querySelector('.minitigerEpisodePreviewPanel');
+    const mtEpisodeClose = view.querySelector('.minitigerEpisodePreviewClose');
+    const mtSeasonSelect = view.querySelector('.minitigerEpisodePreviewSeasonSelect');
+    const mtEpisodeList = view.querySelector('.minitigerEpisodePreviewList');
+    const mtEpisodeStatus = view.querySelector('.minitigerEpisodePreviewStatus');
+    const mtSeriesTitle = view.querySelector('.minitigerEpisodePreviewSeriesTitle');
+    let mtSeriesId = '';
+    let mtEpisodes = [];
+    let mtRequestId = 0;
+
+    function isMinitigerEpisodePreviewOpen() {
+        return !mtEpisodePanel.classList.contains('hide');
+    }
+
+    function closeMinitigerEpisodePreview() {
+        if (!isMinitigerEpisodePreviewOpen()) return;
+        mtEpisodePanel.classList.add('hide');
+        mtEpisodePanel.setAttribute('aria-hidden', 'true');
+        mtEpisodeButton.classList.remove('isActive');
+        if (currentVisibleMenu === 'minitigerEpisodePreview') currentVisibleMenu = 'osd';
+        resetIdle();
+    }
+
+    function updateMinitigerEpisodePreviewButton(item) {
+        const visible = Boolean(item && item.Type === 'Episode' && item.SeriesId);
+        mtEpisodeButton.classList.toggle('hide', !visible);
+        if (!visible) closeMinitigerEpisodePreview();
+    }
+
+    function getMinitigerEpisodeImage(apiClient, episode) {
+        const type = episode.ImageTags?.Primary ? 'Primary' : episode.ImageTags?.Thumb ? 'Thumb' : '';
+        if (!type || !episode.Id) return '';
+        return apiClient.getUrl(`Items/${encodeURIComponent(episode.Id)}/Images/${type}`, { maxWidth: 480, quality: 90 });
+    }
+
+    function renderMinitigerEpisodes(apiClient, episodes) {
+        mtEpisodes = episodes;
+        if (!episodes.length) {
+            mtEpisodeList.innerHTML = '';
+            mtEpisodeStatus.textContent = 'Keine verfügbaren Folgen in dieser Staffel.';
+            mtEpisodeStatus.classList.remove('hide');
+            return;
+        }
+        mtEpisodeStatus.classList.add('hide');
+        mtEpisodeList.innerHTML = episodes.map(episode => {
+            const image = getMinitigerEpisodeImage(apiClient, episode);
+            const season = episode.ParentIndexNumber ?? currentItem?.ParentIndexNumber ?? '';
+            const number = episode.IndexNumber ?? '';
+            const code = season !== '' && number !== '' ? `S${season}:E${number}` : `Folge ${number || '•'}`;
+            const runtime = episode.RunTimeTicks ? datetime.getDisplayRunningTime(episode.RunTimeTicks) : '';
+            const current = episode.Id === currentItem?.Id;
+            const played = Boolean(episode.UserData?.Played);
+            return `<button type="button" class="minitigerEpisodePreviewEpisode${current ? ' isCurrent' : ''}" data-episode-id="${escapeHtml(episode.Id || '')}">
+                <span class="minitigerEpisodePreviewThumb">
+                    ${image ? `<img src="${escapeHtml(image)}" alt="" loading="lazy" />` : '<span class="material-icons">movie</span>'}
+                    ${current ? '<b class="minitigerEpisodePreviewNow">LÄUFT</b>' : ''}
+                    ${played ? '<i class="minitigerEpisodePreviewPlayed">✓</i>' : ''}
+                </span>
+                <span class="minitigerEpisodePreviewEpisodeText"><small>${escapeHtml(code)}${runtime ? ` · ${escapeHtml(runtime)}` : ''}</small><strong>${escapeHtml(episode.Name || 'Episode')}</strong></span>
+            </button>`;
+        }).join('');
+    }
+
+    async function loadMinitigerEpisodes(seasonId) {
+        if (!currentItem?.SeriesId || !seasonId) return;
+        const requestId = ++mtRequestId;
+        const apiClient = ServerConnections.getApiClient(currentItem.ServerId);
+        const result = await apiClient.getItems(apiClient.getCurrentUserId(), {
+            ParentId: seasonId,
+            IncludeItemTypes: 'Episode',
+            Recursive: false,
+            IsMissing: false,
+            Fields: 'PrimaryImageAspectRatio,MediaSources',
+            ImageTypeLimit: 3,
+            EnableImageTypes: 'Primary,Thumb,Backdrop',
+            EnableTotalRecordCount: false,
+            Limit: 500
+        });
+        if (requestId !== mtRequestId) return;
+        const episodes = (result.Items || []).filter(x => x?.Id && x.IsVirtualItem !== true && x.LocationType !== 'Virtual').sort((a, b) => (a.IndexNumber ?? 9999) - (b.IndexNumber ?? 9999));
+        renderMinitigerEpisodes(apiClient, episodes);
+    }
+
+    async function openMinitigerEpisodePreview() {
+        if (!currentItem?.SeriesId || currentItem.Type !== 'Episode') return;
+        showOsd();
+        stopOsdHideTimer();
+        currentVisibleMenu = 'minitigerEpisodePreview';
+        mtEpisodePanel.classList.remove('hide');
+        mtEpisodePanel.setAttribute('aria-hidden', 'false');
+        mtEpisodeButton.classList.add('isActive');
+        mtSeriesTitle.textContent = currentItem.SeriesName || 'Serie';
+
+        const apiClient = ServerConnections.getApiClient(currentItem.ServerId);
+        const seriesId = currentItem.SeriesId;
+        mtSeriesId = seriesId;
+        mtSeasonSelect.disabled = true;
+        mtSeasonSelect.innerHTML = '<option>Staffeln werden geladen …</option>';
+        mtEpisodeStatus.textContent = 'Staffeln werden geladen …';
+        mtEpisodeStatus.classList.remove('hide');
+        mtEpisodeList.innerHTML = '';
+
+        try {
+            const result = await apiClient.getItems(apiClient.getCurrentUserId(), {
+                ParentId: seriesId,
+                IncludeItemTypes: 'Season',
+                Recursive: false,
+                EnableTotalRecordCount: false,
+                Limit: 100
+            });
+            const seasons = (result.Items || []).filter(x => x?.Id).sort((a, b) => (a.IndexNumber ?? 9999) - (b.IndexNumber ?? 9999));
+            if (!isMinitigerEpisodePreviewOpen() || currentItem?.SeriesId !== seriesId) return;
+            mtSeasonSelect.innerHTML = seasons.map(season => `<option value="${escapeHtml(season.Id)}">${escapeHtml(season.Name || `Staffel ${season.IndexNumber ?? ''}`)}</option>`).join('');
+            mtSeasonSelect.disabled = !seasons.length;
+            const selected = seasons.some(x => x.Id === currentItem.SeasonId) ? currentItem.SeasonId : seasons[0]?.Id;
+            if (!selected) {
+                mtEpisodeStatus.textContent = 'Keine Staffeln gefunden.';
+                return;
+            }
+            mtSeasonSelect.value = selected;
+            await loadMinitigerEpisodes(selected);
+        } catch (error) {
+            console.error('[Minitiger Player] Episodenpreview konnte nicht geladen werden.', error);
+            mtEpisodeStatus.textContent = 'Episodenpreview konnte nicht geladen werden.';
+        }
+    }
+
+    async function playMinitigerEpisode(episodeId) {
+        const episode = mtEpisodes.find(x => x.Id === episodeId);
+        if (!episode) return;
+        closeMinitigerEpisodePreview();
+        await playbackManager.play({ items: [ episode ], startPositionTicks: episode.UserData?.PlaybackPositionTicks ?? 0 });
+    }
+
+    // MINITIGER_PATCH_MARKER: PHASE_18_20_0_IN_PLAYER_EPISODE_PREVIEW
 
     nowPlayingPositionSlider.enableKeyboardDragging();
     nowPlayingVolumeSlider.enableKeyboardDragging();
@@ -1772,11 +1911,23 @@ export default function (view) {
         playbackManager.toggleAirPlay(currentPlayer);
     });
     view.querySelector('.btnVideoOsdSettings').addEventListener('click', onSettingsButtonClick);
+    mtEpisodeButton.addEventListener('click', function () {
+        if (isMinitigerEpisodePreviewOpen()) closeMinitigerEpisodePreview();
+        else void openMinitigerEpisodePreview();
+    });
+    mtEpisodeClose.addEventListener('click', closeMinitigerEpisodePreview);
+    mtSeasonSelect.addEventListener('change', function () { void loadMinitigerEpisodes(this.value); });
+    mtEpisodeList.addEventListener('click', function (event) {
+        const button = event.target.closest('.minitigerEpisodePreviewEpisode');
+        if (button?.dataset?.episodeId) void playMinitigerEpisode(button.dataset.episodeId);
+    });
     view.addEventListener('viewhide', function () {
         clearHideAnimationEventListeners(headerElement);
         headerElement.classList.remove('hide');
     });
     view.addEventListener('viewdestroy', function () {
+        closeMinitigerEpisodePreview();
+
         if (self.touchHelper) {
             self.touchHelper.destroy();
             self.touchHelper = null;
@@ -1793,7 +1944,7 @@ export default function (view) {
     let lastPointerDown = 0;
     /* eslint-disable-next-line compat/compat */
     dom.addEventListener(view, window.PointerEvent ? 'pointerdown' : 'click', function (e) {
-        if (dom.parentWithClass(e.target, ['videoOsdBottom', 'upNextContainer'])) {
+        if (dom.parentWithClass(e.target, ['videoOsdBottom', 'upNextContainer', 'minitigerEpisodePreviewPanel'])) {
             showOsd();
             return;
         }

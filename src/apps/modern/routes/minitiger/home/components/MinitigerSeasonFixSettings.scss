@@ -1,0 +1,183 @@
+.minitigerSeasonFixRules {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin: 0.75rem 0;
+}
+
+.minitigerSeasonFixRules > span {
+    padding: 0.5rem 0.7rem;
+    border: 1px solid rgb(255 255 255 / 9%);
+    border-radius: 0.65rem;
+    background: rgb(255 255 255 / 3%);
+}
+
+.minitigerSeasonFixSummary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-top: 0.9rem;
+}
+
+.minitigerSeasonFixSummary > span,
+.minitigerSeasonFixSummary.isApplied {
+    padding: 0.7rem 0.8rem;
+    border: 1px solid rgb(255 255 255 / 9%);
+    border-radius: 0.65rem;
+    background: rgb(255 255 255 / 3%);
+}
+
+.minitigerSeasonFixSummary > span {
+    display: grid;
+    gap: 0.15rem;
+}
+
+.minitigerSeasonFixSummary > span strong {
+    font-size: 1.15rem;
+}
+
+.minitigerSeasonFixSummary.isApplied {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem 1rem;
+}
+
+.minitigerSeasonFixList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    max-height: 30rem;
+    margin-top: 0.9rem;
+    overflow-y: auto;
+}
+
+.minitigerSeasonFixItem {
+    min-width: 0;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid rgb(255 255 255 / 9%);
+    border-radius: 0.7rem;
+    background: rgb(255 255 255 / 3%);
+}
+
+.minitigerSeasonFixItem > strong {
+    display: block;
+    margin-bottom: 0.45rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.minitigerSeasonFixItem > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.minitigerSeasonFixItem > div span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.minitigerSeasonFixItem .isExpected {
+    color: var(--minitiger-accent, #f2b84b);
+    font-weight: 700;
+}
+
+.minitigerSeasonFixItem small {
+    display: block;
+    margin-top: 0.45rem;
+    color: rgb(255 255 255 / 50%);
+}
+
+.minitigerSeasonFixClean {
+    margin-top: 0.9rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgb(117 231 170 / 28%);
+    border-radius: 0.7rem;
+    background: rgb(117 231 170 / 7%);
+    color: #75e7aa;
+    font-weight: 700;
+}
+
+
+
+.minitigerSeasonFixSkippedSection {
+    margin-top: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgb(255 255 255 / 8%);
+}
+
+.minitigerSeasonFixSkippedHead {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.minitigerSeasonFixSkippedHead > span {
+    display: inline-grid;
+    min-width: 1.75rem;
+    height: 1.75rem;
+    place-items: center;
+    padding: 0 0.45rem;
+    border: 1px solid rgb(242 184 75 / 28%);
+    border-radius: 999px;
+    background: rgb(242 184 75 / 9%);
+    color: var(--minitiger-accent, #f2b84b);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.minitigerSeasonFixSkippedList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-top: 0.7rem;
+}
+
+.minitigerSeasonFixSkippedItem {
+    display: grid;
+    min-width: 0;
+    gap: 0.28rem;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid rgb(242 184 75 / 20%);
+    border-radius: 0.7rem;
+    background: rgb(242 184 75 / 5%);
+}
+
+.minitigerSeasonFixSkippedItem > strong,
+.minitigerSeasonFixSkippedItem > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.minitigerSeasonFixSkippedItem > span {
+    color: rgb(255 255 255 / 78%);
+}
+
+.minitigerSeasonFixSkippedItem > small {
+    color: var(--minitiger-accent, #f2b84b);
+    opacity: 0.9;
+}
+
+@media (max-width: 900px) {
+    .minitigerSeasonFixSummary,
+    .minitigerSeasonFixList,
+    .minitigerSeasonFixSkippedList {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .minitigerSeasonFixSummary,
+    .minitigerSeasonFixList,
+    .minitigerSeasonFixSkippedList {
+        grid-template-columns: 1fr;
+    }
+}
+
+// MINITIGER_PATCH_MARKER: PHASE_18_21_0_SEASON_FIX_STYLE
+// MINITIGER_PATCH_MARKER: PHASE_18_21_1_SEASON_FIX_SKIPPED_DETAILS_STYLE

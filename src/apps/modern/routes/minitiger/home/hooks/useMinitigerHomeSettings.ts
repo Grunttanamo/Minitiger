@@ -53,7 +53,8 @@ const PERSONAL_HOME_SETTING_KEYS: Array<keyof MinitigerHomeSettings> = [
     'playedIndicatorShape',
     'hoverEnabled',
     'glowEnabled',
-    'previewEnabled'
+    'previewEnabled',
+    'preferredPlayer'
 ];
 
 const TOOLBAR_BRANDING_SETTING_KEYS: Array<keyof MinitigerHomeSettings> = [
@@ -715,3 +716,5 @@ export default useMinitigerHomeSettings;
 // MINITIGER_PATCH_MARKER: PHASE_18_13_0_TEST_STABILITY_TRANSLATOR_BACKGROUND
 
 // MINITIGER_PATCH_MARKER: PHASE_18_18_1_SAFE_SETTINGS_SYNC
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0A_VLC_PREFERENCE_BRIDGE_CHECK

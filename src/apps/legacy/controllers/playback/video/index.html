@@ -6,6 +6,24 @@
         </div>
     </div>
     <div class="upNextContainer hide"></div>
+
+    <section class="minitigerEpisodePreviewPanel hide" aria-hidden="true" aria-label="Episodenauswahl">
+        <header class="minitigerEpisodePreviewHeader">
+            <div>
+                <small>MINITIGER · EPISODEN</small>
+                <h3 class="minitigerEpisodePreviewSeriesTitle">Serie</h3>
+            </div>
+            <div class="minitigerEpisodePreviewHeaderActions">
+                <label><span>Staffel</span><select class="minitigerEpisodePreviewSeasonSelect"></select></label>
+                <button is="paper-icon-button-light" type="button" class="minitigerEpisodePreviewClose autoSize" title="Schließen" aria-label="Episodenauswahl schließen">
+                    <span class="largePaperIconButton material-icons close" aria-hidden="true"></span>
+                </button>
+            </div>
+        </header>
+        <div class="minitigerEpisodePreviewStatus">Folgen werden geladen …</div>
+        <div class="minitigerEpisodePreviewList"></div>
+    </section>
+
     <div class="videoOsdBottom videoOsdBottom-maincontrols">
         <div class="osdControls">
             <div class="osdTextContainer osdMainTextContainer">
@@ -65,6 +83,10 @@
                 <div class="osdTimeText">
                     <span class="endsAtText"></span>
                 </div>
+
+                <button is="paper-icon-button-light" type="button" class="btnMinitigerEpisodePreview hide autoSize" title="Episoden" aria-label="Episoden anzeigen">
+                    <span class="xlargePaperIconButton material-icons video_library" aria-hidden="true"></span>
+                </button>
 
                 <button is="emby-ratingbutton" type="button" class="btnUserRating hide autoSize paper-icon-button-light" title="${Rate}">
                     <span class="xlargePaperIconButton material-icons favorite" aria-hidden="true"></span>

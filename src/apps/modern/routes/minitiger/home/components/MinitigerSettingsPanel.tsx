@@ -39,6 +39,8 @@ import MinitigerLoginSettings from './MinitigerLoginSettings';
 import MinitigerProfilesSettings from './MinitigerProfilesSettings';
 import MinitigerTranslationSettings from './MinitigerTranslationSettings';
 import MinitigerAvatarGallerySettings from './MinitigerAvatarGallerySettings';
+import MinitigerAdminMessagesSettings from './MinitigerAdminMessagesSettings';
+import MinitigerSeasonFixSettings from './MinitigerSeasonFixSettings';
 
 interface MinitigerSettingsPanelProps {
     settings: MinitigerHomeSettings;
@@ -150,6 +152,8 @@ type SettingsTab =
     | 'login'
     | 'translation'
     | 'avatars'
+    | 'messages'
+    | 'seasonFix'
     | 'backup';
 
 const ROTATION_OPTIONS: Array<{
@@ -527,6 +531,19 @@ const ColorField = ({
     );
 };
 
+
+interface MinitigerVlcSystemBridge {
+    runUserScript?: (script: string) => void;
+    'runUserScript(QString)'?: (script: string) => void;
+    openExternalUrl?: (url: string) => void;
+    'openExternalUrl(QString)'?: (url: string) => void;
+    [key: string]: unknown;
+}
+
+interface MinitigerVlcApiBridge {
+    system?: MinitigerVlcSystemBridge;
+}
+
 const MinitigerSettingsPanel = ({
     settings,
     librarySettings,
@@ -577,9 +594,7 @@ const MinitigerSettingsPanel = ({
                 === preset.colors[key].toLowerCase()
             )
         );
-
-
-    const onUpdate = (
+const onUpdate = (
         patch: Partial<MinitigerHomeSettings>
     ) => {
         if (isAdmin) {
@@ -610,7 +625,8 @@ const MinitigerSettingsPanel = ({
             'hoverEnabled',
             'glowEnabled',
             'previewEnabled',
-            'cardTextCentered'
+            'cardTextCentered',
+            'preferredPlayer'
         ]);
 
         const filtered = Object.fromEntries(
@@ -897,7 +913,9 @@ const MinitigerSettingsPanel = ({
                                 {tabButton('home', 'Startseite', '⌂')}
                                 {tabButton('login', 'Login', '↪')}
                                 {tabButton('avatars', 'Avatar-Galerie', '☺')}
+                                {tabButton('messages', 'Nachrichten', '✉')}
                                 {tabButton('translation', 'Auto-Übersetzung', '文')}
+                                {tabButton('seasonFix', 'Staffel Fix', '↺')}
                                 {tabButton('backup', 'Backup & Import', '↕')}
                             </div>
                         )}
@@ -924,6 +942,59 @@ const MinitigerSettingsPanel = ({
                                         ? 'Globale Standard-Einstellungen für die komplette Minitiger-Oberfläche.'
                                         : 'Persönliche kosmetische Einstellungen für deinen Minitiger-Account.'}
                                 </p>
+
+                                <section className='minitigerSettingsCard'>
+                                    <h4>Wiedergabe</h4>
+                                    <p className='minitigerSettingsHint'>
+                                        Diese Auswahl ist persönlich und wird nur für deinen Jellyfin-Nutzer gespeichert. In diesem ersten Test wird noch nichts an VLC übergeben; wir prüfen zunächst Einstellung und Desktop-Bridge.
+                                    </p>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='radio'
+                                            name='minitigerPreferredPlayer'
+                                            checked={
+                                                settings.preferredPlayer
+                                                === 'native'
+                                            }
+                                            onChange={() =>
+                                                onUpdate({
+                                                    preferredPlayer: 'native'
+                                                })
+                                            }
+                                        />
+                                        <span>
+                                            <strong>Nativer Jellyfin Player</strong>
+                                            <small>Verwendet weiterhin Jellyfin Desktop / MPV bzw. den normalen Browser-Player.</small>
+                                        </span>
+                                    </label>
+
+                                    <label className='minitigerSettingsToggle'>
+                                        <input
+                                            type='radio'
+                                            name='minitigerPreferredPlayer'
+                                            checked={
+                                                settings.preferredPlayer
+                                                === 'vlc'
+                                            }
+                                            onChange={() =>
+                                                onUpdate({
+                                                    preferredPlayer: 'vlc'
+                                                })
+                                            }
+                                        />
+                                        <span>
+                                            <strong>VLC Player · Experimentell</strong>
+                                            <small>Startet Filme, Episoden und Musikvideos über die lokale Minitiger VLC Bridge im installierten VLC Media Player.</small>
+                                        </span>
+                                    </label>
+
+                                    <p className='minitigerSettingsHint'>
+                                        <strong>Wichtig:</strong>{' '}
+                                        Der VLC Player funktioniert aktuell nur unter Windows mit installiertem VLC Media Player und eingerichteter Minitiger VLC Bridge. Ohne diese Windows-Komponenten kann Minitiger VLC nicht starten. Der native Jellyfin Player benötigt diese Zusatzinstallation nicht.
+                                    </p>
+
+                                </section>
 
                                 {isAdmin && (
                                 <section
@@ -2636,8 +2707,16 @@ const MinitigerSettingsPanel = ({
                             <MinitigerAvatarGallerySettings />
                         )}
 
+                        {isAdmin && activeTab === 'messages' && (
+                            <MinitigerAdminMessagesSettings />
+                        )}
+
                         {isAdmin && activeTab === 'translation' && (
                             <MinitigerTranslationSettings />
+                        )}
+
+                        {isAdmin && activeTab === 'seasonFix' && (
+                            <MinitigerSeasonFixSettings />
                         )}
 
                         {isAdmin && activeTab === 'backup' && (
@@ -2736,3 +2815,21 @@ export default MinitigerSettingsPanel;
 // MINITIGER_PATCH_MARKER: PHASE_18_18_1_SEASON_WRAP_SETTING_UI
 
 // MINITIGER_PATCH_MARKER: PHASE_18_18_3_CENTERED_CARD_TEXT_UI
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0A_VLC_PREFERENCE_BRIDGE_CHECK
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0A1_VLC_WINDOW_TYPE_HOTFIX
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0A2_VLC_BRIDGE_DETECTION_HOTFIX
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0A3_VLC_BRIDGE_DIAGNOSTICS
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0A4_VLC_CUSTOM_PROTOCOL_TEST
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0B_VLC_DEMO_LAUNCH_TEST
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0B1_VLC_TEST_BUTTON_CLEANUP
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_1_VLC_COMPLETE_PLAYBACK_SYNC
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_2_EXTERNAL_VLC_FINALIZE

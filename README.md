@@ -25,6 +25,8 @@
   ·
   <a href="PLUGIN_SETUP.md"><strong>🔌 Companion Plugin</strong></a>
   ·
+  <a href="VLC_EXPERIMENTAL_SETUP.md"><strong>🎬 VLC Experimental</strong></a>
+  ·
   <a href="CHANGELOG_Minitiger_Web.txt"><strong>📝 Changelog</strong></a>
 </p>
 
@@ -109,6 +111,14 @@ https://raw.githubusercontent.com/Grunttanamo/Minitiger/minitiger-v12.1/plugin-r
 
 Then open the Plugin Catalog, install **Minitiger Virtual Sync**, and restart Jellyfin. See [PLUGIN_SETUP.md](PLUGIN_SETUP.md) for the full setup and release flow.
 
+## 🎬 VLC Player · Experimentell (Windows)
+
+Minitiger can optionally use an **external VLC Media Player on Windows** while keeping Jellyfin resume state, progress, watched/stopped state and episode auto-next synchronized.
+
+This mode requires **Windows + Jellyfin Desktop + VLC Media Player + the Minitiger VLC Bridge + Minitiger Virtual Sync**. VLC opens in a separate window in the current external edition. The native Jellyfin player remains available and does not require the VLC-specific Windows setup.
+
+See **[VLC_EXPERIMENTAL_SETUP.md](VLC_EXPERIMENTAL_SETUP.md)** for the complete Windows installation, update, uninstall and troubleshooting guide.
+
 ## 🟩 Unraid
 
 Create an additional container and use:
@@ -130,6 +140,7 @@ Do **not** mount your Jellyfin `/config`, `/cache`, appdata or media folders int
 - Virtual libraries and Minitiger-specific navigation
 - Manga / comic improvements
 - Trailer and playback integrations
+- Experimental external VLC playback for Windows Jellyfin Desktop
 - Audio-language flags and media information polish
 - Docker sidecar installation
 - Native Debian / Raspberry Pi installation

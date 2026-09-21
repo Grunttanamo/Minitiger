@@ -2112,6 +2112,357 @@ export class PlaybackManager {
         self.translateItemsForPlayback = translateItemsForPlayback;
         self.getItemsForPlayback = getItemsForPlayback;
 
+
+        function getMinitigerVlcPreference(apiClient) {
+            try {
+                const storageKey = [
+                    'Minitiger.NativeHomeSettings.v1',
+                    apiClient.serverId() || 'server',
+                    apiClient.getCurrentUserId() || 'user'
+                ].join(':');
+
+                const raw = window.localStorage.getItem(storageKey);
+                if (!raw) {
+                    return 'native';
+                }
+
+                const settings = JSON.parse(raw);
+                return settings?.preferredPlayer === 'vlc'
+                    ? 'vlc'
+                    : 'native';
+            } catch (error) {
+                console.warn(
+                    '[Minitiger VLC] Player-Präferenz konnte nicht gelesen werden.',
+                    error
+                );
+                return 'native';
+            }
+        }
+
+        function isMinitigerVlcItem(item) {
+            return item?.MediaType === 'Video'
+                && (
+                    item.Type === 'Movie'
+                    || item.Type === 'Episode'
+                    || item.Type === 'MusicVideo'
+                );
+        }
+
+        async function getMinitigerVlcSystemBridge() {
+            if (typeof window === 'undefined') {
+                return null;
+            }
+
+            let api = window.api;
+
+            if (!api && window.apiPromise) {
+                try {
+                    api = await window.apiPromise;
+                } catch (error) {
+                    console.warn(
+                        '[Minitiger VLC] Desktop API konnte nicht aufgelöst werden.',
+                        error
+                    );
+                }
+            }
+
+            const system = api?.system || window.api?.system;
+            const openExternalUrl = system?.openExternalUrl
+                || system?.['openExternalUrl(QString)'];
+
+            if (typeof openExternalUrl !== 'function') {
+                return null;
+            }
+
+            return {
+                system,
+                openExternalUrl
+            };
+        }
+
+        function getMinitigerVlcHttpStreamUrl(apiClient, item, streamInfo) {
+            if (/^https?:\/\//i.test(streamInfo?.url || '')) {
+                return streamInfo.url;
+            }
+
+            const mediaSource = streamInfo?.mediaSource;
+            if (!mediaSource) {
+                return null;
+            }
+
+            const container = String(mediaSource.Container || '')
+                .split(',')[0]
+                .trim();
+            const extension = container ? `.${container}` : '';
+            const params = {
+                Static: true,
+                mediaSourceId: mediaSource.Id || item.Id,
+                deviceId: apiClient.deviceId(),
+                ApiKey: apiClient.accessToken()
+            };
+
+            if (mediaSource.ETag) {
+                params.Tag = mediaSource.ETag;
+            }
+
+            if (mediaSource.LiveStreamId) {
+                params.LiveStreamId = mediaSource.LiveStreamId;
+            }
+
+            return apiClient.getUrl(
+                `Videos/${item.Id}/stream${extension}`,
+                params
+            );
+        }
+
+        function getMinitigerVlcDirectStream(apiClient, item, preferredSourceName) {
+            const sources = item?.MediaSources || [];
+            const mediaSource = sources.find(source =>
+                preferredSourceName
+                && source?.Name === preferredSourceName
+            ) || sources[0] || null;
+
+            const container = String(mediaSource?.Container || '')
+                .split(',')[0]
+                .trim();
+            const extension = container ? `.${container}` : '';
+            const params = {
+                Static: true,
+                deviceId: apiClient.deviceId(),
+                ApiKey: apiClient.accessToken()
+            };
+
+            if (mediaSource?.Id) {
+                params.mediaSourceId = mediaSource.Id;
+            }
+            if (mediaSource?.ETag) {
+                params.Tag = mediaSource.ETag;
+            }
+
+            return {
+                streamUrl: apiClient.getUrl(
+                    `Videos/${item.Id}/stream${extension}`,
+                    params
+                ),
+                mediaSource
+            };
+        }
+
+        function getMinitigerVlcQueueItem(
+            apiClient,
+            item,
+            streamInfo,
+            playOptions,
+            preferredSourceName,
+            isFirst
+        ) {
+            let streamUrl;
+            let mediaSource;
+            let playMethod = 'DirectPlay';
+            let playSessionId = '';
+
+            if (isFirst) {
+                streamUrl = getMinitigerVlcHttpStreamUrl(
+                    apiClient,
+                    item,
+                    streamInfo
+                );
+                mediaSource = streamInfo?.mediaSource || null;
+                playMethod = streamInfo?.playMethod || 'DirectPlay';
+                playSessionId = streamInfo?.playSessionId || '';
+            } else {
+                const direct = getMinitigerVlcDirectStream(
+                    apiClient,
+                    item,
+                    preferredSourceName
+                );
+                streamUrl = direct.streamUrl;
+                mediaSource = direct.mediaSource;
+            }
+
+            if (!streamUrl) {
+                return null;
+            }
+
+            const defaultAudio =
+                mediaSource?.DefaultAudioStreamIndex
+                ?? item?.UserData?.AudioStreamIndex
+                ?? null;
+            const defaultSubtitle =
+                mediaSource?.DefaultSubtitleStreamIndex
+                ?? item?.UserData?.SubtitleStreamIndex
+                ?? null;
+
+            return {
+                streamUrl,
+                title: item?.Name || '',
+                itemId: item?.Id || '',
+                itemType: item?.Type || '',
+                mediaSourceId: mediaSource?.Id || item?.Id || '',
+                startPositionTicks: isFirst
+                    ? (
+                        streamInfo?.playerStartPositionTicks
+                        ?? playOptions.startPositionTicks
+                        ?? 0
+                    )
+                    : (item?.UserData?.PlaybackPositionTicks ?? 0),
+                durationTicks:
+                    mediaSource?.RunTimeTicks
+                    ?? item?.RunTimeTicks
+                    ?? 0,
+                audioStreamIndex: isFirst
+                    ? (
+                        playOptions.audioStreamIndex
+                        ?? defaultAudio
+                    )
+                    : defaultAudio,
+                subtitleStreamIndex: isFirst
+                    ? (
+                        playOptions.subtitleStreamIndex
+                        ?? defaultSubtitle
+                    )
+                    : defaultSubtitle,
+                playMethod,
+                playSessionId
+            };
+        }
+
+        async function createMinitigerVlcJob(
+            apiClient,
+            item,
+            streamInfo,
+            playOptions,
+            queueItems
+        ) {
+            const preferredSourceName = streamInfo?.mediaSource?.Name || '';
+            const candidates = [ item, ...(queueItems || []).filter(candidate => candidate !== item) ]
+                .filter((candidate, index, all) =>
+                    candidate?.Id
+                    && isMinitigerVlcItem(candidate)
+                    && all.findIndex(other => other?.Id === candidate.Id) === index
+                )
+                .slice(0, 100);
+
+            const queue = candidates
+                .map((candidate, index) =>
+                    getMinitigerVlcQueueItem(
+                        apiClient,
+                        candidate,
+                        index === 0 ? streamInfo : null,
+                        playOptions,
+                        preferredSourceName,
+                        index === 0
+                    )
+                )
+                .filter(Boolean);
+
+            if (!queue.length) {
+                throw new Error('Keine VLC-kompatible Jellyfin-Wiedergabequeue verfügbar.');
+            }
+
+            const token = apiClient.accessToken();
+            const endpoint = apiClient.getUrl(
+                'Minitiger/Vlc/Jobs',
+                token ? { ApiKey: token } : {}
+            );
+
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    callbackBaseUrl: apiClient.getUrl('Minitiger/Vlc'),
+                    queue
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(
+                    `VLC-Job konnte nicht erstellt werden (${response.status}).`
+                );
+            }
+
+            const job = await response.json();
+            if (!job?.jobId) {
+                throw new Error('VLC-Job enthält keine Job-ID.');
+            }
+
+            return apiClient.getUrl(
+                `Minitiger/Vlc/Jobs/${encodeURIComponent(job.jobId)}`
+            );
+        }
+
+        async function tryMinitigerVlcPlayback(item, playOptions, queueItems) {
+            if (!isMinitigerVlcItem(item)) {
+                return false;
+            }
+
+            const apiClient = ServerConnections.getApiClient(item.ServerId);
+            if (!apiClient || getMinitigerVlcPreference(apiClient) !== 'vlc') {
+                return false;
+            }
+
+            const bridge = await getMinitigerVlcSystemBridge();
+            if (!bridge) {
+                console.info(
+                    '[Minitiger VLC] Keine native URL-Bridge – Fallback auf Jellyfin Player.'
+                );
+                return false;
+            }
+
+            try {
+                const streamInfo = await self.getPlaybackInfo(
+                    item,
+                    {
+                        startPositionTicks: playOptions.startPositionTicks || 0,
+                        mediaSourceId: playOptions.mediaSourceId,
+                        audioStreamIndex: playOptions.audioStreamIndex,
+                        subtitleStreamIndex: playOptions.subtitleStreamIndex,
+                        mediaType: item.MediaType
+                    }
+                );
+
+                const consumeUrl = await createMinitigerVlcJob(
+                    apiClient,
+                    item,
+                    streamInfo,
+                    playOptions,
+                    queueItems
+                );
+
+                const activePlayer = self._currentPlayer;
+                if (activePlayer?.isLocalPlayer && self.isPlaying(activePlayer)) {
+                    await onPlaybackChanging(
+                        activePlayer,
+                        null,
+                        item
+                    );
+                    removeCurrentPlayer(activePlayer);
+                }
+
+                const launchUri =
+                    `minitiger-vlc://launch?jobUrl=${encodeURIComponent(consumeUrl)}`;
+
+                bridge.openExternalUrl.call(
+                    bridge.system,
+                    launchUri
+                );
+
+                console.info(
+                    `[Minitiger VLC] Externe Wiedergabe gestartet: ${item.Name || item.Id}`
+                );
+
+                return true;
+            } catch (error) {
+                console.warn(
+                    '[Minitiger VLC] VLC-Start fehlgeschlagen – Fallback auf Jellyfin Player.',
+                    error
+                );
+                return false;
+            }
+        }
+
         self.play = async function (options) {
             normalizePlayOptions(options);
 
@@ -2156,6 +2507,27 @@ export class PlaybackManager {
             }
             // getAdditionalParts returns an array of arrays of items, so flatten it
             items = items.flat();
+
+            const vlcStartIndex = Math.max(
+                0,
+                Math.min(
+                    options.startIndex || 0,
+                    Math.max(0, items.length - 1)
+                )
+            );
+            const vlcItem = items[vlcStartIndex];
+
+            if (
+                vlcItem
+                && await tryMinitigerVlcPlayback(
+                    vlcItem,
+                    options,
+                    items.slice(vlcStartIndex)
+                )
+            ) {
+                loading.hide();
+                return;
+            }
 
             return playWithIntros(items, options);
         };
@@ -4432,3 +4804,7 @@ window.addEventListener('beforeunload', function () {
         console.error('error in onAppClose: ' + err);
     }
 });
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_0C_REAL_JELLYFIN_VLC_LAUNCH
+
+// MINITIGER_PATCH_MARKER: PHASE_18_23_1_VLC_COMPLETE_PLAYBACK_SYNC

@@ -36,3 +36,15 @@ phase18_*_files/
 DIAGNOSE_18_*.sh
 PHASE_18_*.scss.inc
 VERIFY_*.bad-check.bak
+# Minitiger patch delivery / local backups
+.minitiger_patch_backups/
+/APPLY_18_*.py
+/ROLLBACK_18_*.py
+/VERIFY_18_*.sh
+/README_18_*.txt
+/files/
+
+# Minitiger Virtual Sync build output
+tools/MinitigerVirtualSync/bin/
+tools/MinitigerVirtualSync/obj/
+tools/MinitigerVirtualSync/out/

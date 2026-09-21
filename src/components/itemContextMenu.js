@@ -9,6 +9,7 @@ import { copy } from '../scripts/clipboard';
 import dom from '../utils/dom';
 import globalize from '../lib/globalize';
 import actionsheet from './actionSheet/actionSheet';
+import confirm from './confirm/confirm';
 import { appHost } from './apphost';
 import { appRouter } from './router/appRouter';
 import itemHelper, { canEditPlaylist } from './itemHelper';
@@ -205,6 +206,17 @@ export async function getCommands(options) {
                 icon: 'content_copy'
             });
         }
+    }
+
+    if (
+        item.Type === BaseItemKind.Season
+        && user.Policy.IsAdministrator
+    ) {
+        commands.push({
+            name: 'Staffel aus Jellyfin entfernen',
+            id: 'minitigerRemoveSeason',
+            icon: 'delete_forever'
+        });
     }
 
     if (item.CanDelete && options.deleteItem !== false) {
@@ -579,6 +591,12 @@ function executeCommand(item, id, options) {
                 playbackManager.instantMix(item);
                 getResolveFunction(resolve, id)();
                 break;
+            case 'minitigerRemoveSeason':
+                removeSeasonFromJellyfin(apiClient, item).then(
+                    getResolveFunction(resolve, id, true, true, itemId),
+                    getResolveFunction(resolve, id)
+                );
+                break;
             case 'delete':
                 deleteItem(apiClient, item).then(getResolveFunction(resolve, id, true, true, itemId), getResolveFunction(resolve, id));
                 break;
@@ -734,6 +752,33 @@ function editItem(apiClient, item) {
         }
     });
 }
+
+function removeSeasonFromJellyfin(apiClient, item) {
+    return confirm({
+        title: 'Staffel aus Jellyfin entfernen?',
+        text:
+            `„${item.Name || 'Staffel'}“ wird nur aus der Jellyfin-Datenbank entfernt. `
+            + 'Ordner und Videodateien auf dem Server bleiben unangetastet. '
+            + 'Besitzt die Staffel einen realen Ordner, blockiert Minitiger den Vorgang automatisch.',
+        confirmText: 'Aus Jellyfin entfernen',
+        primary: 'delete'
+    }).then(() => apiClient.ajax({
+        url: apiClient.getUrl(
+            `Minitiger/SeasonFix/Season/${encodeURIComponent(item.Id)}`
+        ),
+        type: 'DELETE'
+    })).then(result => {
+        toast('Staffel wurde aus Jellyfin entfernt. Dateien wurden nicht gelöscht.');
+        return result;
+    }).catch(error => {
+        toast(
+            'Staffel wurde nicht entfernt. Echte Staffelordner werden vom Minitiger geschützt.'
+        );
+        throw error;
+    });
+}
+
+// MINITIGER_PATCH_MARKER: PHASE_18_21_2_SAFE_SEASON_CONTEXT_DELETE
 
 function deleteItem(apiClient, item) {
     return new Promise(function (resolve, reject) {

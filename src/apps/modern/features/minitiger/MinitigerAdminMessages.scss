@@ -1,0 +1,315 @@
+.minitigerAdminMessageLayer {
+    position: fixed;
+    z-index: 2147483000;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: max(5.25rem, env(safe-area-inset-top)) 1rem 1rem;
+    pointer-events: none;
+}
+
+.minitigerAdminMessageToast {
+    width: min(38rem, calc(100vw - 2rem));
+    max-height: min(70vh, 38rem);
+    overflow: auto;
+    padding: 1rem 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--minitiger-accent, #f2b84b) 48%, transparent);
+    border-radius: 1rem;
+    background: color-mix(in srgb, #111 92%, transparent);
+    box-shadow:
+        0 1.4rem 4rem rgb(0 0 0 / 52%),
+        0 0 1.6rem color-mix(in srgb, var(--minitiger-glow, #f2b84b) 24%, transparent);
+    color: #fff;
+    backdrop-filter: blur(18px);
+    pointer-events: auto;
+    animation: minitigerAdminMessageIn 180ms ease-out both;
+}
+
+.minitigerAdminMessageToastHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.minitigerAdminMessageToastHeader small {
+    display: block;
+    margin-bottom: 0.1rem;
+    color: rgb(255 255 255 / 62%);
+    font-size: 0.78rem;
+}
+
+.minitigerAdminMessageToastHeader h3 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.18rem;
+    line-height: 1.25;
+}
+
+.minitigerAdminMessageToastIcon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--minitiger-accent, #f2b84b) 18%, transparent);
+    font-size: 1.35rem;
+}
+
+.minitigerAdminMessageToastIconImage {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.minitigerAdminMessageToastBody {
+    margin: 1rem 0;
+    color: rgb(255 255 255 / 92%);
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.minitigerAdminMessageToastFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.minitigerAdminMessageToastFooter > span {
+    color: rgb(255 255 255 / 58%);
+    font-size: 0.8rem;
+}
+
+.minitigerAdminMessageToastFooter button {
+    flex: 0 0 auto;
+    min-width: 7rem;
+    padding: 0.55rem 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--minitiger-accent, #f2b84b);
+    color: #111;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.minitigerAdminMessageToastFooter button:disabled {
+    opacity: 0.55;
+    cursor: default;
+}
+
+.minitigerAdminMessageToastError {
+    margin-top: 0.75rem;
+    color: #ff9d9d;
+    font-size: 0.82rem;
+}
+
+.minitigerAdminMessageCompose {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.minitigerAdminMessageTextarea {
+    box-sizing: border-box;
+    width: 100%;
+    resize: vertical;
+    min-height: 8rem;
+}
+
+.minitigerAdminMessageHistory {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 0.9rem;
+}
+
+.minitigerAdminMessageHistoryItem {
+    padding: 0.8rem 0.9rem;
+    border: 1px solid rgb(255 255 255 / 9%);
+    border-radius: 0.75rem;
+    background: rgb(255 255 255 / 3%);
+}
+
+.minitigerAdminMessageHistoryItem p {
+    margin: 0.55rem 0 0;
+    color: rgb(255 255 255 / 78%);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.minitigerAdminMessageHistoryTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.minitigerAdminMessageHistoryTop > span {
+    flex: 0 0 auto;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.minitigerAdminMessageHistoryTop > span.isRead {
+    color: #75e7aa;
+}
+
+.minitigerAdminMessageHistoryTop > span.isOpen {
+    color: #ffd36a;
+}
+
+.minitigerAdminMessageHistoryMeta,
+.minitigerAdminMessageEmpty {
+    margin-top: 0.35rem;
+    color: rgb(255 255 255 / 52%);
+    font-size: 0.78rem;
+}
+
+@keyframes minitigerAdminMessageIn {
+    from {
+        opacity: 0;
+        transform: translateY(-0.7rem) scale(0.985);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (max-width: 600px) {
+    .minitigerAdminMessageLayer {
+        padding-top: max(4.25rem, env(safe-area-inset-top));
+    }
+
+    .minitigerAdminMessageToastFooter {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .minitigerAdminMessageToastFooter button {
+        width: 100%;
+    }
+}
+
+// MINITIGER_PATCH_MARKER: PHASE_18_19_0_ADMIN_MESSAGES_STYLE
+
+.minitigerAdminMessageRecipientToolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    margin-top: 0.45rem;
+}
+
+.minitigerAdminMessageRecipientToolbar button {
+    padding: 0.48rem 0.75rem;
+    border: 1px solid rgb(255 255 255 / 13%);
+    border-radius: 0.55rem;
+    background: rgb(255 255 255 / 6%);
+    color: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.minitigerAdminMessageRecipientToolbar button:hover:not(:disabled) {
+    border-color: color-mix(in srgb, var(--minitiger-accent, #f2b84b) 55%, transparent);
+    background: color-mix(in srgb, var(--minitiger-accent, #f2b84b) 12%, transparent);
+}
+
+.minitigerAdminMessageRecipientToolbar button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.minitigerAdminMessageRecipientToolbar small {
+    margin-left: auto;
+    color: rgb(255 255 255 / 55%);
+}
+
+.minitigerAdminMessageRecipientList {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.55rem;
+    max-height: 18rem;
+    margin-top: 0.65rem;
+    padding: 0.65rem;
+    overflow-y: auto;
+    border: 1px solid rgb(255 255 255 / 9%);
+    border-radius: 0.7rem;
+    background: rgb(0 0 0 / 14%);
+}
+
+.minitigerAdminMessageRecipient {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+    padding: 0.7rem 0.75rem;
+    border: 1px solid rgb(255 255 255 / 8%);
+    border-radius: 0.65rem;
+    background: rgb(255 255 255 / 3%);
+    cursor: pointer;
+}
+
+.minitigerAdminMessageRecipient:has(input:checked) {
+    border-color: color-mix(in srgb, var(--minitiger-accent, #f2b84b) 58%, transparent);
+    background: color-mix(in srgb, var(--minitiger-accent, #f2b84b) 10%, transparent);
+}
+
+.minitigerAdminMessageRecipient input {
+    flex: 0 0 auto;
+    width: 1.05rem;
+    height: 1.05rem;
+    margin: 0;
+    accent-color: var(--minitiger-accent, #f2b84b);
+}
+
+.minitigerAdminMessageRecipient > span {
+    display: grid;
+    min-width: 0;
+    gap: 0.15rem;
+}
+
+.minitigerAdminMessageRecipient strong,
+.minitigerAdminMessageRecipient small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.minitigerAdminMessageRecipient small {
+    color: rgb(255 255 255 / 55%);
+    font-size: 0.76rem;
+}
+
+@media (max-width: 600px) {
+    .minitigerAdminMessageRecipientToolbar small {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+
+@media (max-width: 1180px) {
+    .minitigerAdminMessageRecipientList {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .minitigerAdminMessageRecipientList {
+        grid-template-columns: 1fr;
+    }
+}
+
+// MINITIGER_PATCH_MARKER: PHASE_18_19_1A_RECIPIENT_GRID_LAYOUT_FIX
+// MINITIGER_PATCH_MARKER: PHASE_18_19_1_MULTI_RECIPIENT_STYLE
+
+// MINITIGER_PATCH_MARKER: PHASE_18_19_1B_SENDER_AVATAR_STYLE

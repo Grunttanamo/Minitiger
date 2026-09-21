@@ -61,7 +61,8 @@ public sealed class MinitigerProfilesController : ControllerBase
         "playedIndicatorShape",
         "hoverEnabled",
         "glowEnabled",
-        "previewEnabled"
+        "previewEnabled",
+        "preferredPlayer"
     };
 
     private readonly IUserManager _userManager;

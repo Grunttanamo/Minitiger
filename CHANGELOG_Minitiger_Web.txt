@@ -1,3 +1,46 @@
+Minitiger Web – Phase 18.23.2
+External VLC Edition / Major Feature Update
+
+BASIS / STATUS
+- Jellyfin Server / Web target: 12.1.
+- Dieser Stand bündelt die seit dem letzten öffentlichen GitHub-Stand bestätigten Minitiger-Erweiterungen.
+- Externe VLC-Wiedergabe unter Windows wurde bis einschließlich Bridge 18.23.1g getestet und bestätigt.
+
+WIEDERGABE / VLC PLAYER · EXPERIMENTELL
+- Persönliche Player-Auswahl in Minitiger Einstellungen -> Allgemein -> Wiedergabe.
+- Nativer Jellyfin Player bleibt jederzeit verfügbar.
+- Experimenteller externer VLC Player für Windows Jellyfin Desktop.
+- Voraussetzung: lokal installiertes VLC + Minitiger VLC Bridge + aktueller Minitiger Virtual Sync Companion.
+- Filme, Folgen und Musikvideos können an VLC übergeben werden.
+- Jellyfin Resume/Progress/Stop/Gesehen-Synchronisation.
+- Audio- und Untertitelspur werden an VLC übergeben.
+- Automatischer Folgenwechsel funktioniert.
+- Automatisch gestartete nächste Folge beginnt sauber bei 0:00.
+- Manuelles Schließen von VLC beendet die Jellyfin Playback-Session sauber.
+- Aktive VLC-Wiedergabe erscheint im Jellyfin Admin-Dashboard als VLC Media Player.
+- Öffentliche Installationsanleitung: VLC_EXPERIMENTAL_SETUP.md.
+- Stabiler Windows-Installer: windows/INSTALL_MINITIGER_VLC_BRIDGE.ps1.
+- Uninstaller: windows/UNINSTALL_MINITIGER_VLC_BRIDGE.ps1.
+
+WEITERE GROSSE ERWEITERUNGEN SEIT 18.7.0
+- Farbtemplates / Presets und kompaktere Minitiger-Einstellungen.
+- Custom Logo / Text Umschaltung.
+- Überarbeitete Login-Oberfläche.
+- Benutzerdefinierte Avatare.
+- "Wer schaut gerade?".
+- Admin Auto-Translator.
+- Admin Nachrichten.
+- In-Player Episodenpreview.
+- Staffel-Fix inklusive sicherer Jellyfin-only Staffelentfernung.
+- Eigene Minitiger-Suche.
+- Diverse Detailpage-, Bibliotheks-, Trailer-, Manga-, Audioflag- und UI-Korrekturen.
+
+COMPANION
+- Minitiger Virtual Sync Quellstand: 1.3.1.
+- Für den öffentlichen Plugin-Katalog sollte dieser Stand als vierteilige Version 1.3.1.0 veröffentlicht werden.
+
+==============================================================================
+
 Minitiger Web – Phase 18.7.0
 Public UI Controls & Home Customization Release
 

@@ -15,6 +15,7 @@ import AppDrawer, { isDrawerPath } from './components/drawers/AppDrawer';
 import LibraryToolbar from './features/libraries/components/LibraryToolbar';
 import { LibraryProvider } from './features/libraries/hooks/useLibrary';
 import { isLibraryPath } from './features/libraries/utils/path';
+import MinitigerAdminMessageHost from './features/minitiger/MinitigerAdminMessageHost';
 import MinitigerGlobalSettingsHost from './features/minitiger/MinitigerGlobalSettingsHost';
 import MinitigerProfileSelectionHost from './features/minitiger/MinitigerProfileSelectionHost';
 
@@ -84,6 +85,7 @@ export const Component = () => {
                     </AppBody>
                 </Box>
             </Box>
+            <MinitigerAdminMessageHost />
             <MinitigerGlobalSettingsHost />
             <MinitigerProfileSelectionHost />
             <ThemeCss />

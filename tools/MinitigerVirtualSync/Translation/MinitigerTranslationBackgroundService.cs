@@ -330,9 +330,45 @@ public sealed class MinitigerTranslationBackgroundService : BackgroundService
         };
     }
 
+    private async Task RunHeartbeatLoopAsync(
+        CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            lock (_statusLock)
+            {
+                _status.WorkerOnline = true;
+                _status.HeartbeatUtc =
+                    DateTimeOffset.UtcNow;
+            }
+
+            try
+            {
+                await Task.Delay(
+                    TimeSpan.FromSeconds(5),
+                    stoppingToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+                when (stoppingToken.IsCancellationRequested)
+            {
+                break;
+            }
+        }
+    }
+
+    // MINITIGER_PATCH_MARKER: PHASE_18_19_2_BACKGROUND_HEARTBEAT
     protected override async Task ExecuteAsync(
         CancellationToken stoppingToken)
     {
+        /*
+         * Keep the heartbeat independent from RunOnceAsync().
+         * A scan or an OpenAI request can take much longer than the UI's
+         * stale-heartbeat window, so the outer worker loop alone is not
+         * sufficient to prove that the hosted service is still alive.
+         */
+        var heartbeatTask =
+            RunHeartbeatLoopAsync(stoppingToken);
+
         lock (_statusLock)
         {
             _status.WorkerOnline = true;
@@ -497,6 +533,14 @@ public sealed class MinitigerTranslationBackgroundService : BackgroundService
                 break;
             }
         }
+
+        /*
+         * The heartbeat loop uses the same host cancellation token and
+         * therefore finishes immediately when Jellyfin stops the service.
+         * Await it before publishing the final offline state so it cannot
+         * race and set WorkerOnline=true again afterwards.
+         */
+        await heartbeatTask.ConfigureAwait(false);
 
         lock (_statusLock)
         {
