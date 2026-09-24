@@ -28,6 +28,31 @@ server {
         return 302 /web/index.html;
     }
 
+    # Jellyfin exposes two dashboard/plugin API endpoints below /web/.
+    # They must reach the Jellyfin server instead of falling through to the
+    # static SPA handler below, otherwise index.html is returned as API data.
+    location = /web/ConfigurationPages {
+        proxy_pass ${JELLYFIN_URL};
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+    }
+
+    location = /web/ConfigurationPage {
+        proxy_pass ${JELLYFIN_URL};
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+    }
+
     # Minitiger itself is completely local to this container.
     location /web/ {
         try_files $uri $uri/ /web/index.html;
