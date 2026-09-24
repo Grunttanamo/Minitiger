@@ -21,6 +21,10 @@ const PluginDrawerSection = () => {
         if (error) console.error('[PluginDrawerSection] unable to fetch plugin config pages', error);
     }, [ error ]);
 
+    const safePagesInfo = Array.isArray(pagesInfo)
+        ? pagesInfo
+        : [];
+
     return (
         <List
             aria-labelledby='plugins-subheader'
@@ -36,7 +40,7 @@ const PluginDrawerSection = () => {
                     '/configurationpage',
                     '/dashboard/plugins/repositories'
                 ]}
-                excludePaths={pagesInfo?.map(p => `/${Dashboard.getPluginUrl(p.Name)}`)}
+                excludePaths={safePagesInfo.map(p => `/${Dashboard.getPluginUrl(p.Name)}`)}
             >
                 <ListItemIcon>
                     <Extension />
@@ -44,7 +48,7 @@ const PluginDrawerSection = () => {
                 <ListItemText primary={globalize.translate('TabPlugins')} />
             </ListItemLink>
 
-            {pagesInfo?.map(pageInfo => (
+            {safePagesInfo.map(pageInfo => (
                 <ListItemLink
                     key={pageInfo.PluginId}
                     to={`/${Dashboard.getPluginUrl(pageInfo.Name)}`}
