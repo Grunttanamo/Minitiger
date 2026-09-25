@@ -595,7 +595,6 @@
 
 /* Jellyfin Desktop can keep a background on the inner Material toolbar even
    when the AppBar itself is transparent. Force the whole library chrome clear. */
-.minitigerLibraryActive .MuiAppBar-root,
 .minitigerLibraryActive .MuiToolbar-root,
 .minitigerLibraryActive .skinHeader,
 .minitigerLibraryActive .headerTop {
@@ -1237,3 +1236,34 @@
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_18_3B_CUSTOM_LIBRARY_CENTERED_TEXT */
+
+
+/* =========================================================
+   PHASE 18.24.0 TEST - PROGRESSIVE LIBRARY LOAD MORE
+   ========================================================= */
+
+.minitigerLibraryLoadMore {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 1.2rem 0 2rem;
+}
+
+.minitigerLibraryLoadMore button {
+    min-width: 11rem;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.72rem 1.2rem;
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.minitigerLibraryLoadMore button:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING */

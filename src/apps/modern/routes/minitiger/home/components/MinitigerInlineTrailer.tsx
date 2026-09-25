@@ -39,6 +39,7 @@ interface Props {
     delayMs?: number;
     onLoadingChange?: (loading: boolean) => void;
     allowYouTube?: boolean;
+    allowLocal?: boolean;
 }
 
 interface TrailerCacheEntry {
@@ -789,8 +790,10 @@ export const refreshMinitigerLocalTrailerRegistration = async (
 
     const cacheKeyBase =
         `${apiClient.serverId?.() ?? 'server'}:${item.Id}`;
-    trailerCache.delete(`${cacheKeyBase}:youtube-0`);
-    trailerCache.delete(`${cacheKeyBase}:youtube-1`);
+    trailerCache.delete(`${cacheKeyBase}:youtube-0:local-0`);
+    trailerCache.delete(`${cacheKeyBase}:youtube-0:local-1`);
+    trailerCache.delete(`${cacheKeyBase}:youtube-1:local-0`);
+    trailerCache.delete(`${cacheKeyBase}:youtube-1:local-1`);
 
     /* Refresh is queued server-side. Poll only this item for a short period;
        no global library scan and no image refresh is triggered here. */
@@ -812,22 +815,25 @@ export const refreshMinitigerLocalTrailerRegistration = async (
         }
     }
 
-    trailerCache.delete(`${cacheKeyBase}:youtube-0`);
-    trailerCache.delete(`${cacheKeyBase}:youtube-1`);
+    trailerCache.delete(`${cacheKeyBase}:youtube-0:local-0`);
+    trailerCache.delete(`${cacheKeyBase}:youtube-0:local-1`);
+    trailerCache.delete(`${cacheKeyBase}:youtube-1:local-0`);
+    trailerCache.delete(`${cacheKeyBase}:youtube-1:local-1`);
     return [];
 };
 
 const resolveSources = async (
     apiClient: ApiClient,
     item: ItemDto,
-    allowYouTube = true
+    allowYouTube = true,
+    allowLocal = true
 ): Promise<TrailerSource[]> => {
     if (!item.Id) {
         return [];
     }
 
     const cacheKey =
-        `${apiClient.serverId?.() ?? 'server'}:${item.Id}:youtube-${allowYouTube ? '1' : '0'}`;
+        `${apiClient.serverId?.() ?? 'server'}:${item.Id}:youtube-${allowYouTube ? '1' : '0'}:local-${allowLocal ? '1' : '0'}`;
 
     const cached =
         trailerCache.get(cacheKey);
@@ -846,10 +852,12 @@ const resolveSources = async (
 
     try {
         const trailers =
-            await resolveMinitigerLocalTrailers(
-                apiClient,
-                item
-            );
+            allowLocal
+                ? await resolveMinitigerLocalTrailers(
+                    apiClient,
+                    item
+                )
+                : [];
 
         if (trailers.length) {
             console.info(
@@ -1321,7 +1329,8 @@ const MinitigerInlineTrailer = ({
     className,
     delayMs = 700,
     onLoadingChange,
-    allowYouTube = true
+    allowYouTube = true,
+    allowLocal = true
 }: Props) => {
     const videoRef =
         useRef<HTMLVideoElement | null>(null);
@@ -1399,7 +1408,8 @@ const MinitigerInlineTrailer = ({
         void resolveSources(
             apiClient,
             item,
-            allowYouTube
+            allowYouTube,
+            allowLocal
         ).then(result => {
             if (!cancelled) {
                 setSources(result);
@@ -1426,7 +1436,8 @@ const MinitigerInlineTrailer = ({
         apiClient,
         delayMs,
         item?.Id,
-        allowYouTube
+        allowYouTube,
+        allowLocal
     ]);
 
     const source =
@@ -1575,7 +1586,11 @@ const MinitigerInlineTrailer = ({
                                 hl: 'de',
                                 loop: 1,
                                 playlist:
-                                    source.videoId
+                                    source.videoId,
+                                origin:
+                                    window.location.origin,
+                                widget_referrer:
+                                    window.location.href
                             },
                             events: {
                                 onReady: event => {
@@ -1810,3 +1825,5 @@ const MinitigerInlineTrailer = ({
 };
 
 export default MinitigerInlineTrailer;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING

@@ -502,6 +502,60 @@ const MinitigerHome = () => {
         orderedVirtualLibraries.slice(16, 24)
     ];
 
+    const openLibraryMenu = async (
+        event: React.MouseEvent<HTMLButtonElement>,
+        library: ItemDto
+    ) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!apiClient || !library.Id) {
+            return;
+        }
+
+        const sourceButton =
+            event.currentTarget;
+        const userId =
+            apiClient.getCurrentUserId();
+
+        if (!userId) {
+            return;
+        }
+
+        try {
+            const [
+                itemContextMenu,
+                detailedItem,
+                currentUser
+            ] = await Promise.all([
+                import('components/itemContextMenu'),
+                apiClient.getItem(
+                    userId,
+                    library.Id
+                ) as Promise<ItemDto>,
+                apiClient.getCurrentUser()
+            ]);
+
+            const result =
+                await itemContextMenu.show({
+                    item: detailedItem,
+                    user: currentUser,
+                    positionTo: sourceButton
+                });
+
+            if (result?.updated || result?.deleted) {
+                await queryClient.invalidateQueries({
+                    queryKey: [ 'Items' ]
+                });
+            }
+        } catch (error) {
+            console.error(
+                '[Minitiger Library Card] Jellyfin-Menü konnte nicht geöffnet werden',
+                error
+            );
+        }
+    };
+
     const librarySection = (
         <section className='minitigerSection minitigerLibrarySection'>
             {librariesPending && (
@@ -529,39 +583,58 @@ const MinitigerHome = () => {
                             );
 
                             return (
-                                <Link
+                                <div
                                     key={library.Id ?? library.Name}
                                     className='minitigerLibraryCard'
-                                    to={getItemRoute(
-                                        libraryItem,
-                                        {
-                                            context:
-                                                library.CollectionType
-                                        }
-                                    )}
-                                    aria-label={
-                                        library.Name ?? 'Bibliothek'
-                                    }
                                 >
-                                    <div className='minitigerLibraryCardBody'>
-                                        <div className='minitigerLibraryImageWrap'>
-                                            {imageUrl ? (
-                                                <img
-                                                    src={imageUrl}
-                                                    alt=''
-                                                />
-                                            ) : (
-                                                <div className='minitigerLibraryFallback'>
-                                                    🐯
-                                                </div>
-                                            )}
-                                        </div>
+                                    <Link
+                                        className='minitigerLibraryCardLink'
+                                        to={getItemRoute(
+                                            libraryItem,
+                                            {
+                                                context:
+                                                    library.CollectionType
+                                            }
+                                        )}
+                                        aria-label={
+                                            library.Name ?? 'Bibliothek'
+                                        }
+                                    >
+                                        <div className='minitigerLibraryCardBody'>
+                                            <div className='minitigerLibraryImageWrap'>
+                                                {imageUrl ? (
+                                                    <img
+                                                        src={imageUrl}
+                                                        alt=''
+                                                    />
+                                                ) : (
+                                                    <div className='minitigerLibraryFallback'>
+                                                        🐯
+                                                    </div>
+                                                )}
+                                            </div>
 
-                                        <div className='minitigerLibraryName'>
-                                            {library.Name ?? 'Bibliothek'}
+                                            <div className='minitigerLibraryName'>
+                                                {library.Name ?? 'Bibliothek'}
+                                            </div>
                                         </div>
-                                    </div>
-                                </Link>
+                                    </Link>
+
+                                    <button
+                                        type='button'
+                                        className='minitigerLibraryMenuButton'
+                                        aria-label='Mehr'
+                                        title='Mehr'
+                                        onClick={event =>
+                                            openLibraryMenu(
+                                                event,
+                                                libraryItem
+                                            )
+                                        }
+                                    >
+                                        ⋮
+                                    </button>
+                                </div>
                             );
                         })}
                     </div>
@@ -584,6 +657,13 @@ const MinitigerHome = () => {
                 variant='landscape'
                 preferParentLandscape
                 showProgress
+                cardSize={settings.cardSize}
+                cardScale={
+                    settings.homeRowStyles.resume.cardScale
+                }
+                cardGap={
+                    settings.homeRowStyles.resume.cardGap
+                }
                 loadAudioFlags={settings.showAudioFlags}
                 showFskBadges={settings.showFskBadges}
                 showPlayedIndicators={settings.showPlayedIndicators}
@@ -601,6 +681,13 @@ const MinitigerHome = () => {
                 error={nextUpError}
                 variant='landscape'
                 preferParentLandscape
+                cardSize={settings.cardSize}
+                cardScale={
+                    settings.homeRowStyles.nextUp.cardScale
+                }
+                cardGap={
+                    settings.homeRowStyles.nextUp.cardGap
+                }
                 loadAudioFlags={settings.showAudioFlags}
                 showFskBadges={settings.showFskBadges}
                 showPlayedIndicators={settings.showPlayedIndicators}
@@ -617,6 +704,13 @@ const MinitigerHome = () => {
                 pending={watchlistPending}
                 error={watchlistError}
                 variant='poster'
+                cardSize={settings.cardSize}
+                cardScale={
+                    settings.homeRowStyles.watchlist.cardScale
+                }
+                cardGap={
+                    settings.homeRowStyles.watchlist.cardGap
+                }
                 loadAudioFlags={settings.showAudioFlags}
                 showFskBadges={settings.showFskBadges}
                 showPlayedIndicators={settings.showPlayedIndicators}
@@ -633,6 +727,13 @@ const MinitigerHome = () => {
                 pending={rewatchPending}
                 error={rewatchError}
                 variant='poster'
+                cardSize={settings.cardSize}
+                cardScale={
+                    settings.homeRowStyles.recent.cardScale
+                }
+                cardGap={
+                    settings.homeRowStyles.recent.cardGap
+                }
                 loadAudioFlags={settings.showAudioFlags}
                 showFskBadges={settings.showFskBadges}
                 showPlayedIndicators={settings.showPlayedIndicators}
@@ -780,6 +881,17 @@ const MinitigerHome = () => {
                     onVirtualAssign={
                         setAssignTarget
                     }
+                    cardSize={settings.cardSize}
+                    cardScale={
+                        settings.homeRowStyles[
+                            row.key
+                        ].cardScale
+                    }
+                    cardGap={
+                        settings.homeRowStyles[
+                            row.key
+                        ].cardGap
+                    }
                 />
             );
         }
@@ -878,6 +990,37 @@ const MinitigerHome = () => {
         '--mt-played-indicator-font-size':
             `${settings.playedIndicatorFontSize}px`,
         '--mt-row-gap': `${settings.rowGap}px`,
+        '--mt-home-row-card-gap': `${settings.homeRowCardGap}px`,
+        '--mt-home-row-card-width':
+            `${Math.round(
+                (
+                    settings.cardSize === 'compact'
+                        ? 150
+                        : settings.cardSize === 'large'
+                            ? 210
+                            : 180
+                ) * settings.homeRowCardScale / 100
+            )}px`,
+        '--mt-home-row-landscape-width':
+            `${Math.round(
+                (
+                    settings.cardSize === 'compact'
+                        ? 255
+                        : settings.cardSize === 'large'
+                            ? 350
+                            : 300
+                ) * settings.homeRowCardScale / 100
+            )}px`,
+        '--mt-home-row-square-width':
+            `${Math.round(
+                (
+                    settings.cardSize === 'compact'
+                        ? 185
+                        : settings.cardSize === 'large'
+                            ? 255
+                            : 220
+                ) * settings.homeRowCardScale / 100
+            )}px`,
         '--mt-library-card-gap': `${settings.libraryCardGap}px`,
         '--mt-library-virtual-gap': `${settings.libraryVirtualGap}px`,
         '--mt-banner-height-offset': `${settings.bannerHeightOffset}px`,
@@ -961,6 +1104,8 @@ const MinitigerHome = () => {
                     maxItems={settings.bannerItemLimit}
                     debugEnabled={settings.trailerDebugEnabled}
                     youtubeTrailersEnabled={settings.youtubeTrailersEnabled}
+                    localTrailersEnabled={settings.localTrailersEnabled}
+                    trailerButtonVisible={settings.trailerButtonVisible}
                     showNavigation={settings.bannerNavigationVisible}
                     showFsk={settings.bannerFskVisible}
                 />
@@ -1002,6 +1147,11 @@ const MinitigerHome = () => {
                             settings.accentColor
                         )
                     }
+                    seriesPreviewEnabled={settings.previewSeriesEnabled}
+                    moviePreviewEnabled={settings.previewMovieEnabled}
+                    mangaPreviewEnabled={settings.previewMangaEnabled}
+                    allowSeasonPreviews
+                    localTrailersEnabled={settings.localTrailersEnabled}
                 />
             )}
 
@@ -1067,3 +1217,7 @@ const MinitigerHome = () => {
 export default MinitigerHome;
 
 // MINITIGER_PATCH_MARKER: PHASE_18_17_4_HOME_SETTINGS_CLOSE_ON_PROFILE_SWITCH
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS

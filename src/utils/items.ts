@@ -119,7 +119,18 @@ export const getFieldsQuery = (
     };
 };
 
-export const getLimitQuery = () => {
+export const getLimitQuery = (
+    limitOverride?: number
+) => {
+    if (
+        typeof limitOverride === 'number'
+        && limitOverride > 0
+    ) {
+        return {
+            limit: limitOverride
+        };
+    }
+
     return {
         limit: userSettings.libraryPageSize(undefined) || undefined
     };
@@ -182,3 +193,5 @@ export function getDataAttributes(
         'data-enddate': opts.itemEndDate?.toString()
     };
 }
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING

@@ -625,6 +625,13 @@ const onUpdate = (
             'hoverEnabled',
             'glowEnabled',
             'previewEnabled',
+            'previewSeriesEnabled',
+            'previewMovieEnabled',
+            'previewMangaEnabled',
+            'localTrailersEnabled',
+            'trailerButtonVisible',
+            'toolbarTransparency',
+            'toolbarGlass',
             'cardTextCentered',
             'preferredPlayer'
         ]);
@@ -1154,6 +1161,54 @@ const onUpdate = (
                                 )}
 
                                 <section className='minitigerSettingsCard'>
+                                    <h4>Obere Leiste</h4>
+                                    <p className='minitigerSettingsHint'>
+                                        Gilt global auf Startseite, Bibliotheken, virtuellen Bibliotheken und Detailseiten. 0% Transparenz entspricht der bisherigen deckenden Leiste; 100% ist vollständig transparent.
+                                    </p>
+
+                                    <label className='minitigerRangeField'>
+                                        <span>Transparenz · {settings.toolbarTransparency}%</span>
+                                        <div>
+                                            <input
+                                                type='range'
+                                                min='0'
+                                                max='100'
+                                                step='5'
+                                                value={settings.toolbarTransparency}
+                                                onChange={event =>
+                                                    onUpdate({
+                                                        toolbarTransparency:
+                                                            Number(event.currentTarget.value)
+                                                    })
+                                                }
+                                            />
+                                            <output>{settings.toolbarTransparency}%</output>
+                                        </div>
+                                    </label>
+
+                                    <label className='minitigerRangeField'>
+                                        <span>Glas-Effekt · {settings.toolbarGlass}%</span>
+                                        <div>
+                                            <input
+                                                type='range'
+                                                min='0'
+                                                max='100'
+                                                step='5'
+                                                value={settings.toolbarGlass}
+                                                onChange={event =>
+                                                    onUpdate({
+                                                        toolbarGlass:
+                                                            Number(event.currentTarget.value)
+                                                    })
+                                                }
+                                            />
+                                            <output>{settings.toolbarGlass}%</output>
+                                        </div>
+                                        <small>Erhöht Hintergrund-Unschärfe und Sättigung der Leiste.</small>
+                                    </label>
+                                </section>
+
+                                <section className='minitigerSettingsCard'>
                                     <h4>Standard Einstellungen</h4>
 
                                     {[
@@ -1185,7 +1240,32 @@ const onUpdate = (
                                         [
                                             'previewEnabled',
                                             'Mini-Vorschaukarten aktivieren',
-                                            'Schaltet kleine und große Netflix-artige Vorschau global ein oder aus.'
+                                            'Globale Hauptschaltung: Ist sie aus, bleiben alle Vorschaukarten aus.'
+                                        ],
+                                        [
+                                            'previewSeriesEnabled',
+                                            'Hover-Vorschaukarten · Serien',
+                                            'Wird nur verwendet, wenn die globale Vorschaukarten-Option aktiv ist. Auf der Startseite gehören Staffeln ebenfalls zu Serien.'
+                                        ],
+                                        [
+                                            'previewMovieEnabled',
+                                            'Hover-Vorschaukarten · Filme',
+                                            'Wird nur verwendet, wenn die globale Vorschaukarten-Option aktiv ist.'
+                                        ],
+                                        [
+                                            'previewMangaEnabled',
+                                            'Hover-Vorschaukarten · Manga / Bücher',
+                                            'Wird nur verwendet, wenn die globale Vorschaukarten-Option aktiv ist.'
+                                        ],
+                                        [
+                                            'localTrailersEnabled',
+                                            'Lokale Trailer aktivieren',
+                                            'Aus = lokale Jellyfin-Trailer werden in Minitiger-Vorschauen und im Banner nicht gesucht oder abgespielt.'
+                                        ],
+                                        [
+                                            'trailerButtonVisible',
+                                            'Trailer-Button anzeigen',
+                                            'Blendet den Trailer-Button im Banner und auf Minitiger-Detailseiten global ein oder aus.'
                                         ],
                                         [
                                             'cardTextCentered',
@@ -1930,6 +2010,7 @@ const onUpdate = (
                                             onToggleSection={onToggleSection}
                                             onMoveHomeRow={onMoveHomeRow}
                                             onReorderHomeRows={onReorderHomeRows}
+                                            onUpdateHomeSettings={onUpdate}
                                             onUpdateCustomRow={onUpdateCustomRow}
                                             onToggleVirtualRow={onToggleVirtualRow}
                                             onUpdateVirtualRowTitle={onUpdateVirtualRowTitle}
@@ -2833,3 +2914,7 @@ export default MinitigerSettingsPanel;
 // MINITIGER_PATCH_MARKER: PHASE_18_23_1_VLC_COMPLETE_PLAYBACK_SYNC
 
 // MINITIGER_PATCH_MARKER: PHASE_18_23_2_EXTERNAL_VLC_FINALIZE
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS

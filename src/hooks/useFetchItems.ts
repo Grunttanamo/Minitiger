@@ -51,7 +51,14 @@ const fetchGetItems = async (
     }
 };
 
-export const useGetItems = (parametersOptions: LibraryApiGetItemsRequest) => {
+interface MinitigerUseGetItemsOptions {
+    keepPreviousData?: boolean;
+}
+
+export const useGetItems = (
+    parametersOptions: LibraryApiGetItemsRequest,
+    options?: MinitigerUseGetItemsOptions
+) => {
     const currentApi = useApi();
     const isRandom = Boolean(parametersOptions.sortBy?.includes(ItemSortBy.Random));
 
@@ -67,6 +74,10 @@ export const useGetItems = (parametersOptions: LibraryApiGetItemsRequest) => {
         gcTime: isRandom ? Infinity : undefined,
         refetchOnMount: isRandom ? false : undefined,
         refetchOnWindowFocus: isRandom ? false : undefined,
+        placeholderData:
+            options?.keepPreviousData
+                ? previousData => previousData
+                : undefined,
         enabled: !!currentApi.api && !!currentApi.user?.Id
     });
 };
@@ -192,6 +203,7 @@ const fetchGetItemsViewByType = async (
     parentId: ParentId,
     itemType: BaseItemKind[],
     libraryViewSettings: LibraryViewSettings,
+    limitOverride?: number,
     options?: AxiosRequestConfig
 ) => {
     const { api, user } = currentApi;
@@ -207,7 +219,7 @@ const fetchGetItemsViewByType = async (
                         enableImageTypes: [libraryViewSettings.ImageType, ImageType.Backdrop],
                         ...getFieldsQuery(viewType, libraryViewSettings),
                         ...getFiltersQuery(viewType, libraryViewSettings),
-                        ...getLimitQuery(),
+                        ...getLimitQuery(limitOverride),
                         ...getAlphaPickerQuery(libraryViewSettings),
                         sortBy: libraryViewSettings.SortBy,
                         sortOrder: [libraryViewSettings.SortOrder],
@@ -228,7 +240,7 @@ const fetchGetItemsViewByType = async (
                         enableImageTypes: [libraryViewSettings.ImageType, ImageType.Backdrop],
                         ...getFieldsQuery(viewType, libraryViewSettings),
                         ...getFiltersQuery(viewType, libraryViewSettings),
-                        ...getLimitQuery(),
+                        ...getLimitQuery(limitOverride),
                         ...getAlphaPickerQuery(libraryViewSettings),
                         sortBy: libraryViewSettings.SortBy,
                         sortOrder: [libraryViewSettings.SortOrder],
@@ -249,7 +261,7 @@ const fetchGetItemsViewByType = async (
                         enableImageTypes: [libraryViewSettings.ImageType, ImageType.Backdrop],
                         fields: [ItemFields.PrimaryImageAspectRatio],
                         filters: libraryViewSettings?.Filters?.Status,
-                        ...getLimitQuery(),
+                        ...getLimitQuery(limitOverride),
                         ...getAlphaPickerQuery(libraryViewSettings),
                         personTypes: [PersonKind.Author],
                         startIndex: libraryViewSettings.StartIndex
@@ -266,7 +278,7 @@ const fetchGetItemsViewByType = async (
                         userId: user.Id,
                         parentId: parentId ?? undefined,
                         ...getFieldsQuery(viewType, libraryViewSettings),
-                        ...getLimitQuery(),
+                        ...getLimitQuery(limitOverride),
                         ...getAlphaPickerQuery(libraryViewSettings),
                         includeItemTypes: itemType,
                         isFavorite,
@@ -303,7 +315,7 @@ const fetchGetItemsViewByType = async (
                         enableImageTypes: [libraryViewSettings.ImageType, ImageType.Backdrop],
                         ...getFieldsQuery(viewType, libraryViewSettings),
                         ...getFiltersQuery(viewType, libraryViewSettings),
-                        ...getLimitQuery(),
+                        ...getLimitQuery(limitOverride),
                         ...getAlphaPickerQuery(libraryViewSettings),
                         sortBy: libraryViewSettings.SortBy,
                         sortOrder: [libraryViewSettings.SortOrder],
@@ -337,7 +349,7 @@ const fetchGetItemsViewByType = async (
                         enableImageTypes: [libraryViewSettings.ImageType, ImageType.Backdrop],
                         ...getFieldsQuery(viewType, libraryViewSettings),
                         ...getFiltersQuery(viewType, libraryViewSettings),
-                        ...getLimitQuery(),
+                        ...getLimitQuery(limitOverride),
                         ...getAlphaPickerQuery(libraryViewSettings),
                         isFavorite: viewType === LibraryTab.Favorites ? true : undefined,
                         sortBy: libraryViewSettings.SortBy,
@@ -362,7 +374,8 @@ export const useGetItemsViewByType = (
     viewType: LibraryTab | undefined,
     parentId: ParentId,
     itemType: BaseItemKind[] = [],
-    libraryViewSettings: LibraryViewSettings
+    libraryViewSettings: LibraryViewSettings,
+    limitOverride?: number
 ) => {
     const currentApi = useApi();
     return useQuery({
@@ -375,7 +388,8 @@ export const useGetItemsViewByType = (
             viewType,
             {
                 itemType,
-                libraryViewSettings
+                libraryViewSettings,
+                limitOverride
             }
         ],
         queryFn: ({ signal }) =>
@@ -385,9 +399,11 @@ export const useGetItemsViewByType = (
                 parentId,
                 itemType,
                 libraryViewSettings!,
+                limitOverride,
                 { signal }
             ),
         refetchOnWindowFocus: false,
+        placeholderData: previousData => previousData,
         enabled: !!currentApi.api && !!currentApi.user?.Id
             && viewType
             && [
@@ -839,3 +855,7 @@ export const useGetProgramsSectionsWithItems = (
         enabled: !!currentApi.api && !!currentApi.user?.Id
     });
 };
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS

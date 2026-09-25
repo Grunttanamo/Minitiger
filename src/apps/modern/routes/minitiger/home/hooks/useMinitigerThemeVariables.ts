@@ -21,6 +21,12 @@ const useMinitigerThemeVariables = (
             '--mt-library-bar': settings.libraryBarColor,
             '--mt-library-bar-text': settings.libraryBarTextColor,
             '--mt-banner-meta': settings.bannerMetaColor,
+            '--mt-toolbar-alpha':
+                String((100 - settings.toolbarTransparency) / 100),
+            '--mt-toolbar-blur':
+                `${Math.round(settings.toolbarGlass * 0.24)}px`,
+            '--mt-toolbar-saturation':
+                `${100 + Math.round(settings.toolbarGlass * 0.45)}%`,
             '--mt-glow-color': settings.glowColor,
             '--mt-arrow-color': settings.arrowColor,
             '--mt-arrow-text':
@@ -100,7 +106,9 @@ const useMinitigerThemeVariables = (
         settings.playedIndicatorSize,
         settings.primaryHoverColor,
         settings.secondaryColor,
-        settings.secondaryHoverColor
+        settings.secondaryHoverColor,
+        settings.toolbarGlass,
+        settings.toolbarTransparency
     ]);
 };
 
@@ -109,3 +117,5 @@ export default useMinitigerThemeVariables;
 // MINITIGER_PATCH_MARKER: PHASE_18_15_0_GLOBAL_HOVER_DETAIL_QUICKPLAY
 
 // MINITIGER_PATCH_MARKER: PHASE_18_18_3_CENTERED_CARD_TEXT_THEME
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING

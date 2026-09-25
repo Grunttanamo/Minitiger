@@ -1,6 +1,13 @@
 import AppBar, { type AppBarProps } from '@mui/material/AppBar';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-import React, { useLayoutEffect, useRef, useState, type FC, type PropsWithChildren } from 'react';
+import React, {
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+    type FC,
+    type PropsWithChildren
+} from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 
 const DEFAULT_APP_BAR_HEIGHT = 64;
@@ -20,7 +27,13 @@ const OffsetAppBar: FC<PropsWithChildren<OffsetAppBarProps>> = ({
     ...props
 }) => {
     const appBarRef = useRef<HTMLHtmlElement>(null);
-    const [height, setHeight] = useState(dense ? DENSE_APP_BAR_HEIGHT : DEFAULT_APP_BAR_HEIGHT);
+    const [height, setHeight] = useState(
+        dense ? DENSE_APP_BAR_HEIGHT : DEFAULT_APP_BAR_HEIGHT
+    );
+    const [
+        nestedScrollTrigger,
+        setNestedScrollTrigger
+    ] = useState(false);
 
     const scrollTrigger = useScrollTrigger({
         disableHysteresis: true,
@@ -53,7 +66,71 @@ const OffsetAppBar: FC<PropsWithChildren<OffsetAppBarProps>> = ({
         };
     }, []);
 
-    const raised = scrollTrigger && !forceTransparent;
+    useEffect(() => {
+        const getScrollTop = (
+            target?: EventTarget | null
+        ) => {
+            let scrollTop = Math.max(
+                window.scrollY,
+                document.documentElement.scrollTop,
+                document.body.scrollTop
+            );
+
+            if (target instanceof HTMLElement) {
+                scrollTop = Math.max(
+                    scrollTop,
+                    target.scrollTop
+                );
+            }
+
+            document.querySelectorAll<HTMLElement>(
+                '.mainAnimatedPage, .smoothScrollY, .scrollY, '
+                + '.emby-scroller, [data-scrollable="true"]'
+            ).forEach(element => {
+                scrollTop = Math.max(
+                    scrollTop,
+                    element.scrollTop
+                );
+            });
+
+            return scrollTop;
+        };
+
+        const update = (event?: Event) => {
+            setNestedScrollTrigger(
+                getScrollTop(event?.target) > 1
+            );
+        };
+
+        update();
+
+        document.addEventListener(
+            'scroll',
+            update,
+            true
+        );
+        window.addEventListener(
+            'resize',
+            update
+        );
+
+        return () => {
+            document.removeEventListener(
+                'scroll',
+                update,
+                true
+            );
+            window.removeEventListener(
+                'resize',
+                update
+            );
+        };
+    }, []);
+
+    const raised = (
+        scrollTrigger
+        || nestedScrollTrigger
+    ) && !forceTransparent;
 
     return (
         <>
@@ -84,3 +161,5 @@ const OffsetAppBar: FC<PropsWithChildren<OffsetAppBarProps>> = ({
 };
 
 export default OffsetAppBar;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS

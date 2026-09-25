@@ -7,6 +7,9 @@ import type { ItemDto } from 'types/base/models/item-dto';
 import type {
     MinitigerCustomRow
 } from '../config/customRows';
+import type {
+    MinitigerCardSize
+} from '../config/homeSettings';
 import MinitigerMediaRow from './MinitigerMediaRow';
 
 interface MinitigerCustomRowProps {
@@ -21,6 +24,9 @@ interface MinitigerCustomRowProps {
         itemId?: string | null
     ) => boolean;
     onVirtualAssign?: (item: ItemDto) => void;
+    cardSize?: MinitigerCardSize;
+    cardScale?: number;
+    cardGap?: number;
 }
 
 interface ItemQueryResult {
@@ -612,7 +618,10 @@ const MinitigerCustomRow = ({
     showPlayedIndicators = true,
     showVirtualAssign = false,
     isVirtuallyAssigned,
-    onVirtualAssign
+    onVirtualAssign,
+    cardSize = 'normal',
+    cardScale = 100,
+    cardGap = 16
 }: MinitigerCustomRowProps) => {
     const userId =
         apiClient?.getCurrentUserId() ?? '';
@@ -752,6 +761,9 @@ const MinitigerCustomRow = ({
                 onVirtualAssign
             }
             previewContext={primaryCollectionType}
+            cardSize={cardSize}
+            cardScale={cardScale}
+            cardGap={cardGap}
             subtitleOverride={
                 row.sortMode === 'latestSeasons'
                     ? getLatestSeasonSubtitle
@@ -767,3 +779,5 @@ export default MinitigerCustomRow;
 // MINITIGER_PATCH_MARKER: PHASE_18_18_0_LATEST_SEASONS_RENDER
 
 // MINITIGER_PATCH_MARKER: PHASE_18_18_5C_PERSISTENT_LATEST_SEASON_HISTORY
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS

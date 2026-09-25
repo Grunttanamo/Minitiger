@@ -5646,3 +5646,139 @@ iframe.minitigerInlineTrailer {
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_18_3_CENTERED_HOME_CARD_TEXT */
+
+
+/* =========================================================
+   PHASE 18.24.0 TEST - HOME ROW SIZE + HORIZONTAL GAP
+   ========================================================= */
+
+@media (min-width: 901px) {
+    .minitigerHome .minitigerMediaRow {
+        gap: var(--mt-home-row-card-gap, 16px) !important;
+    }
+
+    .minitigerHome
+    .minitigerMediaCard:not(.minitigerMediaCardLandscape):not(.minitigerMediaCardSquare) {
+        flex-basis: var(--mt-home-row-card-width, 180px) !important;
+    }
+
+    .minitigerHome .minitigerMediaCardLandscape {
+        flex-basis: var(--mt-home-row-landscape-width, 300px) !important;
+    }
+
+    .minitigerHome .minitigerMediaCardSquare {
+        flex-basis: var(--mt-home-row-square-width, 220px) !important;
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING */
+
+/* =========================================================
+   PHASE 18.24.1 TEST - HOME LIBRARY NATIVE MENU
+   ========================================================= */
+
+.minitigerLibraryCardLink {
+    width: 100%;
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.minitigerLibraryMenuButton {
+    position: absolute;
+    z-index: 24;
+    top: 0.4rem;
+    right: 0.4rem;
+    width: 2.15rem;
+    height: 2.15rem;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(15, 16, 19, 0.82);
+    color: #fff;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition:
+        opacity 150ms ease,
+        transform 180ms ease,
+        background 150ms ease;
+}
+
+.minitigerLibraryCard:hover .minitigerLibraryMenuButton,
+.minitigerLibraryCard:focus-within .minitigerLibraryMenuButton,
+.minitigerLibraryMenuButton:focus-visible {
+    opacity: 1;
+}
+
+.minitigerLibraryCard:hover .minitigerLibraryMenuButton,
+.minitigerLibraryCard:focus-within .minitigerLibraryMenuButton {
+    transform:
+        translateY(-5px)
+        scale(1.018);
+}
+
+.minitigerLibraryMenuButton:hover,
+.minitigerLibraryMenuButton:focus-visible {
+    background: var(--mt-accent);
+    color: var(--mt-accent-text);
+    outline: none;
+}
+
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome
+.minitigerLibraryCard:hover
+.minitigerLibraryMenuButton,
+:root[data-minitiger-hover-enabled='false']
+.minitigerHome
+.minitigerLibraryCard:focus-within
+.minitigerLibraryMenuButton {
+    transform: none !important;
+}
+
+.minitigerLibraryCard:focus-within {
+    outline: none;
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS */
+
+/* =========================================================
+   PHASE 18.24.2a TEST - ROW SLIDERS + HANDLE-ONLY DRAG
+   ========================================================= */
+
+.minitigerHomeBuilderSliderControl {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 5.5rem;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.minitigerHomeBuilderSliderControl input[type='range'] {
+    width: 100%;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.minitigerHomeBuilderSliderControl input[type='number'] {
+    min-width: 0;
+}
+
+.minitigerDragHandle[draggable='true'] {
+    cursor: grab;
+    touch-action: none;
+}
+
+.minitigerDragHandle[draggable='true']:active {
+    cursor: grabbing;
+}
+
+@media (max-width: 760px) {
+    .minitigerHomeBuilderSliderControl {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_24_2A_TEST_POLISH_FIX */

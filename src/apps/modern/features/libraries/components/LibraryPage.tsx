@@ -130,6 +130,10 @@ const LibraryPage: FC<LibraryPageProps> = ({
                             settings.accentColor
                         )
                     }
+                    seriesPreviewEnabled={settings.previewSeriesEnabled}
+                    moviePreviewEnabled={settings.previewMovieEnabled}
+                    mangaPreviewEnabled={settings.previewMangaEnabled}
+                    localTrailersEnabled={settings.localTrailersEnabled}
                 />
             )}
         </Page>
@@ -137,3 +141,5 @@ const LibraryPage: FC<LibraryPageProps> = ({
 };
 
 export default LibraryPage;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING

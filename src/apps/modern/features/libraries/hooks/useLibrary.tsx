@@ -1,6 +1,15 @@
 import { CollectionType } from '@jellyfin/sdk/lib/generated-client/models/collection-type';
 import { UseQueryResult } from '@tanstack/react-query';
-import React, { type FC, type PropsWithChildren, createContext, useContext, useMemo } from 'react';
+import React, {
+    type FC,
+    type PropsWithChildren,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState
+} from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLocalStorage } from 'usehooks-ts';
 
@@ -24,6 +33,9 @@ interface LibraryState {
     itemsResult?: UseQueryResult<ItemDtoQueryResult | undefined, Error>;
     viewSettings?: LibraryViewSettings;
     setViewSettings?: React.Dispatch<React.SetStateAction<LibraryViewSettings>>;
+    isProgressiveAll?: boolean;
+    hasMoreItems?: boolean;
+    loadMoreItems?: () => void;
 }
 
 const DEFAULT_LIBRARY_STATE: LibraryState = {
@@ -52,12 +64,70 @@ export const LibraryProvider: FC<PropsWithChildren<unknown>> = ({ children }) =>
         getDefaultLibraryViewSettings(settingsViewType)
     );
 
+    const [ progressiveLimit, setProgressiveLimit ] =
+        useState(200);
+
+    const progressiveResetKey = JSON.stringify({
+        libraryId,
+        viewType,
+        alphabet: viewSettings.Alphabet ?? null,
+        sortBy: viewSettings.SortBy,
+        sortOrder: viewSettings.SortOrder,
+        filters: viewSettings.Filters
+    });
+
+    useEffect(() => {
+        setProgressiveLimit(200);
+    }, [progressiveResetKey]);
+
+    const isProgressiveAll =
+        isLibPath
+        && !viewSettings.Alphabet;
+
+    const queryViewSettings = useMemo(
+        () => isProgressiveAll
+            ? {
+                ...viewSettings,
+                StartIndex: 0
+            }
+            : viewSettings,
+        [
+            isProgressiveAll,
+            viewSettings
+        ]
+    );
+
     const itemsResult = useGetItemsViewByType(
         viewType,
         libraryId,
         content?.itemType,
-        viewSettings
+        queryViewSettings,
+        isProgressiveAll
+            ? progressiveLimit
+            : undefined
     );
+
+    const loadedItems =
+        itemsResult.data?.Items?.length
+        ?? 0;
+
+    const totalItems =
+        itemsResult.data?.TotalRecordCount;
+
+    const hasMoreItems = Boolean(
+        isProgressiveAll
+        && (
+            typeof totalItems === 'number'
+                ? loadedItems < totalItems
+                : loadedItems >= progressiveLimit
+        )
+    );
+
+    const loadMoreItems = useCallback(() => {
+        setProgressiveLimit(current =>
+            current + 100
+        );
+    }, []);
 
     const state = useMemo(() => ({
         ...DEFAULT_LIBRARY_STATE,
@@ -67,8 +137,22 @@ export const LibraryProvider: FC<PropsWithChildren<unknown>> = ({ children }) =>
         content,
         viewSettings,
         setViewSettings,
-        itemsResult
-    }), [collectionType, isLibPath, id, content, viewSettings, setViewSettings, itemsResult]);
+        itemsResult,
+        isProgressiveAll,
+        hasMoreItems,
+        loadMoreItems
+    }), [
+        collectionType,
+        isLibPath,
+        id,
+        content,
+        viewSettings,
+        setViewSettings,
+        itemsResult,
+        isProgressiveAll,
+        hasMoreItems,
+        loadMoreItems
+    ]);
 
     return (
         <LibraryContext.Provider value={state}>
@@ -76,3 +160,7 @@ export const LibraryProvider: FC<PropsWithChildren<unknown>> = ({ children }) =>
         </LibraryContext.Provider>
     );
 };
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS

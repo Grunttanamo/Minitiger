@@ -23,6 +23,7 @@ import type { ItemDto } from 'types/base/models/item-dto';
 import {
     getBackdropImageUrl,
     getLandscapeImageUrl,
+    getParentLandscapeImageUrl,
     getLogoImageUrl,
     getMediaTypeName,
     getPrimaryImageUrl,
@@ -47,11 +48,18 @@ interface PreviewTarget {
     item: ItemDto;
     kind: PreviewKind;
     rect: DOMRect;
+    initialSeasonId?: string;
+    seasonPreviewItem?: ItemDto;
 }
 
 interface MinitigerPreviewLayerProps {
     accentColor: string;
     accentTextColor: string;
+    seriesPreviewEnabled?: boolean;
+    moviePreviewEnabled?: boolean;
+    mangaPreviewEnabled?: boolean;
+    allowSeasonPreviews?: boolean;
+    localTrailersEnabled?: boolean;
 }
 
 const HOVER_DELAY = 1050;
@@ -67,7 +75,13 @@ const PREVIEW_CACHE_MS = 2 * 60_000;
 
 const isSupportedItem = (
     item: ItemDto,
-    card: Element
+    card: Element,
+    options: {
+        series: boolean;
+        movie: boolean;
+        manga: boolean;
+        season: boolean;
+    }
 ): PreviewKind | null => {
     const type = String(item.Type ?? '').toLowerCase();
     const previewContext = String(
@@ -101,23 +115,34 @@ const isSupportedItem = (
     );
 
     if (
-        type === 'book'
-        || (
-            isBooksLibrary
-            && (
-                type === 'folder'
-                || type === 'boxset'
+        options.manga
+        && (
+            type === 'book'
+            || (
+                isBooksLibrary
+                && (
+                    type === 'folder'
+                    || type === 'boxset'
+                )
             )
         )
     ) {
         return 'manga';
     }
 
-    if (type === 'series') {
+    if (type === 'series' && options.series) {
         return 'series';
     }
 
-    if (type === 'movie') {
+    if (
+        type === 'season'
+        && options.series
+        && options.season
+    ) {
+        return 'series';
+    }
+
+    if (type === 'movie' && options.movie) {
         return 'movie';
     }
 
@@ -215,7 +240,12 @@ const getSmallPosition = (rect: DOMRect) => {
 
 const MinitigerPreviewLayer = ({
     accentColor,
-    accentTextColor
+    accentTextColor,
+    seriesPreviewEnabled = true,
+    moviePreviewEnabled = true,
+    mangaPreviewEnabled = true,
+    allowSeasonPreviews = false,
+    localTrailersEnabled = true
 }: MinitigerPreviewLayerProps) => {
     const {
         __legacyApiClient__: apiClient
@@ -235,6 +265,7 @@ const MinitigerPreviewLayer = ({
     ] = useState<{
         item: ItemDto;
         kind: PreviewKind;
+        initialSeasonId?: string;
     } | null>(null);
 
     const hoverTimer = useRef<number | null>(null);
@@ -313,16 +344,73 @@ const MinitigerPreviewLayer = ({
                 return;
             }
 
-            const kind = isSupportedItem(item, card);
+            const kind = isSupportedItem(
+                item,
+                card,
+                {
+                    series: seriesPreviewEnabled,
+                    movie: moviePreviewEnabled,
+                    manga: mangaPreviewEnabled,
+                    season: allowSeasonPreviews
+                }
+            );
 
             if (!kind || !card.isConnected) {
                 return;
             }
 
+            let previewItem = item;
+            let initialSeasonId: string | undefined;
+            let seasonPreviewItem: ItemDto | undefined;
+
+            if (
+                String(item.Type ?? '').toLowerCase()
+                === 'season'
+            ) {
+                const seriesId = item.SeriesId;
+
+                if (!seriesId || !item.Id) {
+                    return;
+                }
+
+                const seriesCacheKey =
+                    `${client.serverId?.() ?? 'server'}:${seriesId}`;
+                const cachedSeries =
+                    previewItemCache.get(seriesCacheKey);
+
+                const seriesItem = (
+                    cachedSeries
+                    && Date.now() - cachedSeries.timestamp
+                        < PREVIEW_CACHE_MS
+                )
+                    ? cachedSeries.item
+                    : await client.getItem(
+                        userId,
+                        seriesId
+                    ) as ItemDto;
+
+                if (!cachedSeries || cachedSeries.item !== seriesItem) {
+                    previewItemCache.set(seriesCacheKey, {
+                        timestamp: Date.now(),
+                        item: seriesItem
+                    });
+                }
+
+                if (token !== requestToken.current) {
+                    return;
+                }
+
+                previewItem = seriesItem;
+                initialSeasonId = item.Id;
+                seasonPreviewItem = item;
+            }
+
             setPreview({
-                item,
+                item: previewItem,
                 kind,
-                rect: card.getBoundingClientRect()
+                rect: card.getBoundingClientRect(),
+                initialSeasonId,
+                seasonPreviewItem
             });
         } catch (error) {
             console.warn(
@@ -330,7 +418,12 @@ const MinitigerPreviewLayer = ({
                 error
             );
         }
-    }, []);
+    }, [
+        allowSeasonPreviews,
+        mangaPreviewEnabled,
+        moviePreviewEnabled,
+        seriesPreviewEnabled
+    ]);
 
     const schedulePreview = useCallback((
         card: Element
@@ -631,7 +724,9 @@ const MinitigerPreviewLayer = ({
                 onExpand={() => {
                     setExpanded({
                         item: preview.item,
-                        kind: preview.kind
+                        kind: preview.kind,
+                        initialSeasonId:
+                            preview.initialSeasonId
                     });
                     setPreview(null);
                     clearCloseTimer();
@@ -651,6 +746,9 @@ const MinitigerPreviewLayer = ({
                 onClose={() => setExpanded(null)}
                 onPlay={playItem}
                 onToggleFavorite={toggleFavorite}
+                localTrailersEnabled={
+                    localTrailersEnabled
+                }
             />,
             document.body
         )
@@ -690,9 +788,19 @@ const SmallPreview = ({
         [target.rect]
     );
 
+    const isSeasonPreview = Boolean(
+        target.initialSeasonId
+        && target.seasonPreviewItem
+    );
+
     const imageUrl = target.kind === 'manga'
         ? getPrimaryImageUrl(apiClient, target.item)
-        : getBackdropImageUrl(apiClient, target.item);
+        : target.seasonPreviewItem
+            ? getParentLandscapeImageUrl(
+                apiClient,
+                target.seasonPreviewItem
+            )
+            : getBackdropImageUrl(apiClient, target.item);
 
     const rawMangaAspectRatio = Number(
         target.item.PrimaryImageAspectRatio
@@ -706,10 +814,12 @@ const SmallPreview = ({
         ? rawMangaAspectRatio
         : 2 / 3;
 
-    const logoUrl = getLogoImageUrl(
-        apiClient,
-        target.item
-    );
+    const logoUrl = isSeasonPreview
+        ? undefined
+        : getLogoImageUrl(
+            apiClient,
+            target.item
+        );
 
     const rating = getRatingLabel(
         target.item.OfficialRating
@@ -782,16 +892,18 @@ const SmallPreview = ({
 
                 <div className='minitigerHoverPreviewHeroShade' />
 
-                {logoUrl ? (
-                    <img
-                        className='minitigerHoverPreviewLogo'
-                        src={logoUrl}
-                        alt={target.item.Name ?? ''}
-                    />
-                ) : (
-                    <strong>
-                        {target.item.Name ?? 'Unbekannt'}
-                    </strong>
+                {!isSeasonPreview && (
+                    logoUrl ? (
+                        <img
+                            className='minitigerHoverPreviewLogo'
+                            src={logoUrl}
+                            alt={target.item.Name ?? ''}
+                        />
+                    ) : (
+                        <strong>
+                            {target.item.Name ?? 'Unbekannt'}
+                        </strong>
+                    )
                 )}
             </Link>
 
@@ -856,12 +968,14 @@ interface LargePreviewProps {
     target: {
         item: ItemDto;
         kind: PreviewKind;
+        initialSeasonId?: string;
     };
     apiClient?: ApiClient;
     style: React.CSSProperties;
     onClose: () => void;
     onPlay: (item: ItemDto) => void;
     onToggleFavorite: (item: ItemDto) => void;
+    localTrailersEnabled: boolean;
 }
 
 const LargePreview = ({
@@ -870,7 +984,8 @@ const LargePreview = ({
     style,
     onClose,
     onPlay,
-    onToggleFavorite
+    onToggleFavorite,
+    localTrailersEnabled
 }: LargePreviewProps) => {
     const backdropUrl = target.kind === 'manga'
         ? getPrimaryImageUrl(apiClient, target.item)
@@ -956,6 +1071,7 @@ const LargePreview = ({
                             item={target.item}
                             className='minitigerLargePreviewTrailerMedia'
                             delayMs={650}
+                            allowLocal={localTrailersEnabled}
                         />
                     )}
 
@@ -1034,6 +1150,9 @@ const LargePreview = ({
                             apiClient={apiClient}
                             onPlay={onPlay}
                             onClose={onClose}
+                            initialSeasonId={
+                                target.initialSeasonId
+                            }
                         />
                     )}
 
@@ -1165,13 +1284,18 @@ interface SeriesPreviewSectionProps {
     apiClient?: ApiClient;
     onPlay: (item: ItemDto) => void;
     onClose: () => void;
+    initialSeasonId?: string;
 }
+
+const ALL_SEASONS = '__minitiger_all_seasons__';
+const EPISODE_BATCH_SIZE = 25;
 
 const SeriesPreviewSection = ({
     series,
     apiClient,
     onPlay,
-    onClose
+    onClose,
+    initialSeasonId
 }: SeriesPreviewSectionProps) => {
     const {
         data: seasonsData,
@@ -1200,6 +1324,11 @@ const SeriesPreviewSection = ({
         setSelectedSeasonId
     ] = useState<string>('');
 
+    const [
+        visibleEpisodeCount,
+        setVisibleEpisodeCount
+    ] = useState(EPISODE_BATCH_SIZE);
+
     useEffect(() => {
         if (
             selectedSeasonId
@@ -1208,7 +1337,13 @@ const SeriesPreviewSection = ({
             return;
         }
 
-        const preferred = seasons.find(season =>
+        const preferred = (
+            initialSeasonId
+                ? seasons.find(season =>
+                    season.Id === initialSeasonId
+                )
+                : undefined
+        ) ?? seasons.find(season =>
             season.IndexNumber === 1
         ) ?? seasons[0];
 
@@ -1216,17 +1351,30 @@ const SeriesPreviewSection = ({
             setSelectedSeasonId(preferred.Id);
         }
     }, [
+        initialSeasonId,
         seasons,
         selectedSeasonId
     ]);
 
+    useEffect(() => {
+        setVisibleEpisodeCount(
+            EPISODE_BATCH_SIZE
+        );
+    }, [selectedSeasonId]);
+
+    const allSeasonsSelected =
+        selectedSeasonId === ALL_SEASONS;
+
     const {
         data: episodesData,
-        isPending: episodesPending
+        isPending: episodesPending,
+        isFetching: episodesFetching
     } = useGetItems({
-        parentId: selectedSeasonId || undefined,
-        recursive: false,
-        limit: 100,
+        parentId: allSeasonsSelected
+            ? series.Id ?? undefined
+            : selectedSeasonId || series.Id || undefined,
+        recursive: allSeasonsSelected,
+        limit: visibleEpisodeCount,
         includeItemTypes: [
             BaseItemKind.Episode
         ],
@@ -1240,17 +1388,84 @@ const SeriesPreviewSection = ({
             ImageType.Backdrop
         ],
         imageTypeLimit: 1,
-        enableTotalRecordCount: false
+        enableTotalRecordCount: true,
+        sortBy: allSeasonsSelected
+            ? [
+                ItemSortBy.ParentIndexNumber,
+                ItemSortBy.IndexNumber
+            ]
+            : [ ItemSortBy.IndexNumber ],
+        sortOrder: [ SortOrder.Ascending ]
+    }, {
+        keepPreviousData: true
     });
 
+    const rawEpisodes =
+        episodesData?.Items ?? [];
+
     const episodes = useMemo(
-        () => [ ...(episodesData?.Items ?? []) ]
+        () => [ ...rawEpisodes ]
             .filter(isMinitigerAvailableEpisode)
-            .sort((left, right) => (
-                (left.IndexNumber ?? 9999)
-                - (right.IndexNumber ?? 9999)
-            )),
-        [episodesData?.Items]
+            .sort((left, right) => {
+                const seasonDelta =
+                    (left.ParentIndexNumber ?? 9999)
+                    - (right.ParentIndexNumber ?? 9999);
+
+                if (
+                    allSeasonsSelected
+                    && seasonDelta !== 0
+                ) {
+                    return seasonDelta;
+                }
+
+                return (
+                    (left.IndexNumber ?? 9999)
+                    - (right.IndexNumber ?? 9999)
+                );
+            }),
+        [
+            allSeasonsSelected,
+            rawEpisodes
+        ]
+    );
+
+    const totalEpisodeCount =
+        episodesData?.TotalRecordCount
+        ?? rawEpisodes.length;
+
+    const selectedSeason =
+        allSeasonsSelected
+            ? undefined
+            : seasons.find(season =>
+                season.Id === selectedSeasonId
+            );
+
+    const effectiveTotalEpisodeCount =
+        allSeasonsSelected
+            ? totalEpisodeCount
+            : (
+                selectedSeason?.RecursiveItemCount
+                ?? selectedSeason?.ChildCount
+                ?? totalEpisodeCount
+            );
+
+    const loadedEpisodeCountForPaging =
+        allSeasonsSelected
+            ? rawEpisodes.length
+            : episodes.length;
+
+    const canLoadMore =
+        loadedEpisodeCountForPaging >= visibleEpisodeCount
+        && loadedEpisodeCountForPaging < effectiveTotalEpisodeCount;
+
+    const getEpisodeSeasonNumber = (
+        episode: ItemDto
+    ) => (
+        episode.ParentIndexNumber
+        ?? seasons.find(season =>
+            season.Id === episode.ParentId
+        )?.IndexNumber
+        ?? null
     );
 
     if (seasonsPending) {
@@ -1279,6 +1494,10 @@ const SeriesPreviewSection = ({
                     }
                     aria-label='Staffel auswählen'
                 >
+                    <option value={ALL_SEASONS}>
+                        Alle
+                    </option>
+
                     {seasons.map(season => (
                         <option
                             key={season.Id ?? season.Name}
@@ -1300,101 +1519,162 @@ const SeriesPreviewSection = ({
                     Folgen werden geladen …
                 </div>
             ) : (
-                <div className='minitigerSeriesEpisodeList'>
-                    {episodes.map((episode, index) => {
-                        const imageUrl =
-                            getLandscapeImageUrl(
-                                apiClient,
-                                episode
-                            );
+                <>
+                    <div className='minitigerSeriesEpisodeList'>
+                        {episodes.map((episode, index) => {
+                            const imageUrl =
+                                getLandscapeImageUrl(
+                                    apiClient,
+                                    episode
+                                );
 
-                        const episodeLabel =
-                            getMinitigerEpisodeCode(episode);
+                            const episodeLabel =
+                                getMinitigerEpisodeCode(episode);
 
-                        const runtime =
-                            getRuntimeLabel(
-                                episode.RunTimeTicks
-                            );
+                            const runtime =
+                                getRuntimeLabel(
+                                    episode.RunTimeTicks
+                                );
 
-                        return (
-                            <article
-                                key={
-                                    episode.Id
-                                    ?? episode.Name
-                                }
-                                className='minitigerSeriesEpisodeCard'
-                            >
-                                <Link
-                                    className='minitigerSeriesEpisodeLink'
-                                    to={getItemRoute(episode)}
-                                    onClick={onClose}
+                            const seasonNumber =
+                                getEpisodeSeasonNumber(
+                                    episode
+                                );
+
+                            const previousSeasonNumber =
+                                index > 0
+                                    ? getEpisodeSeasonNumber(
+                                        episodes[index - 1]
+                                    )
+                                    : null;
+
+                            const showSeasonHeading =
+                                allSeasonsSelected
+                                && seasonNumber != null
+                                && (
+                                    index === 0
+                                    || seasonNumber
+                                        !== previousSeasonNumber
+                                );
+
+                            return (
+                                <React.Fragment
+                                    key={
+                                        episode.Id
+                                        ?? episode.Name
+                                    }
                                 >
-                                    <div className='minitigerSeriesEpisodeNumber'>
-                                        {index + 1}.
-                                    </div>
+                                    {showSeasonHeading && (
+                                        <h4 className='minitigerSeriesSeasonHeading'>
+                                            Staffel {seasonNumber}
+                                        </h4>
+                                    )}
 
-                                    <div className='minitigerSeriesEpisodeImage'>
-                                        {imageUrl ? (
-                                            <img
-                                                src={imageUrl}
-                                                alt=''
-                                            />
-                                        ) : (
-                                            <div className='minitigerSeriesEpisodeFallback' />
-                                        )}
-
-                                        <button
-                                            type='button'
-                                            className='minitigerSeriesEpisodePlay'
-                                            onClick={event => {
-                                                event.preventDefault();
-                                                event.stopPropagation();
-                                                onPlay(episode);
-                                            }}
-                                            aria-label={
-                                                `${episode.Name ?? 'Episode'} abspielen`
-                                            }
-                                            title='Abspielen'
+                                    <article
+                                        className='minitigerSeriesEpisodeCard'
+                                    >
+                                        <Link
+                                            className='minitigerSeriesEpisodeLink'
+                                            to={getItemRoute(episode)}
+                                            onClick={onClose}
                                         >
-                                            ▶
-                                        </button>
-                                    </div>
+                                            <div className='minitigerSeriesEpisodeNumber'>
+                                                {
+                                                    episode.IndexNumber
+                                                    ?? index + 1
+                                                }.
+                                            </div>
 
-                                    <div className='minitigerSeriesEpisodeText'>
-                                        <div className='minitigerSeriesEpisodeTitleLine'>
-                                            <strong>
-                                                {episode.Name
-                                                    ?? 'Episode'}
-                                            </strong>
+                                            <div className='minitigerSeriesEpisodeImage'>
+                                                {imageUrl ? (
+                                                    <img
+                                                        src={imageUrl}
+                                                        alt=''
+                                                    />
+                                                ) : (
+                                                    <div className='minitigerSeriesEpisodeFallback' />
+                                                )}
 
-                                            {runtime && (
-                                                <span className='minitigerSeriesEpisodeRuntime'>
-                                                    {runtime}
-                                                </span>
-                                            )}
-                                        </div>
+                                                <button
+                                                    type='button'
+                                                    className='minitigerSeriesEpisodePlay'
+                                                    onClick={event => {
+                                                        event.preventDefault();
+                                                        event.stopPropagation();
+                                                        onPlay(episode);
+                                                    }}
+                                                    aria-label={
+                                                        `${episode.Name ?? 'Episode'} abspielen`
+                                                    }
+                                                    title='Abspielen'
+                                                >
+                                                    ▶
+                                                </button>
+                                            </div>
 
-                                        {episodeLabel && (
-                                            <span className='minitigerSeriesEpisodeMeta'>
-                                                {episodeLabel}
-                                            </span>
-                                        )}
+                                            <div className='minitigerSeriesEpisodeText'>
+                                                <div className='minitigerSeriesEpisodeTitleLine'>
+                                                    <strong>
+                                                        {episode.Name
+                                                            ?? 'Episode'}
+                                                    </strong>
 
-                                        <p>
-                                            {shortOverview(
-                                                episode.Overview,
-                                                220
-                                            ) || 'Keine Beschreibung hinterlegt.'}
-                                        </p>
-                                    </div>
-                                </Link>
-                            </article>
-                        );
-                    })}
-                </div>
+                                                    {runtime && (
+                                                        <span className='minitigerSeriesEpisodeRuntime'>
+                                                            {runtime}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {episodeLabel && (
+                                                    <span className='minitigerSeriesEpisodeMeta'>
+                                                        {episodeLabel}
+                                                    </span>
+                                                )}
+
+                                                <p>
+                                                    {shortOverview(
+                                                        episode.Overview,
+                                                        220
+                                                    ) || 'Keine Beschreibung hinterlegt.'}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    </article>
+                                </React.Fragment>
+                            );
+                        })}
+                    </div>
+
+                    {canLoadMore && (
+                        <div className='minitigerSeriesLoadMore'>
+                            <button
+                                type='button'
+                                disabled={episodesFetching}
+                                onClick={() =>
+                                    setVisibleEpisodeCount(
+                                        current =>
+                                            current
+                                            + EPISODE_BATCH_SIZE
+                                    )
+                                }
+                            >
+                                {episodesFetching
+                                    ? 'Wird geladen …'
+                                    : 'Mehr anzeigen'}
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </section>
     );
 };
 
 export default MinitigerPreviewLayer;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_2A_TEST_POLISH_FIX

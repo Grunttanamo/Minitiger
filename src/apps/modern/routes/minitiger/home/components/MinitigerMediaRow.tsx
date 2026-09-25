@@ -16,6 +16,9 @@ import {
 } from 'hooks/useFetchItems';
 import type { ItemDto } from 'types/base/models/item-dto';
 
+import type {
+    MinitigerCardSize
+} from '../config/homeSettings';
 import {
     getCardSubtitle,
     getCardTitle,
@@ -50,6 +53,9 @@ interface MinitigerMediaRowProps {
     onVirtualAssign?: (item: ItemDto) => void;
     emptyText?: string;
     previewContext?: string;
+    cardSize?: MinitigerCardSize;
+    cardScale?: number;
+    cardGap?: number;
     subtitleOverride?: (
         item: ItemDto
     ) => string | null | undefined;
@@ -101,6 +107,9 @@ const MinitigerMediaRow = ({
     onVirtualAssign,
     emptyText,
     previewContext,
+    cardSize = 'normal',
+    cardScale = 100,
+    cardGap = 16,
     subtitleOverride
 }: MinitigerMediaRowProps) => {
     const rowRef = useRef<HTMLDivElement>(null);
@@ -433,10 +442,72 @@ const MinitigerMediaRow = ({
         return null;
     }
 
+    const safeCardScale = Math.min(
+        160,
+        Math.max(
+            60,
+            Number.isFinite(cardScale)
+                ? cardScale
+                : 100
+        )
+    );
+    const safeCardGap = Math.min(
+        48,
+        Math.max(
+            0,
+            Number.isFinite(cardGap)
+                ? cardGap
+                : 16
+        )
+    );
+
+    const posterBase =
+        cardSize === 'compact'
+            ? 150
+            : cardSize === 'large'
+                ? 210
+                : 180;
+    const landscapeBase =
+        cardSize === 'compact'
+            ? 255
+            : cardSize === 'large'
+                ? 350
+                : 300;
+    const squareBase =
+        cardSize === 'compact'
+            ? 185
+            : cardSize === 'large'
+                ? 255
+                : 220;
+
+    const rowStyle = {
+        '--mt-home-row-card-gap':
+            `${safeCardGap}px`,
+        '--mt-home-row-card-width':
+            `${Math.round(
+                posterBase
+                * safeCardScale
+                / 100
+            )}px`,
+        '--mt-home-row-landscape-width':
+            `${Math.round(
+                landscapeBase
+                * safeCardScale
+                / 100
+            )}px`,
+        '--mt-home-row-square-width':
+            `${Math.round(
+                squareBase
+                * safeCardScale
+                / 100
+            )}px`
+    } as React.CSSProperties;
+
     return (
         <section
             className='minitigerSection minitigerMediaSection'
             data-has-scroll-controls={canScroll}
+            style={rowStyle}
         >
             <div className='minitigerSectionHeader'>
                 <h2
@@ -876,3 +947,5 @@ const MinitigerMediaRow = ({
 export default MinitigerMediaRow;
 
 // MINITIGER_PATCH_MARKER: PHASE_18_18_5B_MEDIA_SUBTITLE_OVERRIDE
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS

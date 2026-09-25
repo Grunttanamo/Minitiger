@@ -48,7 +48,17 @@ export const Component = () => {
                 <StrictMode>
                     <OffsetAppBar
                         dense
-                        forceTransparent={isCurrentLibraryPath}
+                        elevation={0}
+                        sx={{
+                            backgroundColor:
+                                'rgb(32 34 38 / var(--mt-toolbar-alpha, 1)) !important',
+                            backgroundImage: 'none !important',
+                            boxShadow: 'none !important',
+                            backdropFilter:
+                                'blur(var(--mt-toolbar-blur, 0px)) saturate(var(--mt-toolbar-saturation, 100%)) !important',
+                            WebkitBackdropFilter:
+                                'blur(var(--mt-toolbar-blur, 0px)) saturate(var(--mt-toolbar-saturation, 100%)) !important'
+                        }}
                     >
                         <AppToolbar
                             isDrawerAvailable={!isMediumScreen && isDrawerAvailable}
@@ -95,3 +105,11 @@ export const Component = () => {
 };
 
 // MINITIGER_PATCH_MARKER: PHASE_18_17_4_GLOBAL_PROFILE_SELECTION_MOUNT
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0A_TEST_APPLAYOUT_FIX
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_2A_TEST_POLISH_FIX

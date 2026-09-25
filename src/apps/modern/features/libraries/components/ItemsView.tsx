@@ -172,7 +172,10 @@ const ItemsView: FC = () => {
         content,
         itemsResult,
         viewSettings,
-        setViewSettings
+        setViewSettings,
+        isProgressiveAll,
+        hasMoreItems,
+        loadMoreItems
     } = useLibrary();
 
     const {
@@ -726,6 +729,11 @@ const ItemsView: FC = () => {
             cardOptions.overlayMoreButton = true;
         }
 
+        /* Original/native media-library cards keep Jellyfin's
+           context menu. Because it lives inside the card, it follows the
+           same Minitiger hover transform. */
+        cardOptions.overlayMoreButton = true;
+
         return cardOptions;
     }, [
         __legacyApiClient__,
@@ -944,6 +952,20 @@ const ItemsView: FC = () => {
                     {getItems()}
                 </ItemsContainer>
             )}
+
+            {isProgressiveAll && hasMoreItems && (
+                <div className='minitigerLibraryLoadMore'>
+                    <button
+                        type='button'
+                        disabled={Boolean(itemsResult?.isFetching)}
+                        onClick={() => loadMoreItems?.()}
+                    >
+                        {itemsResult?.isFetching
+                            ? 'Wird geladen …'
+                            : 'Mehr anzeigen'}
+                    </button>
+                </div>
+            )}
         </Box>
 
         {assignTarget && (
@@ -961,3 +983,5 @@ const ItemsView: FC = () => {
 };
 
 export default ItemsView;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING

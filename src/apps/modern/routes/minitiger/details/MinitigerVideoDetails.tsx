@@ -93,6 +93,21 @@ const getPersonImageUrl = (
 };
 
 const MinitigerVideoDetails = () => {
+    useEffect(() => {
+        const root = document.documentElement;
+
+        root.setAttribute(
+            'data-minitiger-main-detail-overlay',
+            'true'
+        );
+
+        return () => {
+            root.removeAttribute(
+                'data-minitiger-main-detail-overlay'
+            );
+        };
+    }, []);
+
     const [ searchParams ] = useSearchParams();
     const itemId = searchParams.get('id') ?? undefined;
 
@@ -800,7 +815,8 @@ const MinitigerVideoDetails = () => {
                                 ▶ Abspielen
                             </button>
 
-                            {remoteTrailerUrl && (
+                            {settings.trailerButtonVisible
+                                && remoteTrailerUrl && (
                                 <button
                                     type='button'
                                     onClick={() =>
@@ -1344,3 +1360,7 @@ export default MinitigerVideoDetails;
 // MINITIGER_PATCH_MARKER: PHASE_18_18_1_SERIES_SEASON_WRAP
 
 // MINITIGER_PATCH_MARKER: PHASE_18_18_1B_VALID_EMPTY_GUID
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_2C_TEST_MAIN_DETAIL_TOOLBAR_OVERLAY

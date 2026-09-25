@@ -37,6 +37,11 @@ export type HomeRowId =
     | MinitigerCustomRowId
     | VirtualHomeRowId;
 
+export interface MinitigerHomeRowStyle {
+    cardScale: number;
+    cardGap: number;
+}
+
 export const DEFAULT_HOME_ROW_ORDER: HomeRowId[] = [
     ...SYSTEM_HOME_ROW_IDS,
     ...VIRTUAL_HOME_ROW_IDS,
@@ -75,6 +80,8 @@ export interface MinitigerHomeSettings {
     toolbarBrandLogoSize: number;
     toolbarBrandTextEnabled: boolean;
     toolbarBrandText: string;
+    toolbarTransparency: number;
+    toolbarGlass: number;
     customHomeRowsEnabled: boolean;
     bannerEnabled: boolean;
     bannerHeightOffset: number;
@@ -87,6 +94,9 @@ export interface MinitigerHomeSettings {
     bannerItemLimit: BannerItemLimit;
     cardSize: MinitigerCardSize;
     rowGap: number;
+    homeRowCardScale: number;
+    homeRowCardGap: number;
+    homeRowStyles: Record<HomeRowId, MinitigerHomeRowStyle>;
     libraryCardWidth: number;
     libraryCardGap: number;
     libraryVirtualGap: number;
@@ -99,10 +109,15 @@ export interface MinitigerHomeSettings {
     playedIndicatorShape: PlayedIndicatorShape;
     trailerDebugEnabled: boolean;
     youtubeTrailersEnabled: boolean;
+    localTrailersEnabled: boolean;
+    trailerButtonVisible: boolean;
     sideRowTitlesEnabled: boolean;
     hoverEnabled: boolean;
     glowEnabled: boolean;
     previewEnabled: boolean;
+    previewSeriesEnabled: boolean;
+    previewMovieEnabled: boolean;
+    previewMangaEnabled: boolean;
     cardTextCentered: boolean;
     preferredPlayer: MinitigerPlayerPreference;
 
@@ -302,6 +317,25 @@ export const COLOR_THEME_PRESETS:
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_8_0_TEST_COLOR_TEMPLATES */
 
+const createDefaultHomeRowStyles = (
+    cardScale = 100,
+    cardGap = 16
+): Record<HomeRowId, MinitigerHomeRowStyle> => (
+    DEFAULT_HOME_ROW_ORDER.reduce(
+        (result, rowId) => {
+            result[rowId] = {
+                cardScale,
+                cardGap
+            };
+            return result;
+        },
+        {} as Record<
+            HomeRowId,
+            MinitigerHomeRowStyle
+        >
+    )
+);
+
 export const DEFAULT_HOME_SETTINGS: MinitigerHomeSettings = {
     accentColor: '#ffbf00',
     primaryHoverColor: '#ffe152',
@@ -320,6 +354,8 @@ export const DEFAULT_HOME_SETTINGS: MinitigerHomeSettings = {
     toolbarBrandLogoSize: 44,
     toolbarBrandTextEnabled: false,
     toolbarBrandText: 'Minitiger',
+    toolbarTransparency: 0,
+    toolbarGlass: 0,
     customHomeRowsEnabled: true,
     bannerEnabled: true,
     bannerHeightOffset: 0,
@@ -332,6 +368,9 @@ export const DEFAULT_HOME_SETTINGS: MinitigerHomeSettings = {
     bannerItemLimit: 10,
     cardSize: 'normal',
     rowGap: 40,
+    homeRowCardScale: 100,
+    homeRowCardGap: 16,
+    homeRowStyles: createDefaultHomeRowStyles(),
     libraryCardWidth: 280,
     libraryCardGap: 16,
     libraryVirtualGap: 64,
@@ -344,10 +383,15 @@ export const DEFAULT_HOME_SETTINGS: MinitigerHomeSettings = {
     playedIndicatorShape: 'round',
     trailerDebugEnabled: true,
     youtubeTrailersEnabled: true,
+    localTrailersEnabled: true,
+    trailerButtonVisible: true,
     sideRowTitlesEnabled: false,
     hoverEnabled: true,
     glowEnabled: true,
     previewEnabled: true,
+    previewSeriesEnabled: true,
+    previewMovieEnabled: true,
+    previewMangaEnabled: true,
     cardTextCentered: false,
     preferredPlayer: 'native',
     sectionOrder: [ ...HOME_SECTION_IDS ],
@@ -535,6 +579,60 @@ export const normalizeHomeSettings = (
         ...homeRowOrder.filter(isSystemHomeRowId)
     ];
 
+    const legacyHomeRowCardScale = clampNumber(
+        source.homeRowCardScale,
+        DEFAULT_HOME_SETTINGS.homeRowCardScale,
+        60,
+        160
+    );
+    const legacyHomeRowCardGap = clampNumber(
+        source.homeRowCardGap,
+        DEFAULT_HOME_SETTINGS.homeRowCardGap,
+        0,
+        48
+    );
+
+    const incomingHomeRowStyles = (
+        source.homeRowStyles
+        && typeof source.homeRowStyles === 'object'
+    )
+        ? source.homeRowStyles as Partial<
+            Record<
+                HomeRowId,
+                Partial<MinitigerHomeRowStyle>
+            >
+        >
+        : {};
+
+    const homeRowStyles =
+        DEFAULT_HOME_ROW_ORDER.reduce(
+            (result, rowId) => {
+                const incoming =
+                    incomingHomeRowStyles[rowId];
+
+                result[rowId] = {
+                    cardScale: clampNumber(
+                        incoming?.cardScale,
+                        legacyHomeRowCardScale,
+                        60,
+                        160
+                    ),
+                    cardGap: clampNumber(
+                        incoming?.cardGap,
+                        legacyHomeRowCardGap,
+                        0,
+                        48
+                    )
+                };
+
+                return result;
+            },
+            {} as Record<
+                HomeRowId,
+                MinitigerHomeRowStyle
+            >
+        );
+
     return {
         accentColor: normalizedAccent,
         primaryHoverColor: colorOr(
@@ -603,6 +701,18 @@ export const normalizeHomeSettings = (
             typeof source.toolbarBrandText === 'string'
                 ? source.toolbarBrandText.slice(0, 40)
                 : DEFAULT_HOME_SETTINGS.toolbarBrandText,
+        toolbarTransparency: clampNumber(
+            source.toolbarTransparency,
+            DEFAULT_HOME_SETTINGS.toolbarTransparency,
+            0,
+            100
+        ),
+        toolbarGlass: clampNumber(
+            source.toolbarGlass,
+            DEFAULT_HOME_SETTINGS.toolbarGlass,
+            0,
+            100
+        ),
         customHomeRowsEnabled: source.customHomeRowsEnabled !== false,
         bannerEnabled: source.bannerEnabled !== false,
         bannerHeightOffset: clampNumber(
@@ -648,6 +758,11 @@ export const normalizeHomeSettings = (
             12,
             90
         ),
+        homeRowCardScale:
+            legacyHomeRowCardScale,
+        homeRowCardGap:
+            legacyHomeRowCardGap,
+        homeRowStyles,
         libraryCardWidth: clampNumber(
             source.libraryCardWidth,
             DEFAULT_HOME_SETTINGS.libraryCardWidth,
@@ -688,10 +803,15 @@ export const normalizeHomeSettings = (
                 : DEFAULT_HOME_SETTINGS.playedIndicatorShape,
         trailerDebugEnabled: source.trailerDebugEnabled !== false,
         youtubeTrailersEnabled: source.youtubeTrailersEnabled !== false,
+        localTrailersEnabled: source.localTrailersEnabled !== false,
+        trailerButtonVisible: source.trailerButtonVisible !== false,
         sideRowTitlesEnabled: source.sideRowTitlesEnabled === true,
         hoverEnabled: source.hoverEnabled !== false,
         glowEnabled: source.glowEnabled !== false,
         previewEnabled: source.previewEnabled !== false,
+        previewSeriesEnabled: source.previewSeriesEnabled !== false,
+        previewMovieEnabled: source.previewMovieEnabled !== false,
+        previewMangaEnabled: source.previewMangaEnabled !== false,
         cardTextCentered:
             source.cardTextCentered === true,
         preferredPlayer:
@@ -749,3 +869,7 @@ export const getContrastTextColor = (hex: string) => {
 // MINITIGER_PATCH_MARKER: PHASE_18_18_3_CENTERED_CARD_TEXT_SETTING
 
 // MINITIGER_PATCH_MARKER: PHASE_18_23_0A_VLC_PREFERENCE_BRIDGE_CHECK
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS

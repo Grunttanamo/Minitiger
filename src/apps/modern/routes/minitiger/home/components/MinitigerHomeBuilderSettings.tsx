@@ -39,6 +39,9 @@ interface MinitigerHomeBuilderSettingsProps {
         sourceId: HomeRowId,
         targetId: HomeRowId
     ) => void;
+    onUpdateHomeSettings: (
+        patch: Partial<MinitigerHomeSettings>
+    ) => void;
     onUpdateCustomRow: (
         rowKey: string,
         patch: Partial<Omit<MinitigerCustomRow, 'key'>>
@@ -131,6 +134,7 @@ const MinitigerHomeBuilderSettings = ({
     onToggleSection,
     onMoveHomeRow,
     onReorderHomeRows,
+    onUpdateHomeSettings,
     onUpdateCustomRow,
     onToggleVirtualRow,
     onUpdateVirtualRowTitle,
@@ -153,19 +157,9 @@ const MinitigerHomeBuilderSettings = ({
     const [ dragTarget, setDragTarget ] =
         useState<HomeRowId | null>(null);
 
-    const dragProps = (rowId: HomeRowId) => ({
-        draggable: true,
-        onDragStart: (
-            event: React.DragEvent<HTMLDivElement>
-        ) => {
-            setDraggedRow(rowId);
-            setDragTarget(null);
-            event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData(
-                'text/plain',
-                rowId
-            );
-        },
+    const dragContainerProps = (
+        rowId: HomeRowId
+    ) => ({
         onDragOver: (
             event: React.DragEvent<HTMLDivElement>
         ) => {
@@ -203,12 +197,59 @@ const MinitigerHomeBuilderSettings = ({
 
             setDraggedRow(null);
             setDragTarget(null);
+        }
+    });
+
+    const dragHandleProps = (
+        rowId: HomeRowId
+    ) => ({
+        draggable: true,
+        onDragStart: (
+            event: React.DragEvent<HTMLSpanElement>
+        ) => {
+            setDraggedRow(rowId);
+            setDragTarget(null);
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData(
+                'text/plain',
+                rowId
+            );
         },
         onDragEnd: () => {
             setDraggedRow(null);
             setDragTarget(null);
         }
     });
+
+    const getRowStyle = (
+        rowId: HomeRowId
+    ) => (
+        settings.homeRowStyles[rowId]
+        ?? {
+            cardScale:
+                settings.homeRowCardScale,
+            cardGap:
+                settings.homeRowCardGap
+        }
+    );
+
+    const updateRowStyle = (
+        rowId: HomeRowId,
+        patch: Partial<{
+            cardScale: number;
+            cardGap: number;
+        }>
+    ) => {
+        onUpdateHomeSettings({
+            homeRowStyles: {
+                ...settings.homeRowStyles,
+                [rowId]: {
+                    ...getRowStyle(rowId),
+                    ...patch
+                }
+            }
+        });
+    };
 
     const getDragClass = (
         rowId: HomeRowId
@@ -292,14 +333,19 @@ const MinitigerHomeBuilderSettings = ({
                             return (
                                 <div
                                     key={rowId}
-                                    {...dragProps(rowId)}
+                                    {...dragContainerProps(rowId)}
                                     className={[
                                         'minitigerHomeBuilderRow',
                                         getDragClass(rowId)
                                     ].filter(Boolean).join(' ')}
                                 >
                                     <div className='minitigerHomeBuilderHead'>
-                                        <span className='minitigerDragHandle'>
+                                        <span
+                                            {...dragHandleProps(rowId)}
+                                            className='minitigerDragHandle'
+                                            title='Reihe verschieben'
+                                            aria-label='Reihe verschieben'
+                                        >
                                             ☰
                                         </span>
 
@@ -360,6 +406,112 @@ const MinitigerHomeBuilderSettings = ({
                                             </button>
                                         </div>
                                     </div>
+
+                                    <details className='minitigerHomeBuilderDetails'>
+                                        <summary>Reihe konfigurieren</summary>
+
+                                        <div className='minitigerHomeBuilderGrid'>
+                                            <label className='minitigerSettingsField'>
+                                                <span>Kartengröße (%)</span>
+                                                <div className='minitigerHomeBuilderSliderControl'>
+                                                    <input
+                                                        type='range'
+                                                        min='60'
+                                                        max='160'
+                                                        step='5'
+                                                        value={
+                                                            getRowStyle(
+                                                                rowId
+                                                            ).cardScale
+                                                        }
+                                                        onChange={event =>
+                                                            updateRowStyle(
+                                                                rowId,
+                                                                {
+                                                                    cardScale:
+                                                                        Number(
+                                                                            event.currentTarget.value
+                                                                        )
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                    <input
+                                                        type='number'
+                                                        min='60'
+                                                        max='160'
+                                                        step='5'
+                                                        value={
+                                                            getRowStyle(
+                                                                rowId
+                                                            ).cardScale
+                                                        }
+                                                        onChange={event =>
+                                                            updateRowStyle(
+                                                                rowId,
+                                                                {
+                                                                    cardScale:
+                                                                        Number(
+                                                                            event.currentTarget.value
+                                                                        )
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            </label>
+
+                                            <label className='minitigerSettingsField'>
+                                                <span>Abstand links/rechts (px)</span>
+                                                <div className='minitigerHomeBuilderSliderControl'>
+                                                    <input
+                                                        type='range'
+                                                        min='0'
+                                                        max='48'
+                                                        step='2'
+                                                        value={
+                                                            getRowStyle(
+                                                                rowId
+                                                            ).cardGap
+                                                        }
+                                                        onChange={event =>
+                                                            updateRowStyle(
+                                                                rowId,
+                                                                {
+                                                                    cardGap:
+                                                                        Number(
+                                                                            event.currentTarget.value
+                                                                        )
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                    <input
+                                                        type='number'
+                                                        min='0'
+                                                        max='48'
+                                                        step='2'
+                                                        value={
+                                                            getRowStyle(
+                                                                rowId
+                                                            ).cardGap
+                                                        }
+                                                        onChange={event =>
+                                                            updateRowStyle(
+                                                                rowId,
+                                                                {
+                                                                    cardGap:
+                                                                        Number(
+                                                                            event.currentTarget.value
+                                                                        )
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </details>
                                 </div>
                             );
                         }
@@ -371,7 +523,7 @@ const MinitigerHomeBuilderSettings = ({
                             return (
                                 <div
                                     key={rowId}
-                                    {...dragProps(rowId)}
+                                    {...dragContainerProps(rowId)}
                                     className={[
                                         'minitigerHomeBuilderRow',
                                         'isVirtual',
@@ -379,7 +531,12 @@ const MinitigerHomeBuilderSettings = ({
                                     ].filter(Boolean).join(' ')}
                                 >
                                     <div className='minitigerHomeBuilderHead'>
-                                        <span className='minitigerDragHandle'>
+                                        <span
+                                            {...dragHandleProps(rowId)}
+                                            className='minitigerDragHandle'
+                                            title='Reihe verschieben'
+                                            aria-label='Reihe verschieben'
+                                        >
                                             ☰
                                         </span>
 
@@ -506,7 +663,7 @@ const MinitigerHomeBuilderSettings = ({
                             return (
                                 <div
                                     key={rowId}
-                                    {...dragProps(rowId)}
+                                    {...dragContainerProps(rowId)}
                                     className={[
                                         'minitigerHomeBuilderRow',
                                         'isCustom',
@@ -514,7 +671,12 @@ const MinitigerHomeBuilderSettings = ({
                                     ].filter(Boolean).join(' ')}
                                 >
                                     <div className='minitigerHomeBuilderHead'>
-                                        <span className='minitigerDragHandle'>
+                                        <span
+                                            {...dragHandleProps(rowId)}
+                                            className='minitigerDragHandle'
+                                            title='Reihe verschieben'
+                                            aria-label='Reihe verschieben'
+                                        >
                                             ☰
                                         </span>
 
@@ -724,6 +886,106 @@ const MinitigerHomeBuilderSettings = ({
                                                         )
                                                     }
                                                 />
+                                            </label>
+
+                                            <label className='minitigerSettingsField'>
+                                                <span>Kartengröße (%)</span>
+                                                <div className='minitigerHomeBuilderSliderControl'>
+                                                    <input
+                                                        type='range'
+                                                        min='60'
+                                                        max='160'
+                                                        step='5'
+                                                        value={
+                                                            getRowStyle(
+                                                                rowId
+                                                            ).cardScale
+                                                        }
+                                                        onChange={event =>
+                                                            updateRowStyle(
+                                                                rowId,
+                                                                {
+                                                                    cardScale:
+                                                                        Number(
+                                                                            event.currentTarget.value
+                                                                        )
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                    <input
+                                                        type='number'
+                                                        min='60'
+                                                        max='160'
+                                                        step='5'
+                                                        value={
+                                                            getRowStyle(
+                                                                rowId
+                                                            ).cardScale
+                                                        }
+                                                        onChange={event =>
+                                                            updateRowStyle(
+                                                                rowId,
+                                                                {
+                                                                    cardScale:
+                                                                        Number(
+                                                                            event.currentTarget.value
+                                                                        )
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
+                                            </label>
+
+                                            <label className='minitigerSettingsField'>
+                                                <span>Abstand links/rechts (px)</span>
+                                                <div className='minitigerHomeBuilderSliderControl'>
+                                                    <input
+                                                        type='range'
+                                                        min='0'
+                                                        max='48'
+                                                        step='2'
+                                                        value={
+                                                            getRowStyle(
+                                                                rowId
+                                                            ).cardGap
+                                                        }
+                                                        onChange={event =>
+                                                            updateRowStyle(
+                                                                rowId,
+                                                                {
+                                                                    cardGap:
+                                                                        Number(
+                                                                            event.currentTarget.value
+                                                                        )
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                    <input
+                                                        type='number'
+                                                        min='0'
+                                                        max='48'
+                                                        step='2'
+                                                        value={
+                                                            getRowStyle(
+                                                                rowId
+                                                            ).cardGap
+                                                        }
+                                                        onChange={event =>
+                                                            updateRowStyle(
+                                                                rowId,
+                                                                {
+                                                                    cardGap:
+                                                                        Number(
+                                                                            event.currentTarget.value
+                                                                        )
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                </div>
                                             </label>
                                         </div>
                                     </details>
@@ -1014,3 +1276,7 @@ const MinitigerHomeBuilderSettings = ({
 export default MinitigerHomeBuilderSettings;
 
 // MINITIGER_PATCH_MARKER: PHASE_18_18_0_LATEST_SEASONS_BUILDER
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_1_TEST_POLISH_ROW_CONFIGS
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_2A_TEST_POLISH_FIX

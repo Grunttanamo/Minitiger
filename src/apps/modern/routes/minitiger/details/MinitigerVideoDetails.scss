@@ -3,6 +3,20 @@
 
     position: relative;
     min-height: 100vh;
+
+    /*
+     * Jellyfin .mainAnimatedPage normally uses:
+     * contain: layout style size;
+     *
+     * 'layout' turns this page into the containing block for fixed
+     * descendants. Minitiger's fixed backdrop then starts below the
+     * OffsetAppBar spacer instead of at the viewport top.
+     *
+     * Keep size/style containment, but release layout containment so
+     * backdrop + shade can extend behind the transparent/glass toolbar.
+     */
+    contain: size style !important;
+
     overflow-x: hidden;
     background: #08090b;
 }
@@ -2625,3 +2639,42 @@ a.minitigerDetailsParentTitle:focus-visible {
 }
 
 /* MINITIGER_PATCH_MARKER: PHASE_18_18_1_SEASON_WRAP_STYLE */
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_24_2B_TEST_DETAIL_BACKDROP_UNDER_TOOLBAR */
+
+
+/* =========================================================
+   PHASE 18.24.2c TEST - MAIN DETAIL BACKDROP UNDER APPBAR
+   ========================================================= */
+
+/*
+ * OffsetAppBar renders a 48px layout spacer below the fixed AppBar.
+ * That spacer intentionally keeps normal pages below the toolbar, but it also
+ * means the Minitiger backdrop on main Series/Manga pages starts 48px too low.
+ *
+ * Only those two main-detail page families set the root attribute below.
+ * Remove the spacer there, then give the content surface the same 48px back as
+ * padding. Visual content stays where it was; only backdrop/shade extend behind
+ * the transparent/glass AppBar.
+ */
+:root[data-minitiger-main-detail-overlay='true']
+.MuiAppBar-root + div[aria-hidden='true'] {
+    height: 0 !important;
+    min-height: 0 !important;
+}
+
+:root[data-minitiger-main-detail-overlay='true']
+.minitigerVideoDetailsPage
+.minitigerDetailsSurface {
+    padding-top: calc(3.2rem + 48px);
+}
+
+@media (max-width: 900px) {
+    :root[data-minitiger-main-detail-overlay='true']
+    .minitigerVideoDetailsPage
+    .minitigerDetailsSurface {
+        padding-top: calc(2rem + 48px);
+    }
+}
+
+/* MINITIGER_PATCH_MARKER: PHASE_18_24_2C_TEST_MAIN_DETAIL_TOOLBAR_OVERLAY */

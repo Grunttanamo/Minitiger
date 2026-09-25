@@ -293,6 +293,21 @@ const MangaVolumeCards = ({
 export const MinitigerMangaSeriesDetails = ({
     itemId
 }: Props) => {
+    useEffect(() => {
+        const root = document.documentElement;
+
+        root.setAttribute(
+            'data-minitiger-main-detail-overlay',
+            'true'
+        );
+
+        return () => {
+            root.removeAttribute(
+                'data-minitiger-main-detail-overlay'
+            );
+        };
+    }, []);
+
     const {
         user,
         __legacyApiClient__: apiClient
@@ -1120,3 +1135,5 @@ export const MinitigerMangaVolumeDetails = ({
         </MangaShell>
     );
 };
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_2C_TEST_MAIN_DETAIL_TOOLBAR_OVERLAY

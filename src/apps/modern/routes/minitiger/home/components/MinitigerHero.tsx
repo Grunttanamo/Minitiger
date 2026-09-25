@@ -47,6 +47,8 @@ interface MinitigerHeroProps {
     maxItems?: number;
     debugEnabled?: boolean;
     youtubeTrailersEnabled?: boolean;
+    localTrailersEnabled?: boolean;
+    trailerButtonVisible?: boolean;
     showNavigation?: boolean;
     showFsk?: boolean;
 }
@@ -56,6 +58,8 @@ const MinitigerHero = ({
     maxItems = 10,
     debugEnabled = true,
     youtubeTrailersEnabled = true,
+    localTrailersEnabled = true,
+    trailerButtonVisible = true,
     showNavigation = true,
     showFsk = true
 }: MinitigerHeroProps) => {
@@ -299,10 +303,12 @@ const MinitigerHero = ({
 
         try {
             const trailers =
-                await resolveMinitigerLocalTrailers(
-                    apiClient,
-                    heroItem
-                );
+                localTrailersEnabled
+                    ? await resolveMinitigerLocalTrailers(
+                        apiClient,
+                        heroItem
+                    )
+                    : [];
 
             if (trailers.length > 0) {
                 await playbackManager.play({
@@ -331,7 +337,12 @@ const MinitigerHero = ({
                 error
             );
         }
-    }, [ apiClient, heroItem, youtubeTrailersEnabled ]);
+    }, [
+        apiClient,
+        heroItem,
+        localTrailersEnabled,
+        youtubeTrailersEnabled
+    ]);
 
     if (bannerPending && !candidates.length) {
         return (
@@ -374,12 +385,18 @@ const MinitigerHero = ({
     );
 
     const hasTrailer = (
-        (heroItem.LocalTrailerCount ?? 0) > 0
-        || (
-            youtubeTrailersEnabled
-            && Boolean(
-                heroItem.RemoteTrailers
-                    ?.some(trailer => Boolean(trailer.Url))
+        trailerButtonVisible
+        && (
+            (
+                localTrailersEnabled
+                && (heroItem.LocalTrailerCount ?? 0) > 0
+            )
+            || (
+                youtubeTrailersEnabled
+                && Boolean(
+                    heroItem.RemoteTrailers
+                        ?.some(trailer => Boolean(trailer.Url))
+                )
             )
         )
     );
@@ -406,6 +423,7 @@ const MinitigerHero = ({
                     delayMs={900}
                     onLoadingChange={setTrailerLoading}
                     allowYouTube={youtubeTrailersEnabled}
+                    allowLocal={localTrailersEnabled}
                 />
                 </div>
 
@@ -574,3 +592,5 @@ const MinitigerHero = ({
 };
 
 export default MinitigerHero;
+
+// MINITIGER_PATCH_MARKER: PHASE_18_24_0_TEST_UI_PREVIEW_PAGING
