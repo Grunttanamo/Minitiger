@@ -40,3 +40,43 @@ jobs:
 
       - name: Build plugin
         run: dotnet build tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj --configuration Release --no-restore
+
+      - name: Package TEST plugin artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROJECT='tools/MinitigerVirtualSync/Jellyfin.Plugin.MinitigerVirtualSync.csproj'
+          BASE_VERSION="$(dotnet msbuild "$PROJECT" -getProperty:Version | tail -n 1 | tr -d '\r')"
+          if [[ "$BASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            VERSION="$BASE_VERSION.0"
+          else
+            VERSION="$BASE_VERSION"
+          fi
+
+          OUT="$RUNNER_TEMP/minitiger-plugin-test"
+          PKG="$RUNNER_TEMP/minitiger-plugin-package"
+          ZIP="$RUNNER_TEMP/Minitiger.VirtualSync_${VERSION}_TEST.zip"
+          rm -rf "$OUT" "$PKG" "$ZIP"
+
+          dotnet publish "$PROJECT" \
+            --configuration Release \
+            --no-restore \
+            --output "$OUT" \
+            -p:Version="$VERSION" \
+            -p:AssemblyVersion="$VERSION" \
+            -p:FileVersion="$VERSION"
+
+          mkdir -p "$PKG"
+          cp "$OUT/Jellyfin.Plugin.MinitigerVirtualSync.dll" "$PKG/"
+          (cd "$PKG" && zip -9 "$ZIP" Jellyfin.Plugin.MinitigerVirtualSync.dll)
+
+          echo "TEST_PLUGIN_VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "TEST_PLUGIN_ZIP=$ZIP" >> "$GITHUB_ENV"
+
+      - name: Upload TEST plugin artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Minitiger-Virtual-Sync-${{ env.TEST_PLUGIN_VERSION }}-TEST
+          path: ${{ env.TEST_PLUGIN_ZIP }}
+          if-no-files-found: error
+          retention-days: 14
