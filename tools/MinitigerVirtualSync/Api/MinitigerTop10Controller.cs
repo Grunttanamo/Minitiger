@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using Jellyfin.Database.Implementations.Enums;
+using Jellyfin.Data.Enums;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
